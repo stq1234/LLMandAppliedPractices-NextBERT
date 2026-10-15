@@ -1,0 +1,222 @@
+{
+  "status": "proposed_not_run",
+  "purpose": "Pre-register comparable pilot ablations for continuing a bilingual 8K encoder; this file is a plan, not a training record.",
+  "checkpoint": {
+    "model_id": "jhu-clsp/mmBERT-base",
+    "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
+    "base_config": "configs/mmbert_adaptation.json"
+  },
+  "data_freeze": {
+    "pretraining_source": {
+      "status": "proposed_candidate_not_downloaded",
+      "source": "Hugging Face dataset repository wikimedia/wikipedia, pinned to the verified immutable dataset revision.",
+      "repository_id": "wikimedia/wikipedia",
+      "repository_uri": "https://huggingface.co/datasets/wikimedia/wikipedia",
+      "revision": "b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
+      "revision_uri": "https://huggingface.co/datasets/wikimedia/wikipedia/tree/b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
+      "dataset_card_uri": "https://huggingface.co/datasets/wikimedia/wikipedia",
+      "dataset_card_licenses": ["cc-by-sa-3.0", "gfdl"],
+      "config_metadata": {
+        "zh": {
+          "config_name": "20231101.zh",
+          "file_count_at_pinned_revision": 6
+        },
+        "en": {
+          "config_name": "20231101.en",
+          "file_count_at_pinned_revision": 41
+        }
+      },
+      "metadata_verification_scope": "Repository revision, zh/en config names, file counts, and dataset-card license metadata were checked via the repository/API only. Dataset files were not downloaded and row schemas were not inspected.",
+      "availability_rule": "Before any data collection, verify the pinned repository revision, both exact config names, and applicable dataset-card license/attribution terms. If a config is absent or terms are unsuitable, stop and version a replacement plan; do not silently change revision or config.",
+      "required_freeze_fields": [
+        "dataset_repository_id_and_uri",
+        "immutable_repository_revision",
+        "config_name",
+        "config_file_count",
+        "artifact_filename_and_download_uri",
+        "artifact_sha256_after_acquisition",
+        "license_and_attribution_record",
+        "license_source_uri",
+        "source_card_sha256",
+        "downloaded_utc_after_acquisition",
+        "dataset_loader_and_parser_version",
+        "normalization_version",
+        "deduplication_version",
+        "tokenizer_id_revision_and_asset_sha256",
+        "document_raw_and_normalized_sha256",
+        "document_split_and_dedup_group"
+      ],
+      "normalization": "After inspecting the pinned row schema, map only article text and title fields; version and record the loader, field mapping, and normalization code. No row schema has been inspected yet.",
+      "deduplication": {
+        "exact": "SHA-256 of normalized full text, within language.",
+        "near_duplicate": "Version-pinned same-language MinHash over normalized 5-grams; Jaccard threshold 0.90; retain the lexicographically smallest document ID per group."
+      },
+      "split": {
+        "algorithm": "integer(SHA-256(language_code || stable_upstream_record_id)) mod 100; if no stable ID is exposed, use the normalized document SHA-256 as the ID and record that fallback.",
+        "train_remainders": "0-97",
+        "validation_remainder": "98",
+        "quarantined_test_remainder": "99"
+      },
+      "evaluation_contamination_audit": "Before sampling, exclude mapped benchmark page IDs and exact normalized benchmark query/context strings; report unresolved title or near-duplicate overlap without using benchmark test content for training or selection.",
+      "tokenizer": {
+        "model_id": "jhu-clsp/mmBERT-base",
+        "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
+        "counting_rule": "Count non-padding content tokens; exclude padding, BOS/EOS/SEP, MASK, and other tokenizer-defined special tokens."
+      },
+      "exposure_budget": {
+        "pilot_training_unique_source_content_tokens_total": 100000000,
+        "zh_unique_source_content_tokens": 50000000,
+        "en_unique_source_content_tokens": 50000000,
+        "maximum_sequence_length": 8192,
+        "cross_document_packing": false,
+        "sampling_seed": 0,
+        "sampling": "Select separately within each language from the train partition ordered by SHA-256(language_code || document_id || sampling_seed); stop at the exact content-token target and record any final-document truncation."
+      }
+    },
+    "evaluation_sources": [
+      {
+        "tasks": "classification",
+        "datasets": ["XNLI"],
+        "languages": ["zh", "en"],
+        "split_rule": "Official train for fine-tuning, validation/dev for selection, test for final evaluation only."
+      },
+      {
+        "tasks": "extraction_and_entity_spans",
+        "datasets": ["MLQA", "XQuAD", "WikiANN"],
+        "languages": ["zh", "en"],
+        "split_rule": "Use only official train/validation/test splits where provided; freeze the task configuration and exact asset revision."
+      },
+      {
+        "tasks": "retrieval_and_reranking",
+        "datasets": ["MTEB v2 bilingual retrieval/reranking tasks"],
+        "languages": ["zh", "en"],
+        "split_rule": "Freeze task IDs and official corpus/query qrels revisions; never use test queries or qrels for training, hard-negative mining, or checkpoint selection."
+      }
+    ],
+    "manifest_schema": "data/manifest.schema.json",
+    "manifest_populated": false
+  },
+  "shared_training": {
+    "seeds": [17, 29, 43],
+    "optimizer_and_schedule": "Choose once on the common baseline, record exact values and software versions before ablations, then hold fixed; no per-arm hyperparameter tuning.",
+    "kernel_dtype_batch": "Record and hold constant within each comparison; compare architectures with the same attention implementation.",
+    "stage_1": {
+      "content_tokens": 80000000,
+      "token_unit": "unique_source_content_tokens",
+      "zh_content_tokens": 40000000,
+      "en_content_tokens": 40000000,
+      "objective": "dynamic token MLM",
+      "shared_by": "all arms in objective and retrieval comparisons"
+    },
+    "stage_2_span_objective": {
+      "content_tokens": 20000000,
+      "token_unit": "unique_source_content_tokens",
+      "zh_content_tokens": 10000000,
+      "en_content_tokens": 10000000,
+      "control": "dynamic token MLM",
+      "treatment": "contiguous-span MLM at the same 30% target-token rate",
+      "span_boundary_prediction_head": false,
+      "report_views": ["equal token exposure", "equal measured training FLOPs"]
+    },
+    "stage_2_retrieval_objective": {
+      "shared_stage_1": "The same 80M-token MLM prefix and resulting checkpoint in both arms.",
+      "unique_source_content_tokens": 20000000,
+      "control": "Continue MLM; average the losses from two independently corrupted views of each sentence.",
+      "treatment": "SimCSE-style contrastive loss from two independent dropout views of the same sentence; negatives come only from other training sentences in the current batch.",
+      "dropout_probability_in_both_final_stage_arms": 0.1,
+      "compute_budget": "Each final stage receives exactly the measured FLOPs of the two-view MLM control on the same 20M unique source content tokens; stop at that budget and record actual token exposure.",
+      "extra_training_after_control": false,
+      "primary_comparison": "equal measured training FLOPs"
+    },
+    "compute_accounting": {
+      "equal_token_view": "Every arm consumes the stated content-token target; separately report cumulative train FLOPs and wall time.",
+      "equal_flops_view": "Profile the baseline with a fixed counting method and hardware/software stack; set the cumulative FLOPs cap before running variants; stop every arm at that same cap and report actual token exposure.",
+      "never_combine_views": true
+    }
+  },
+  "ablations": [
+    {
+      "id": "attention_global_schedule",
+      "purpose": "Long-context quality and compute cost",
+      "primary_quality_metric": "Equal-weight mean of zh/en span F1 across held-out 8K evidence conditions and evidence positions.",
+      "baseline": {"global_attention_every_n_layers": 3},
+      "variants": [
+        {"global_attention_every_n_layers": 6},
+        {"global_attention_every_n_layers": 1}
+      ],
+      "fixed_local_attention_window": 128,
+      "fixed_parameters_per_layer": true,
+      "objective": "dynamic token MLM",
+      "budget_content_tokens_per_arm": 100000000,
+      "comparison_views": ["equal token exposure", "equal measured training FLOPs"]
+    },
+    {
+      "id": "token_vs_span_objective",
+      "purpose": "Extraction boundary quality and task retention",
+      "control": "Dynamic token MLM in the final 20M-token stage.",
+      "treatment": "Contiguous-span MLM in the final 20M-token stage.",
+      "primary_quality_metric": "Equal-weight mean of zh/en span F1 on official extraction test splits.",
+      "shared_stage_content_tokens": 80000000,
+      "branch_content_tokens": 20000000,
+      "comparison_views": ["equal token exposure", "equal measured training FLOPs"]
+    },
+    {
+      "id": "mlm_vs_simcse_final_stage",
+      "purpose": "Bilingual bi-encoder retrieval quality under a fixed training-compute budget",
+      "control": "Two-view MLM in the final stage.",
+      "treatment": "SimCSE contrastive loss in the final stage.",
+      "primary_quality_metric": "Equal-weight mean of zh/en nDCG@10 on frozen retrieval test tasks.",
+      "shared_stage_content_tokens": 80000000,
+      "branch_compute_budget": "FLOPs of the reference 20M-token MLM stage",
+      "comparison_views": ["equal measured training FLOPs"],
+      "no_post_control_adaptation": true
+    }
+  ],
+  "evaluation_protocol": {
+    "baseline": "Original pinned mmBERT-base checkpoint with the same task heads and downstream fine-tuning recipe.",
+    "ablation_effect_reference": "Each treatment is compared with its matched control at the same token exposure or FLOPs budget as defined for that ablation.",
+    "retention_reference": "The original pinned mmBERT-base checkpoint, evaluated with the same task heads, fine-tuning data, recipe, and seeds.",
+    "long_evidence": {
+      "sequence_lengths": [1024, 4096, 8192],
+      "evidence_positions": ["first", "middle", "last"],
+      "similar_distractor_paragraphs_per_example": 4,
+      "interventions": ["intact", "support_sentence_deleted", "support_answer_span_replaced_by_same_type_same_token_length_counterfactual", "similar_distractor_paragraphs_added"],
+      "baselines": [
+        {"name": "first_512_truncation", "tokens": 512},
+        {"name": "sliding_512", "window": 512, "stride": 384, "aggregation": "maximum answer or relevance score across chunks"}
+      ]
+    },
+    "metrics": {
+      "classification": ["accuracy", "macro-F1"],
+      "extraction": ["exact match", "span F1", "NER micro-F1"],
+      "retrieval": ["nDCG@10", "Recall@10"],
+      "reranking": ["MRR@10", "nDCG@10"],
+      "cost": ["8K p50/p95 latency", "peak GPU memory", "training FLOPs", "training wall time", "index build time", "vector storage"]
+    },
+    "uncertainty": "Use 10,000 paired bootstrap resamples of frozen test examples, stratified by task and language; also report each of the three seed scores and their standard deviation. The bootstrap interval describes paired test-sample uncertainty; three seeds do not establish broad training-run uncertainty.",
+    "quality_path": {
+      "primary_metric_rule": "Pre-register one primary metric per ablation; express metrics on a 0-100 point scale, average equally over Chinese and English, and macro-average the prespecified test strata for long-evidence evaluation.",
+      "target_gain_reference": "Matched control for the same ablation.",
+      "target_macro_score_minimum_gain_percentage_points": 1.0,
+      "paired_95_percent_interval_lower_bound_minimum": 0.0,
+      "maximum_non_target_task_retention_drop_percentage_points": 0.5,
+      "retention_drop_reference": "Original pinned mmBERT-base checkpoint.",
+      "each_language_must_pass": true
+    },
+    "structural_cost_path": {
+      "quality_reference": "Every-third-layer-global attention baseline under the same training view.",
+      "quality_noninferiority_margin_percentage_points": 0.5,
+      "paired_95_percent_interval_lower_bound_must_exceed_negative_margin": true,
+      "minimum_improvement_in_latency_or_peak_memory_percent": 10,
+      "maximum_allowed_regression_in_other_cost_metric_percent": 5,
+      "separate_quality_gain_required": false
+    },
+    "mlm_loss_only_is_acceptance_evidence": false
+  },
+  "execution_status": {
+    "training_started": false,
+    "dataset_downloaded": false,
+    "semantic_benchmark_run": false,
+    "note": "The local package contains CPU plumbing checks only; this proposed protocol requires a separate approved compute and dataset run."
+  }
+}

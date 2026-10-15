@@ -1,0 +1,49 @@
+{
+  "status": "selected_pretrained_adaptation_route",
+  "model_id": "jhu-clsp/mmBERT-base",
+  "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
+  "architecture_class": "ModernBertForMaskedLM",
+  "parameter_count_from_config_module": 307786240,
+  "vocabulary": {
+    "tokenizer": "google/gemma-2-9b tokenizer assets distributed with the mmBERT checkpoint",
+    "size": 256000,
+    "input_output_embeddings_tied": true,
+    "special_token_ids": {
+      "pad": 0,
+      "bos": 2,
+      "eos": 1,
+      "cls": 1,
+      "sep": 1,
+      "unk": 3,
+      "mask": 4,
+      "additional_special_tokens": {
+        "<start_of_turn>": 106,
+        "<end_of_turn>": 107
+      },
+      "all_special_token_ids": [0, 1, 2, 3, 4, 106, 107]
+    }
+  },
+  "encoder": {
+    "layers": 22,
+    "hidden_size": 768,
+    "attention_heads": 12,
+    "intermediate_size_per_geglu_branch": 1152,
+    "max_position_embeddings": 8192,
+    "local_attention_window_config": 128,
+    "global_attention_every_n_layers": 3,
+    "global_rope_theta": 160000,
+    "local_rope_theta": 160000,
+    "normalization": "pre-norm LayerNorm",
+    "gated_feed_forward": "GeGLU",
+    "linear_bias": false,
+    "normalization_bias": false
+  },
+  "checkpoint_downloaded_for_this_package": false,
+  "configuration_evidence": "https://huggingface.co/jhu-clsp/mmBERT-base/blob/8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c/config.json",
+  "tokenizer_metadata_evidence": {
+    "tokenizer_config": "https://huggingface.co/jhu-clsp/mmBERT-base/resolve/8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c/tokenizer_config.json",
+    "tokenizer_json": "https://huggingface.co/jhu-clsp/mmBERT-base/resolve/8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c/tokenizer.json",
+    "verified_special_token_ids": [0, 1, 2, 3, 4, 106, 107],
+    "verification_scope": "Metadata only: tokenizer_config.json declares pad/eos/bos/unk/mask and additional turn markers; tokenizer.json confirms the corresponding IDs, including <mask> at 4. No model weights or corpus were downloaded."
+  }
+}

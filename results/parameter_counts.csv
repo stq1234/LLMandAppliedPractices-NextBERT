@@ -1,0 +1,9 @@
+model,component,parameters,evidence_basis
+"mmBERT-base pinned config","token embedding",196608000,"meta instantiation of official Transformers module; tied embedding counted once"
+"mmBERT-base pinned config","transformer blocks",110330112,"meta instantiation of official Transformers module"
+"mmBERT-base pinned config","embedding norms and MLM head",848128,"meta instantiation of official Transformers module"
+"mmBERT-base pinned config","total unique trainable parameters",307786240,"meta instantiation of official Transformers module; tied embedding counted once"
+"48K scratch alternative","token embedding",49152000,"formula estimate; untrained design"
+"48K scratch alternative","transformer blocks",249561088,"formula estimate; untrained design"
+"48K scratch alternative","MLM head and norms",1156992,"formula estimate; untrained design"
+"48K scratch alternative","total estimated parameters",299870080,"formula estimate; untrained design"

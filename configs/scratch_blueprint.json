@@ -1,0 +1,22 @@
+{
+  "status": "untrained_alternative_blueprint",
+  "layers": 28,
+  "hidden_size": 1024,
+  "attention_heads": 16,
+  "geglu_branch_size": 1536,
+  "vocabulary_size": 48000,
+  "max_position_embeddings": 8192,
+  "tied_embeddings": true,
+  "linear_and_norm_biases": false,
+  "attention_schedule": "local window 128; global attention every third layer",
+  "parameter_formula": {
+    "attention_per_layer": "4 * hidden_size^2",
+    "geglu_per_layer": "3 * hidden_size * branch_size",
+    "transformer_blocks": 249561088,
+    "token_embeddings": 49152000,
+    "mlm_head_and_norms": 1156992,
+    "estimated_total": 299870080
+  },
+  "tokenizer_quality_verified": false,
+  "pretraining_performed": false
+}

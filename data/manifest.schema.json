@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NextBERT frozen bilingual corpus manifest",
+  "description": "Schema only. The proposed source metadata is pinned to wikimedia/wikipedia revision b04c8d1ceb2f5cd4588862100d08de323dccfbaa and configs 20231101.zh / 20231101.en. Source files have not been downloaded or inspected; populate only after recording artifact hashes, applicable dataset-card license and attribution terms, and document hashes. No corpus is included in this package.",
+  "type": "object",
+  "required": ["manifest_version", "created_utc", "parser_version", "normalization_version", "deduplication_version", "split_policy", "tokenizer", "sources", "documents"],
+  "properties": {
+    "manifest_version": {"const": 1},
+    "created_utc": {"type": "string", "format": "date-time"},
+    "parser_version": {"type": "string", "minLength": 1},
+    "normalization_version": {"type": "string", "minLength": 1},
+    "deduplication_version": {"type": "string", "minLength": 1},
+    "split_policy": {"type": "string", "minLength": 1},
+    "tokenizer": {
+      "type": "object",
+      "required": ["model_id", "revision", "asset_sha256"],
+      "properties": {
+        "model_id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "asset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "dataset_id", "dataset_uri", "immutable_revision", "config_name", "config_file_count", "artifact_filename", "artifact_uri", "artifact_sha256", "downloaded_utc", "license", "license_source_uri", "attribution_record_uri", "language_filter", "source_card_sha256"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "dataset_id": {"type": "string", "minLength": 1},
+          "dataset_uri": {"type": "string", "format": "uri"},
+          "immutable_revision": {"type": "string", "minLength": 1, "description": "Immutable source commit/revision; pair with the config name and artifact_sha256."},
+          "config_name": {"type": "string", "minLength": 1, "description": "Exact source dataset configuration, such as 20231101.zh or 20231101.en."},
+          "config_file_count": {"type": "integer", "minimum": 1, "description": "Number of files listed for this config at the pinned source revision."},
+          "artifact_filename": {"type": "string", "minLength": 1},
+          "artifact_uri": {"type": "string", "format": "uri"},
+          "artifact_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "downloaded_utc": {"type": "string", "format": "date-time"},
+          "license": {"type": "string", "minLength": 1},
+          "license_source_uri": {"type": "string", "format": "uri"},
+          "attribution_record_uri": {"type": "string", "format": "uri"},
+          "language_filter": {"enum": ["zh", "en"]},
+          "subset": {"type": ["string", "null"]},
+          "source_card_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the dataset card captured at the pinned revision."}
+        },
+        "additionalProperties": false
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["document_id", "source_id", "language", "split", "raw_sha256", "normalized_sha256", "byte_count", "content_token_count"],
+        "properties": {
+          "document_id": {"type": "string", "minLength": 1},
+          "source_id": {"type": "string", "minLength": 1},
+          "language": {"enum": ["zh", "en"]},
+          "split": {"enum": ["train", "validation", "test"]},
+          "raw_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "normalized_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "byte_count": {"type": "integer", "minimum": 1},
+          "content_token_count": {"type": "integer", "minimum": 1},
+          "near_duplicate_group": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

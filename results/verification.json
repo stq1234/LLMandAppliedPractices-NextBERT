@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "generated_at_local": "2026-10-15 13:54:11 中国标准时间",
+  "environment": {
+    "python": "3.12.7",
+    "torch": "2.12.0+cu126",
+    "transformers": "4.51.3",
+    "device_used": "cpu only",
+    "torch_threads": 2,
+    "torch_interop_threads": 2,
+    "cuda_api_called": false
+  },
+  "selected_pretrained_route": {
+    "checkpoint": "jhu-clsp/mmBERT-base",
+    "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
+    "instantiated_from_config_without_weights": true,
+    "total_parameters": 307786240,
+    "token_embedding_parameters": 196608000,
+    "transformer_block_parameters": 110330112,
+    "embedding_norm_and_mlm_head_parameters": 848128,
+    "input_output_embeddings_tied": true,
+    "max_position_embeddings": 8192,
+    "config": {
+      "vocab_size": 256000,
+      "hidden_size": 768,
+      "num_hidden_layers": 22,
+      "intermediate_size": 1152,
+      "num_attention_heads": 12,
+      "max_position_embeddings": 8192,
+      "local_attention": 128,
+      "global_attn_every_n_layers": 3,
+      "global_rope_theta": 160000,
+      "local_rope_theta": 160000,
+      "tie_word_embeddings": true,
+      "attention_bias": false,
+      "mlp_bias": false,
+      "norm_bias": false,
+      "pad_token_id": 0,
+      "unk_token_id": 3,
+      "bos_token_id": 2,
+      "eos_token_id": 1,
+      "cls_token_id": 1,
+      "sep_token_id": 1,
+      "mask_token_id": 4,
+      "embedding_dropout": 0.0,
+      "mlp_dropout": 0.0,
+      "attention_dropout": 0.0
+    },
+    "attention_layout": {
+      "global_layer_indices_zero_based": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21
+      ],
+      "local_layer_indices_zero_based": [
+        1,
+        2,
+        4,
+        5,
+        7,
+        8,
+        10,
+        11,
+        13,
+        14,
+        16,
+        17,
+        19,
+        20
+      ],
+      "global_layer_count": 8,
+      "local_layer_count": 14,
+      "local_window_config_tokens": 128,
+      "local_layer_symmetric_radius": 64,
+      "global_every_n_layers": 3
+    }
+  },
+  "scratch_alternative": {
+    "status": "untrained_alternative_blueprint",
+    "layers": 28,
+    "hidden_size": 1024,
+    "attention_heads": 16,
+    "geglu_branch_size": 1536,
+    "vocabulary_size": 48000,
+    "max_position_embeddings": 8192,
+    "attention_parameters_per_layer": 4194304,
+    "geglu_parameters_per_layer": 4718592,
+    "transformer_block_parameters": 249561088,
+    "tied_token_embedding_parameters": 49152000,
+    "mlm_head_and_norm_parameters": 1156992,
+    "estimated_total_parameters": 299870080,
+    "tied_embeddings": true,
+    "biases": false
+  },
+  "functional_verification": {
+    "model": {
+      "class": "transformers.ModernBertForMaskedLM",
+      "parameters": 177280,
+      "synthetic_vocab_size": 512,
+      "layers": 4,
+      "hidden_size": 64,
+      "attention_heads": 4,
+      "dropout_for_contrastive_views": 0.1,
+      "device": "cpu"
+    },
+    "data": {
+      "source": "synthetic random token IDs; no language corpus was loaded",
+      "batch_shape": [
+        3,
+        18
+      ],
+      "padding_and_document_boundary_present": true,
+      "mask_rate": 0.3,
+      "selected_token_counts": [
+        4,
+        4,
+        4
+      ],
+      "selected_span_counts": [
+        4,
+        4,
+        4
+      ],
+      "special_token_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        106,
+        107
+      ],
+      "special_ids_injected_at_attended_probe_positions": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "106": 1,
+        "107": 1
+      },
+      "special_ids_selected_for_token_mlm": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "106": 0,
+        "107": 0
+      },
+      "special_ids_selected_for_span_mlm": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "106": 0,
+        "107": 0
+      },
+      "special_and_padding_tokens_excluded": true
+    },
+    "updates": {
+      "dynamic_token_mlm": {
+        "loss": 6.2029032707214355,
+        "encoder_gradient_norm": 0.005316040478646755,
+        "encoder_parameter_updated": true
+      },
+      "contiguous_span_mlm": {
+        "loss": 6.128177165985107,
+        "encoder_gradient_norm": 0.0048020025715231895,
+        "encoder_parameter_updated": true
+      }
+    },
+    "attention_layout": {
+      "global_layer_indices_zero_based": [
+        0,
+        3
+      ],
+      "local_layer_indices_zero_based": [
+        1,
+        2
+      ],
+      "global_layer_count": 2,
+      "local_layer_count": 2,
+      "local_window_config_tokens": 8,
+      "local_layer_symmetric_radius": 4,
+      "global_every_n_layers": 3
+    },
+    "pooling_padding_invariant": true,
+    "evaluation_deterministic": true,
+    "downstream_heads": {
+      "losses": {
+        "classification": 1.0060116052627563,
+        "span_extraction": 6.861515998840332,
+        "simcse_retrieval": 0.001648799399845302,
+        "cross_encoder_reranking": 0.6659877896308899
+      },
+      "total_loss": 8.535163879394531,
+      "encoder_gradient_norm": 0.03916754946112633,
+      "head_gradient_norms": {
+        "classification": 0.856871485710144,
+        "extraction": 6.6222243309021,
+        "embedding": 0.04660244658589363,
+        "reranking": 0.6589314341545105
+      },
+      "encoder_parameter_updated": true,
+      "output_shapes": {
+        "classification_logits": [
+          3,
+          3
+        ],
+        "extraction_token_logits": [
+          3,
+          18,
+          2
+        ],
+        "retrieval_similarity_matrix": [
+          3,
+          3
+        ],
+        "reranking_scores": [
+          3
+        ]
+      },
+      "dropout_views_independent": true,
+      "gold_spans_valid_non_special_and_attended": true,
+      "synthetic_gold_start_positions": [
+        1,
+        1,
+        1
+      ],
+      "synthetic_gold_end_positions": [
+        2,
+        2,
+        2
+      ],
+      "span_loss_invariant_to_padding_logit_perturbation": true
+    },
+    "semantic_quality_evaluated": false
+  },
+  "tiny_8k_runtime_probe": {
+    "status": "passed",
+    "sequence_length": 8192,
+    "model_parameters": 15616,
+    "hidden_size": 16,
+    "layers": 3,
+    "device": "cpu",
+    "threads": 2,
+    "attention_implementation": "sdpa",
+    "measured_single_forward_seconds": 0.6884200000022247,
+    "process_peak_working_set_mb_before": 704.25390625,
+    "process_peak_working_set_mb_after": 1984.39453125,
+    "memory_measurement_scope": "Windows process peak working set (whole verification process)",
+    "production_latency_claim": false
+  },
+  "interpretation": "Configuration counts and synthetic task-head updates verify architecture plumbing only. No pretrained weights were downloaded and no semantic benchmark was run."
+}
