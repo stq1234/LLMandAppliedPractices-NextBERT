@@ -1,0 +1,11 @@
+{
+  "archive": "pilot_classification.tar.gz",
+  "bytes": 49180,
+  "sha256": "decde0cf17cbeae7013bda6914d39d1f009f3e028b3c52c280135960ec1df226",
+  "members": [
+    "data/prepared/classification_dev.jsonl",
+    "data/prepared/classification_test.jsonl",
+    "data/prepared/classification_train.jsonl",
+    "data/prepared/manifest_classification.json"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "archive": "pilot_qa.tar.gz",
+  "bytes": 2541084,
+  "sha256": "68bdcd2472181cade729523b883b7159fa03c944061dd6707c69d98525b9385e",
+  "members": [
+    "data/prepared/manifest_qa.json",
+    "data/prepared/qa_dev.jsonl",
+    "data/prepared/qa_long_augmentation.jsonl",
+    "data/prepared/qa_test.jsonl",
+    "data/prepared/qa_train.jsonl"
+  ]
+}

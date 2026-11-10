@@ -1,0 +1,19 @@
+{
+  "archive": "pilot_retrieval.tar.gz",
+  "bytes": 45183007,
+  "sha256": "3c6b743950166028437240a3a8629ae19f1def79f92e18943db261f5dea18495",
+  "members": [
+    "data/prepared/manifest_retrieval.json",
+    "data/prepared/reranking_dev.jsonl",
+    "data/prepared/reranking_test.jsonl",
+    "data/prepared/reranking_train.jsonl",
+    "data/prepared/retrieval_corpus.jsonl",
+    "data/prepared/retrieval_corpus_en.jsonl",
+    "data/prepared/retrieval_corpus_zh.jsonl",
+    "data/prepared/retrieval_dev.jsonl",
+    "data/prepared/retrieval_queries_dev.jsonl",
+    "data/prepared/retrieval_queries_test.jsonl",
+    "data/prepared/retrieval_test.jsonl",
+    "data/prepared/retrieval_train.jsonl"
+  ]
+}

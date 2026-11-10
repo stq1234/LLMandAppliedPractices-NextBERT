@@ -1,0 +1,116 @@
+{
+  "validated": true,
+  "counts": {
+    "wiki_512": {
+      "en": 16,
+      "zh": 16
+    },
+    "wiki_512_dev": {
+      "zh": 8,
+      "en": 8
+    },
+    "wiki_512_test": {
+      "en": 8,
+      "zh": 8
+    },
+    "wiki_1024": {
+      "zh": 16,
+      "en": 16
+    },
+    "wiki_1024_dev": {
+      "zh": 8,
+      "en": 8
+    },
+    "wiki_1024_test": {
+      "en": 8,
+      "zh": 8
+    },
+    "wiki_4096": {
+      "zh": 16,
+      "en": 16
+    },
+    "wiki_4096_dev": {
+      "zh": 8,
+      "en": 8
+    },
+    "wiki_4096_test": {
+      "zh": 8,
+      "en": 8
+    },
+    "wiki_8192": {
+      "en": 16,
+      "zh": 16
+    },
+    "wiki_8192_dev": {
+      "en": 8,
+      "zh": 8
+    },
+    "wiki_8192_test": {
+      "zh": 8,
+      "en": 8
+    },
+    "classification_train": {
+      "rows": 128,
+      "languages": {
+        "en": 64,
+        "zh": 64
+      }
+    },
+    "classification_dev": {
+      "rows": 128,
+      "languages": {
+        "en": 64,
+        "zh": 64
+      }
+    },
+    "classification_test": {
+      "rows": 128,
+      "languages": {
+        "en": 64,
+        "zh": 64
+      }
+    },
+    "qa_train": {
+      "rows": 160,
+      "languages": {
+        "en": 80,
+        "zh": 80
+      }
+    },
+    "qa_dev": {
+      "rows": 71,
+      "languages": {
+        "en": 32,
+        "zh": 39
+      }
+    },
+    "qa_test": {
+      "rows": 67,
+      "languages": {
+        "en": 32,
+        "zh": 35
+      }
+    },
+    "retrieval_train": {
+      "rows": 128,
+      "languages": {
+        "en": 64,
+        "zh": 64
+      }
+    },
+    "retrieval_dev": {
+      "rows": 32,
+      "languages": {
+        "en": 16,
+        "zh": 16
+      }
+    },
+    "retrieval_test": {
+      "rows": 32,
+      "languages": {
+        "en": 16,
+        "zh": 16
+      }
+    }
+  }
+}

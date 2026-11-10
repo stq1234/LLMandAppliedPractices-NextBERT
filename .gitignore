@@ -2,3 +2,9 @@ __pycache__/
 *.py[cod]
 .venv/
 Piazza发布截图.png
+artifacts/
+data/raw/
+runs/
+.pytest_cache/
+data/prepared/
+results/formal/

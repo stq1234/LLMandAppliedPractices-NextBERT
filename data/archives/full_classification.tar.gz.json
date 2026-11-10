@@ -1,0 +1,11 @@
+{
+  "archive": "full_classification.tar.gz",
+  "bytes": 2021254,
+  "sha256": "dd67600c6b41121e9cba5efd5673906cabb0eaa735b2c0f863561455a326d87d",
+  "members": [
+    "data/prepared/full/classification_dev.jsonl",
+    "data/prepared/full/classification_test.jsonl",
+    "data/prepared/full/classification_train.jsonl",
+    "data/prepared/full/manifest_classification.json"
+  ]
+}

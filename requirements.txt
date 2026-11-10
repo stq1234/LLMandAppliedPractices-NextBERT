@@ -2,3 +2,8 @@ torch==2.12.0
 transformers==4.51.3
 psutil==5.9.0
 matplotlib==3.9.2
+datasets==4.3.0
+huggingface_hub==0.31.2
+numpy==1.26.4
+pyarrow==22.0.0
+requests==2.31.0

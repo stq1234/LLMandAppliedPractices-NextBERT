@@ -1,222 +1,490 @@
 {
-  "status": "proposed_not_run",
-  "purpose": "Pre-register comparable pilot ablations for continuing a bilingual 8K encoder; this file is a plan, not a training record.",
+  "status": "small_scale_implementation_calibrated_awaiting_training_scale_decision",
+  "date": "2026-11-11",
+  "scope_note": "The 704-step branch is a small architecture-validation schedule. Its size and effective batches are not established convergence requirements or an approved formal training recipe.",
+  "proposal_document": "重做实验方案.md",
   "checkpoint": {
     "model_id": "jhu-clsp/mmBERT-base",
     "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
-    "base_config": "configs/mmbert_adaptation.json"
+    "pretrained_mlm_parameters": 307786240
   },
-  "data_freeze": {
-    "pretraining_source": {
-      "status": "proposed_candidate_not_downloaded",
-      "source": "Hugging Face dataset repository wikimedia/wikipedia, pinned to the verified immutable dataset revision.",
-      "repository_id": "wikimedia/wikipedia",
-      "repository_uri": "https://huggingface.co/datasets/wikimedia/wikipedia",
-      "revision": "b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
-      "revision_uri": "https://huggingface.co/datasets/wikimedia/wikipedia/tree/b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
-      "dataset_card_uri": "https://huggingface.co/datasets/wikimedia/wikipedia",
-      "dataset_card_licenses": ["cc-by-sa-3.0", "gfdl"],
-      "config_metadata": {
-        "zh": {
-          "config_name": "20231101.zh",
-          "file_count_at_pinned_revision": 6
-        },
-        "en": {
-          "config_name": "20231101.en",
-          "file_count_at_pinned_revision": 41
-        }
-      },
-      "metadata_verification_scope": "Repository revision, zh/en config names, file counts, and dataset-card license metadata were checked via the repository/API only. Dataset files were not downloaded and row schemas were not inspected.",
-      "availability_rule": "Before any data collection, verify the pinned repository revision, both exact config names, and applicable dataset-card license/attribution terms. If a config is absent or terms are unsuitable, stop and version a replacement plan; do not silently change revision or config.",
-      "required_freeze_fields": [
-        "dataset_repository_id_and_uri",
-        "immutable_repository_revision",
-        "config_name",
-        "config_file_count",
-        "artifact_filename_and_download_uri",
-        "artifact_sha256_after_acquisition",
-        "license_and_attribution_record",
-        "license_source_uri",
-        "source_card_sha256",
-        "downloaded_utc_after_acquisition",
-        "dataset_loader_and_parser_version",
-        "normalization_version",
-        "deduplication_version",
-        "tokenizer_id_revision_and_asset_sha256",
-        "document_raw_and_normalized_sha256",
-        "document_split_and_dedup_group"
-      ],
-      "normalization": "After inspecting the pinned row schema, map only article text and title fields; version and record the loader, field mapping, and normalization code. No row schema has been inspected yet.",
-      "deduplication": {
-        "exact": "SHA-256 of normalized full text, within language.",
-        "near_duplicate": "Version-pinned same-language MinHash over normalized 5-grams; Jaccard threshold 0.90; retain the lexicographically smallest document ID per group."
-      },
-      "split": {
-        "algorithm": "integer(SHA-256(language_code || stable_upstream_record_id)) mod 100; if no stable ID is exposed, use the normalized document SHA-256 as the ID and record that fallback.",
-        "train_remainders": "0-97",
-        "validation_remainder": "98",
-        "quarantined_test_remainder": "99"
-      },
-      "evaluation_contamination_audit": "Before sampling, exclude mapped benchmark page IDs and exact normalized benchmark query/context strings; report unresolved title or near-duplicate overlap without using benchmark test content for training or selection.",
-      "tokenizer": {
-        "model_id": "jhu-clsp/mmBERT-base",
-        "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
-        "counting_rule": "Count non-padding content tokens; exclude padding, BOS/EOS/SEP, MASK, and other tokenizer-defined special tokens."
-      },
-      "exposure_budget": {
-        "pilot_training_unique_source_content_tokens_total": 100000000,
-        "zh_unique_source_content_tokens": 50000000,
-        "en_unique_source_content_tokens": 50000000,
-        "maximum_sequence_length": 8192,
-        "cross_document_packing": false,
-        "sampling_seed": 0,
-        "sampling": "Select separately within each language from the train partition ordered by SHA-256(language_code || document_id || sampling_seed); stop at the exact content-token target and record any final-document truncation."
-      }
-    },
-    "evaluation_sources": [
-      {
-        "tasks": "classification",
-        "datasets": ["XNLI"],
-        "languages": ["zh", "en"],
-        "split_rule": "Official train for fine-tuning, validation/dev for selection, test for final evaluation only."
-      },
-      {
-        "tasks": "extraction_and_entity_spans",
-        "datasets": ["MLQA", "XQuAD", "WikiANN"],
-        "languages": ["zh", "en"],
-        "split_rule": "Use only official train/validation/test splits where provided; freeze the task configuration and exact asset revision."
-      },
-      {
-        "tasks": "retrieval_and_reranking",
-        "datasets": ["MTEB v2 bilingual retrieval/reranking tasks"],
-        "languages": ["zh", "en"],
-        "split_rule": "Freeze task IDs and official corpus/query qrels revisions; never use test queries or qrels for training, hard-negative mining, or checkpoint selection."
-      }
+  "architecture": {
+    "layers": 22,
+    "hidden_size": 768,
+    "heads": 12,
+    "intermediate_size_per_geglu_branch": 1152,
+    "vocabulary_size": 256000,
+    "max_length": 8192,
+    "retain": [
+      "tokenizer",
+      "RoPE with original positions",
+      "Pre-LayerNorm",
+      "GeGLU",
+      "tied input and MLM embeddings",
+      "QKV and output projection shapes"
     ],
-    "manifest_schema": "data/manifest.schema.json",
-    "manifest_populated": false
-  },
-  "shared_training": {
-    "seeds": [17, 29, 43],
-    "optimizer_and_schedule": "Choose once on the common baseline, record exact values and software versions before ablations, then hold fixed; no per-arm hyperparameter tuning.",
-    "kernel_dtype_batch": "Record and hold constant within each comparison; compare architectures with the same attention implementation.",
-    "stage_1": {
-      "content_tokens": 80000000,
-      "token_unit": "unique_source_content_tokens",
-      "zh_content_tokens": 40000000,
-      "en_content_tokens": 40000000,
-      "objective": "dynamic token MLM",
-      "shared_by": "all arms in objective and retrieval comparisons"
+    "global_layers": [
+      0,
+      6,
+      12,
+      18,
+      21
+    ],
+    "ordinary_local_layers": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15,
+      17,
+      19
+    ],
+    "dual_scale_layers": {
+      "2": 2,
+      "4": 4,
+      "8": 2,
+      "10": 4,
+      "14": 2,
+      "16": 4,
+      "20": 2
     },
-    "stage_2_span_objective": {
-      "content_tokens": 20000000,
-      "token_unit": "unique_source_content_tokens",
-      "zh_content_tokens": 10000000,
-      "en_content_tokens": 10000000,
-      "control": "dynamic token MLM",
-      "treatment": "contiguous-span MLM at the same 30% target-token rate",
-      "span_boundary_prediction_head": false,
-      "report_views": ["equal token exposure", "equal measured training FLOPs"]
-    },
-    "stage_2_retrieval_objective": {
-      "shared_stage_1": "The same 80M-token MLM prefix and resulting checkpoint in both arms.",
-      "unique_source_content_tokens": 20000000,
-      "control": "Continue MLM; average the losses from two independently corrupted views of each sentence.",
-      "treatment": "SimCSE-style contrastive loss from two independent dropout views of the same sentence; negatives come only from other training sentences in the current batch.",
-      "dropout_probability_in_both_final_stage_arms": 0.1,
-      "compute_budget": "Each final stage receives exactly the measured FLOPs of the two-view MLM control on the same 20M unique source content tokens; stop at that budget and record actual token exposure.",
-      "extra_training_after_control": false,
-      "primary_comparison": "equal measured training FLOPs"
-    },
-    "compute_accounting": {
-      "equal_token_view": "Every arm consumes the stated content-token target; separately report cumulative train FLOPs and wall time.",
-      "equal_flops_view": "Profile the baseline with a fixed counting method and hardware/software stack; set the cumulative FLOPs cap before running variants; stop every arm at that same cap and report actual token exposure.",
-      "never_combine_views": true
-    }
-  },
-  "ablations": [
-    {
-      "id": "attention_global_schedule",
-      "purpose": "Long-context quality and compute cost",
-      "primary_quality_metric": "Equal-weight mean of zh/en span F1 across held-out 8K evidence conditions and evidence positions.",
-      "baseline": {"global_attention_every_n_layers": 3},
-      "variants": [
-        {"global_attention_every_n_layers": 6},
-        {"global_attention_every_n_layers": 1}
+    "local_radius": 64,
+    "dilated_key_rule": "abs(j-i)<=64*r AND (j-i)%r==0; valid positions in same document",
+    "dual_scale_heads": {
+      "ordinary": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "fixed_local_attention_window": 128,
-      "fixed_parameters_per_layer": true,
-      "objective": "dynamic token MLM",
-      "budget_content_tokens_per_arm": 100000000,
-      "comparison_views": ["equal token exposure", "equal measured training FLOPs"]
-    },
-    {
-      "id": "token_vs_span_objective",
-      "purpose": "Extraction boundary quality and task retention",
-      "control": "Dynamic token MLM in the final 20M-token stage.",
-      "treatment": "Contiguous-span MLM in the final 20M-token stage.",
-      "primary_quality_metric": "Equal-weight mean of zh/en span F1 on official extraction test splits.",
-      "shared_stage_content_tokens": 80000000,
-      "branch_content_tokens": 20000000,
-      "comparison_views": ["equal token exposure", "equal measured training FLOPs"]
-    },
-    {
-      "id": "mlm_vs_simcse_final_stage",
-      "purpose": "Bilingual bi-encoder retrieval quality under a fixed training-compute budget",
-      "control": "Two-view MLM in the final stage.",
-      "treatment": "SimCSE contrastive loss in the final stage.",
-      "primary_quality_metric": "Equal-weight mean of zh/en nDCG@10 on frozen retrieval test tasks.",
-      "shared_stage_content_tokens": 80000000,
-      "branch_compute_budget": "FLOPs of the reference 20M-token MLM stage",
-      "comparison_views": ["equal measured training FLOPs"],
-      "no_post_control_adaptation": true
-    }
-  ],
-  "evaluation_protocol": {
-    "baseline": "Original pinned mmBERT-base checkpoint with the same task heads and downstream fine-tuning recipe.",
-    "ablation_effect_reference": "Each treatment is compared with its matched control at the same token exposure or FLOPs budget as defined for that ablation.",
-    "retention_reference": "The original pinned mmBERT-base checkpoint, evaluated with the same task heads, fine-tuning data, recipe, and seeds.",
-    "long_evidence": {
-      "sequence_lengths": [1024, 4096, 8192],
-      "evidence_positions": ["first", "middle", "last"],
-      "similar_distractor_paragraphs_per_example": 4,
-      "interventions": ["intact", "support_sentence_deleted", "support_answer_span_replaced_by_same_type_same_token_length_counterfactual", "similar_distractor_paragraphs_added"],
-      "baselines": [
-        {"name": "first_512_truncation", "tokens": 512},
-        {"name": "sliding_512", "window": 512, "stride": 384, "aggregation": "maximum answer or relevance score across chunks"}
+      "gated": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
       ]
     },
-    "metrics": {
-      "classification": ["accuracy", "macro-F1"],
-      "extraction": ["exact match", "span F1", "NER micro-F1"],
-      "retrieval": ["nDCG@10", "Recall@10"],
-      "reranking": ["MRR@10", "nDCG@10"],
-      "cost": ["8K p50/p95 latency", "peak GPU memory", "training FLOPs", "training wall time", "index build time", "vector storage"]
+    "gate": {
+      "parameters": 42,
+      "initial_logit": 0,
+      "mixing": "(1-alpha)*local+alpha*dilated",
+      "alpha": "sigmoid(logit) times first-64-update linear ramp",
+      "scope": "one scalar per gated head per dual-scale layer"
     },
-    "uncertainty": "Use 10,000 paired bootstrap resamples of frozen test examples, stratified by task and language; also report each of the three seed scores and their standard deviation. The bootstrap interval describes paired test-sample uncertainty; three seeds do not establish broad training-run uncertainty.",
-    "quality_path": {
-      "primary_metric_rule": "Pre-register one primary metric per ablation; express metrics on a 0-100 point scale, average equally over Chinese and English, and macro-average the prespecified test strata for long-evidence evaluation.",
-      "target_gain_reference": "Matched control for the same ablation.",
-      "target_macro_score_minimum_gain_percentage_points": 1.0,
-      "paired_95_percent_interval_lower_bound_minimum": 0.0,
-      "maximum_non_target_task_retention_drop_percentage_points": 0.5,
-      "retention_drop_reference": "Original pinned mmBERT-base checkpoint.",
-      "each_language_must_pass": true
+    "mlm_parameters_with_gates": 307786282
+  },
+  "variants": [
+    {
+      "id": "V0",
+      "global_layers": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21
+      ],
+      "dual_scale": false,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "classification",
+        "qa",
+        "retrieval",
+        "reranking"
+      ]
     },
-    "structural_cost_path": {
-      "quality_reference": "Every-third-layer-global attention baseline under the same training view.",
-      "quality_noninferiority_margin_percentage_points": 0.5,
-      "paired_95_percent_interval_lower_bound_must_exceed_negative_margin": true,
-      "minimum_improvement_in_latency_or_peak_memory_percent": 10,
-      "maximum_allowed_regression_in_other_cost_metric_percent": 5,
-      "separate_quality_gain_required": false
+    {
+      "id": "V1",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": false,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "qa",
+        "retrieval"
+      ]
     },
-    "mlm_loss_only_is_acceptance_evidence": false
+    {
+      "id": "V2",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": true,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "qa",
+        "retrieval"
+      ]
+    },
+    {
+      "id": "V3",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": true,
+      "objective": "token MLM for first 512 steps; final 192 steps balanced token/span within each length stage",
+      "tasks": [
+        "classification",
+        "qa",
+        "retrieval",
+        "reranking"
+      ]
+    }
+  ],
+  "adaptation": {
+    "seed": 17,
+    "source": "wikimedia/wikipedia zh and en; freeze immutable revision and article-level splits before acquisition",
+    "language_balance_by_content_tokens": {
+      "zh": 0.5,
+      "en": 0.5
+    },
+    "sampling": "single-article contiguous full windows; no padding counted",
+    "stages": [
+      {
+        "max_length": 512,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "effective_sequences": 32,
+        "optimizer_steps": 256,
+        "input_tokens": 4194304
+      },
+      {
+        "max_length": 1024,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "effective_sequences": 16,
+        "optimizer_steps": 256,
+        "input_tokens": 4194304
+      },
+      {
+        "max_length": 4096,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "effective_sequences": 4,
+        "optimizer_steps": 128,
+        "input_tokens": 2097152
+      },
+      {
+        "max_length": 8192,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "effective_sequences": 2,
+        "optimizer_steps": 64,
+        "input_tokens": 1048576
+      }
+    ],
+    "full_branch_steps": 704,
+    "full_branch_input_tokens": 11534336,
+    "shared_prefix": {
+      "variants": [
+        "V2",
+        "V3"
+      ],
+      "steps": 512,
+      "input_tokens": 8388608,
+      "share_optimizer_state": true
+    },
+    "total_executed_steps": 2304,
+    "total_input_tokens": 37748736,
+    "masking": {
+      "ratio": 0.3,
+      "mask_random_keep": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "exclude_all_special_ids": true,
+      "span_mean": 3,
+      "span_max": 10,
+      "predict_same_target_count": true
+    },
+    "optimizer": {
+      "name": "AdamW",
+      "full_parameter": true,
+      "backbone_lr": 0.00002,
+      "gate_lr": 0.001,
+      "weight_decay": 0.01,
+      "clip_norm": 1,
+      "warmup_fraction": 0.05,
+      "schedule": "linear"
+    },
+    "implementation": [
+      "BF16 autocast",
+      "gradient checkpointing",
+      "genuine local attention kernel",
+      "MLM outputs only at supervised positions",
+      "fused loss or chunked loss with activation recomputation"
+    ]
+  },
+  "downstream": {
+    "shared": {
+      "epochs": 2,
+      "warmup_fraction": 0.05,
+      "weight_decay": 0.01,
+      "clip_norm": 1,
+      "head_lr": 0.0001,
+      "schedule": "linear",
+      "separate_task_branches": true
+    },
+    "classification": {
+      "sources": [
+        "facebook/xnli zh",
+        "facebook/xnli en"
+      ],
+      "train_per_language": 2000,
+      "max_length": 256,
+      "physical_batch": 16,
+      "accumulation": 2,
+      "effective_batch": 32,
+      "steps": 250,
+      "backbone_lr": 0.00002,
+      "head": "masked content mean; 768->3; cross entropy"
+    },
+    "qa": {
+      "sources": [
+        "SQuAD1.1",
+        "CMRC2018"
+      ],
+      "train_questions_per_language": 2000,
+      "max_length": 512,
+      "physical_batch": 16,
+      "accumulation": 2,
+      "effective_batch": 32,
+      "long_augmentation": {
+        "fraction_of_regular_training_windows": 0.1,
+        "max_length": 4096,
+        "physical_batch": 4,
+        "accumulation": 2,
+        "effective_batch": 8,
+        "train_sources_only": true
+      },
+      "steps_estimate": [
+        350,
+        500
+      ],
+      "step_rule": "complete regular feature list for 2 epochs, add 10% long features; ceil by batch separately and freeze actual counts",
+      "backbone_lr": 0.00002,
+      "head": "768->2; start/end cross entropy; context-only decoding"
+    },
+    "retrieval": {
+      "source": "Shitao/MLDR zh and en",
+      "train_queries_per_language": 1000,
+      "steps": 125,
+      "logical_batch_queries": 32,
+      "physical_document_batch": [
+        2,
+        4
+      ],
+      "query_max_length": 128,
+      "document_length_proportions": {
+        "512": 0.9,
+        "4096": 0.08,
+        "8192": 0.02
+      },
+      "train_window_rule": "deterministic first-token window capped at hash-assigned 512/4096/8192 tokens; retain natural short lengths; BM25 is used only for evaluation candidate selection",
+      "evaluation_window": "fixed first at most 8192 tokens, independent of test query",
+      "backbone_lr": 0.00001,
+      "head": "mean;768->256;L2 normalization",
+      "loss": "InfoNCE with explicit and true logical-batch negatives",
+      "temperature": 0.05,
+      "gradient_cache": true
+    },
+    "reranking": {
+      "source": "same MLDR training queries",
+      "train_queries_total": 2000,
+      "negatives_per_positive": 2,
+      "physical_query_groups": 4,
+      "physical_pairs": 12,
+      "accumulation": 2,
+      "effective_query_groups": 8,
+      "effective_pairs": 24,
+      "max_pair_length": 1024,
+      "steps": 500,
+      "backbone_lr": 0.00001,
+      "head": "joint query-document encoder;mean;768->1;groupwise cross entropy"
+    },
+    "run_matrix": [
+      {
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "tasks": [
+          "classification",
+          "qa",
+          "retrieval",
+          "reranking"
+        ],
+        "seeds": [
+          17
+        ],
+        "phases": 8
+      },
+      {
+        "variants": [
+          "V1",
+          "V2"
+        ],
+        "tasks": [
+          "qa",
+          "retrieval"
+        ],
+        "seeds": [
+          17
+        ],
+        "phases": 4
+      },
+      {
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "tasks": [
+          "classification",
+          "qa"
+        ],
+        "seeds": [
+          29
+        ],
+        "phases": 4
+      }
+    ],
+    "total_training_phases": 16
+  },
+  "evaluation": {
+    "classification": "official zh/en XNLI test; development selection uses validation",
+    "qa": "article-grouped dev from train for selection; public SQuAD/CMRC dev locked for final research evaluation; official metrics",
+    "retrieval": {
+      "dev_queries_per_language": 100,
+      "test_queries_per_language": 200,
+      "corpus_documents_per_language": 5000,
+      "known_relevant_plus_hash_sampled_distractors": true,
+      "metrics": [
+        "nDCG@10",
+        "Recall@10",
+        "Recall@100"
+      ],
+      "scope": "fixed reduced corpus"
+    },
+    "reranking": {
+      "candidates": "fixed BM25 top20, same for all variants",
+      "dev_queries_per_language": 100,
+      "test_queries_per_language": 200,
+      "metrics": [
+        "nDCG@10",
+        "MRR@10",
+        "candidate Recall@20"
+      ]
+    },
+    "long_context": {
+      "source_groups_per_language": 100,
+      "lengths": [
+        1024,
+        4096,
+        8192
+      ],
+      "evidence_positions": [
+        "first",
+        "middle",
+        "last"
+      ],
+      "interventions": [
+        "intact",
+        "equal-length decisive fact replacement",
+        "irrelevant background replacement"
+      ],
+      "baselines": [
+        "first512",
+        "fixed sliding512",
+        "full input"
+      ],
+      "resampling_unit": "source group"
+    },
+    "retention": "fixed bilingual MLM and frozen classification/QA probes; original pretrained reference, V0,V3, and retrieval-adapted state",
+    "performance": {
+      "lengths": [
+        512,
+        4096,
+        8192
+      ],
+      "physical_batches": [
+        16,
+        4,
+        2
+      ],
+      "measures": [
+        "forward latency",
+        "end-to-end latency",
+        "throughput",
+        "p50/p95",
+        "allocated/reserved peak memory",
+        "index build time",
+        "vector storage"
+      ]
+    }
+  },
+  "resources": {
+    "gpu_type": "RTX A6000 48GB",
+    "max_physical_gpus": 1,
+    "target_physical_gpu_hours": [
+      5,
+      7.5
+    ],
+    "hard_cap_physical_gpu_hours": 8,
+    "budget_scope": "provisional small-scale matrix only; includes 25 or 100 long-evidence groups/language; no formal training has been authorized",
+    "measured": true,
+    "measurement_scope": "short optimizer calibration on GPU7, complete training-case coverage; full-run durations and convergence remain unmeasured",
+    "calibration_summary": "results/calibration_summary.json",
+    "caps_gpu_hours": {
+      "calibration": 0.5,
+      "adaptation": 0.65,
+      "classification": 0.12,
+      "qa": 0.5,
+      "retrieval": 1.1,
+      "reranking": 0.26,
+      "evaluation": 3.6,
+      "recovery": 0.6
+    },
+    "physical_microbatch_one_allowed": false,
+    "max_jobs_per_gpu": 1,
+    "concurrency_rule": "two simultaneous 512-token jobs measured about 5 percent less aggregate throughput; use one process on GPU7 and reserve >=6GiB",
+    "storage_target_GB": 40,
+    "remote_host": "a6000",
+    "remote_workdir": "~/LLM/nextbert",
+    "preferred_pilot_gpu": 7,
+    "allowed_modification_scope": "~/LLM; conda llm environment as specified by project AGENTS.md",
+    "remote_network": "offline; acquire model/data on local Windows and use shared verified uploader"
   },
   "execution_status": {
+    "implemented": true,
+    "data_frozen": true,
+    "data_scope": "small-scale profile; additional data for larger token budgets has not been prepared",
+    "formal_training_scale_selected": false,
     "training_started": false,
-    "dataset_downloaded": false,
-    "semantic_benchmark_run": false,
-    "note": "The local package contains CPU plumbing checks only; this proposed protocol requires a separate approved compute and dataset run."
+    "pilot_training_started": true,
+    "formal_full_matrix_started": false,
+    "semantic_benchmark_run": false
   }
 }

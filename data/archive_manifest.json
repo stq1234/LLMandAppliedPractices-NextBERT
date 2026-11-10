@@ -1,0 +1,57 @@
+{
+  "archive_root": "repository root",
+  "large_file_rule_mib": 96,
+  "rebuild_command": "python src/prepare_data.py --profile full",
+  "included": [
+    "data/archives/pilot_wiki.tar.gz",
+    "data/archives/pilot_classification.tar.gz",
+    "data/archives/pilot_qa.tar.gz",
+    "data/archives/pilot_retrieval.tar.gz",
+    "data/archives/full_wiki.tar.gz",
+    "data/archives/full_classification.tar.gz",
+    "data/archives/full_qa.tar.gz",
+    "data/archives/full_retrieval.tar.gz"
+  ],
+  "excluded_large_files": [
+    {
+      "path": "data/prepared/full/reranking_dev.jsonl",
+      "bytes": 186498151,
+      "sha256": "c1e838b098a1ea95dfd3da6af837eceffad13a6c42adb42947178e5707e7aba4"
+    },
+    {
+      "path": "data/prepared/full/reranking_test.jsonl",
+      "bytes": 361918315,
+      "sha256": "473ded8b30a60430395cda56d3c3c3cc5d21a59290f17fe7a4a08babb5148d19"
+    },
+    {
+      "path": "data/prepared/full/reranking_train.jsonl",
+      "bytes": 148589690,
+      "sha256": "84bf54d21159a65daa406e012b5c3977f5355fc7c0710f11b80b5d8d4e494ef3"
+    },
+    {
+      "path": "data/prepared/full/retrieval_corpus.jsonl",
+      "bytes": 794181538,
+      "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0"
+    },
+    {
+      "path": "data/prepared/full/retrieval_corpus_en.jsonl",
+      "bytes": 379369982,
+      "sha256": "a64c2082a1efbf9624cb0c754ddc180f4564834a8d178443d0ab8dc179f42372"
+    },
+    {
+      "path": "data/prepared/full/retrieval_corpus_zh.jsonl",
+      "bytes": 414811556,
+      "sha256": "0b27ba04b59154b9523d3cec853719208279d3b3fb073c285cc100ad9760eab9"
+    },
+    {
+      "path": "data/prepared/full/retrieval_test.jsonl",
+      "bytes": 131211324,
+      "sha256": "64c4be675843d09c29cf95caf7932c949cae3ae53422cc7ee6b7ce0af0348070"
+    },
+    {
+      "path": "data/prepared/full/retrieval_train.jsonl",
+      "bytes": 152046721,
+      "sha256": "d21e9304b199391258f0577d7a09294c99d6cc139390879d5f221cd2f7eedaf4"
+    }
+  ]
+}

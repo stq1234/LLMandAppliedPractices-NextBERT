@@ -1,0 +1,751 @@
+{
+  "status": "calibration_completed_awaiting_training_decision",
+  "formal_full_matrix_started": false,
+  "physical_gpu": 7,
+  "components_seconds": {
+    "mlm_training": 1873.940772011876,
+    "classification_training": 333.4246225422248,
+    "qa_training": 1442.1822453499772,
+    "retrieval_training": 3044.5710241328925,
+    "reranking_training": 731.3787374878302,
+    "index_build_four_variants": 2800.589773032698,
+    "retrieval_dev_and_test_queries": 54.25182102411054,
+    "reranking_dev_and_test": 166.90181352198124,
+    "classification_and_qa_dev_test_inference": 481.17052627373414,
+    "retention_mlm_probes_and_latency_reserve": 360.0,
+    "checkpoint_io_and_process_startup_reserve": 540.0
+  },
+  "projection": {
+    "adaptation_steps_planned": 2304,
+    "adaptation_unique_steps_including_shared_prefix": 2304,
+    "adaptation_stage_projections": [
+      {
+        "variant": "V0",
+        "length": 512,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "execution_accounting": "V0_branch",
+        "measured_pilot_step_seconds_median": 0.7598068860825151,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 194.51056283712387,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V0",
+        "length": 1024,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "execution_accounting": "V0_branch",
+        "measured_pilot_step_seconds_median": 0.7689698419999331,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 196.85627955198288,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V0",
+        "length": 4096,
+        "planned_optimizer_steps": 128,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V0_branch",
+        "measured_pilot_step_seconds_median": 0.7833842299878597,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 100.27318143844604,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V0",
+        "length": 8192,
+        "planned_optimizer_steps": 64,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V0_branch",
+        "measured_pilot_step_seconds_median": 0.8483919689897448,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 54.297086015343666,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V1",
+        "length": 512,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "execution_accounting": "V1_branch",
+        "measured_pilot_step_seconds_median": 0.7708500961307436,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 197.33762460947037,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V1",
+        "length": 1024,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "execution_accounting": "V1_branch",
+        "measured_pilot_step_seconds_median": 0.7762539631221443,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 198.72101455926895,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V1",
+        "length": 4096,
+        "planned_optimizer_steps": 128,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V1_branch",
+        "measured_pilot_step_seconds_median": 0.7679329758975655,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 98.29542091488838,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V1",
+        "length": 8192,
+        "planned_optimizer_steps": 64,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V1_branch",
+        "measured_pilot_step_seconds_median": 0.8117373560089618,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 51.951190784573555,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V2",
+        "length": 512,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "execution_accounting": "shared_prefix_V2_V3",
+        "measured_pilot_step_seconds_median": 0.8313999581150711,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 212.8383892774582,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V2",
+        "length": 1024,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "execution_accounting": "shared_prefix_V2_V3",
+        "measured_pilot_step_seconds_median": 0.8371212899219245,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 214.30305022001266,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V2",
+        "length": 4096,
+        "planned_optimizer_steps": 128,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V2_branch",
+        "measured_pilot_step_seconds_median": 0.8249621649738401,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 105.59515711665154,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V2",
+        "length": 8192,
+        "planned_optimizer_steps": 64,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V2_branch",
+        "measured_pilot_step_seconds_median": 0.8692761238198727,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 55.633671924471855,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V3",
+        "length": 512,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "execution_accounting": "shared_prefix_V2_V3",
+        "measured_pilot_step_seconds_median": 0.8313999581150711,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 212.8383892774582,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V3",
+        "length": 1024,
+        "planned_optimizer_steps": 256,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "execution_accounting": "shared_prefix_V2_V3",
+        "measured_pilot_step_seconds_median": 0.8371212899219245,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 214.30305022001266,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V3",
+        "length": 4096,
+        "planned_optimizer_steps": 128,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V3_branch",
+        "measured_pilot_step_seconds_median": 0.96107101009693,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 123.01708929240704,
+        "projection_status": "projected_from_measured_pilot"
+      },
+      {
+        "variant": "V3",
+        "length": 8192,
+        "planned_optimizer_steps": 64,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "execution_accounting": "V3_branch",
+        "measured_pilot_step_seconds_median": 1.0986102104652673,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 70.31105346977711,
+        "projection_status": "projected_from_measured_pilot"
+      }
+    ],
+    "adaptation_projected_seconds_from_pilot": 1873.940772011876,
+    "adaptation_projection_coverage": 1.0,
+    "adaptation_projection_is_partial": false,
+    "downstream_phase_count": 16,
+    "downstream_phase_projections": [
+      {
+        "phase_id": 1,
+        "variant": "V0",
+        "task": "classification",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.2800749510060996,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 70.0187377515249,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 2,
+        "variant": "V0",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.48892244906164706,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 122.23061226541176,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 2,
+        "variant": "V0",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.167328453157097,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 116.73284531570971,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 3,
+        "variant": "V0",
+        "task": "retrieval",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 125,
+        "measured_pilot_step_seconds_median": 5.445801997091621,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 680.7252496364526,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 4,
+        "variant": "V0",
+        "task": "reranking",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 500,
+        "measured_pilot_step_seconds_median": 0.6909130469430238,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 345.4565234715119,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 5,
+        "variant": "V3",
+        "task": "classification",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.35931154410354793,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 89.82788602588698,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 6,
+        "variant": "V3",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.5345397379714996,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 133.6349344928749,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 6,
+        "variant": "V3",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.1684042979031801,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 116.84042979031801,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 7,
+        "variant": "V3",
+        "task": "retrieval",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 125,
+        "measured_pilot_step_seconds_median": 7.025834382977337,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 878.2292978721671,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 8,
+        "variant": "V3",
+        "task": "reranking",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 500,
+        "measured_pilot_step_seconds_median": 0.7718444280326366,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 385.9222140163183,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 9,
+        "variant": "V1",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.47614471917040646,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 119.03617979260162,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 9,
+        "variant": "V1",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.0629692708607763,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 106.29692708607763,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 10,
+        "variant": "V1",
+        "task": "retrieval",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 125,
+        "measured_pilot_step_seconds_median": 5.25555760296993,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 656.9447003712412,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 11,
+        "variant": "V2",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.5459415011573583,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 136.48537528933957,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 11,
+        "variant": "V2",
+        "task": "qa",
+        "seed": 17,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.173996919998899,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 117.39969199988991,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 12,
+        "variant": "V2",
+        "task": "retrieval",
+        "seed": 17,
+        "subphase": "all",
+        "planned_optimizer_steps": 125,
+        "measured_pilot_step_seconds_median": 6.6293742100242525,
+        "measured_pilot_sample_count": 5,
+        "projected_seconds": 828.6717762530316,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 13,
+        "variant": "V0",
+        "task": "classification",
+        "seed": 29,
+        "subphase": "all",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.274654335109517,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 68.66358377737924,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 14,
+        "variant": "V0",
+        "task": "qa",
+        "seed": 29,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.47483585216104984,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 118.70896304026246,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 14,
+        "variant": "V0",
+        "task": "qa",
+        "seed": 29,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.0676275750156492,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 106.76275750156492,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 15,
+        "variant": "V3",
+        "task": "classification",
+        "seed": 29,
+        "subphase": "all",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.4196576599497348,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 104.9144149874337,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 16,
+        "variant": "V3",
+        "task": "qa",
+        "seed": 29,
+        "subphase": "regular",
+        "planned_optimizer_steps": 250,
+        "measured_pilot_step_seconds_median": 0.5465409678872675,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 136.63524197181687,
+        "projection_status": "projected_from_real_batch_pilot"
+      },
+      {
+        "phase_id": 16,
+        "variant": "V3",
+        "task": "qa",
+        "seed": 29,
+        "subphase": "long",
+        "planned_optimizer_steps": 100,
+        "measured_pilot_step_seconds_median": 1.1141828680410981,
+        "measured_pilot_sample_count": 3,
+        "projected_seconds": 111.41828680410981,
+        "projection_status": "projected_from_real_batch_pilot"
+      }
+    ],
+    "downstream_projected_seconds_from_real_batch_pilots": 5551.556629512925,
+    "downstream_projection_coverage": 1.0,
+    "downstream_projection_is_partial": false,
+    "evaluation_and_indexing_work": [
+      {
+        "stage": "classification_validation_and_official_test",
+        "languages": [
+          "zh",
+          "en"
+        ],
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "runs": 4,
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "qa_article_grouped_selection_and_locked_final_eval",
+        "sources": [
+          "SQuAD1.1",
+          "CMRC2018"
+        ],
+        "variants": [
+          "V0",
+          "V1",
+          "V2",
+          "V3"
+        ],
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "retrieval_index_build_and_dev_test",
+        "languages": [
+          "zh",
+          "en"
+        ],
+        "documents_per_language": 5000,
+        "dev_queries_per_language": 100,
+        "test_queries_per_language": 200,
+        "variant_indexes": 4,
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "reranking_fixed_bm25_top20",
+        "languages": [
+          "zh",
+          "en"
+        ],
+        "queries_per_language": 200,
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "long_context_evidence_interventions",
+        "source_groups_per_language": 100,
+        "lengths": [
+          1024,
+          4096,
+          8192
+        ],
+        "evidence_positions": [
+          "first",
+          "middle",
+          "last"
+        ],
+        "interventions": [
+          "intact",
+          "equal-length decisive fact replacement",
+          "irrelevant background replacement"
+        ],
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "retention_probes",
+        "references": [
+          "pretrained",
+          "V0",
+          "V3",
+          "retrieval_adapted"
+        ],
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      },
+      {
+        "stage": "performance_and_index_storage",
+        "lengths": [
+          512,
+          4096,
+          8192
+        ],
+        "physical_batches": [
+          16,
+          4,
+          2
+        ],
+        "measures": [
+          "forward latency",
+          "end-to-end latency",
+          "throughput",
+          "p50/p95",
+          "allocated/reserved peak memory",
+          "index build time",
+          "vector storage"
+        ],
+        "measured_seconds": null,
+        "projected_seconds": null,
+        "status": "unmeasured",
+        "gpu_hour_cap": null
+      }
+    ],
+    "evaluation_and_indexing_measured_seconds": null,
+    "unmeasured_plan_caps_gpu_hours": {
+      "evaluation_and_indexing": 3.6,
+      "calibration": 0.5,
+      "recovery": 0.6,
+      "hard_cap_physical_gpu_hours": 8.0
+    },
+    "total_projected_training_seconds": 7425.497401524801,
+    "total_schedule_wall_seconds": null,
+    "interpretation": "Pilot durations are observed on short real optimizer runs. Projected training seconds multiply their measured median step duration by the planned count; they are projections, not completed-run measurements. Evaluation and index construction remain unmeasured because no such timed run was made."
+  },
+  "index_projection": {
+    "index_build_by_variant": [
+      {
+        "variant": "V0",
+        "measured_index_sample_seconds": 9.708939018659294,
+        "projected_5000_documents_per_language_seconds": 755.097492965433,
+        "projected_5000_vector_storage_bytes_per_language": [
+          5120000,
+          5120000
+        ],
+        "query_encoding_sample_count": 400,
+        "projected_600_queries_total_encode_seconds": 10.814731167512944,
+        "projection_source": "real local corpus/query sample"
+      },
+      {
+        "variant": "V1",
+        "measured_index_sample_seconds": 8.289750856813043,
+        "projected_5000_documents_per_language_seconds": 644.2698875798669,
+        "projected_5000_vector_storage_bytes_per_language": [
+          5120000,
+          5120000
+        ],
+        "query_encoding_sample_count": 400,
+        "projected_600_queries_total_encode_seconds": 11.25855857937131,
+        "projection_source": "real local corpus/query sample"
+      },
+      {
+        "variant": "V2",
+        "measured_index_sample_seconds": 9.007741113891825,
+        "projected_5000_documents_per_language_seconds": 700.1809160828998,
+        "projected_5000_vector_storage_bytes_per_language": [
+          5120000,
+          5120000
+        ],
+        "query_encoding_sample_count": 400,
+        "projected_600_queries_total_encode_seconds": 16.210164817865007,
+        "projection_source": "real local corpus/query sample"
+      },
+      {
+        "variant": "V3",
+        "measured_index_sample_seconds": 9.017920188838616,
+        "projected_5000_documents_per_language_seconds": 701.0414764044981,
+        "projected_5000_vector_storage_bytes_per_language": [
+          5120000,
+          5120000
+        ],
+        "query_encoding_sample_count": 400,
+        "projected_600_queries_total_encode_seconds": 15.968366459361276,
+        "projection_source": "real local corpus/query sample"
+      }
+    ],
+    "index_projection_variant_coverage": 1.0,
+    "projected_index_seconds_for_four_variants": 2800.589773032698,
+    "projected_retrieval_query_encode_seconds_for_four_variants": 54.25182102411054,
+    "reranking_by_variant": [
+      {
+        "variant": "V0",
+        "sample_queries": 8,
+        "measured_sample_query_latency_seconds": 0.1301996433758177,
+        "projected_dev_and_test_queries_seconds": 78.13513949513435,
+        "candidate_count_mean": 20,
+        "projection_source": "real local BM25 candidate rows"
+      },
+      {
+        "variant": "V3",
+        "sample_queries": 8,
+        "measured_sample_query_latency_seconds": 0.147964604140725,
+        "projected_dev_and_test_queries_seconds": 88.76667402684689,
+        "candidate_count_mean": 20,
+        "projection_source": "real local BM25 candidate rows"
+      }
+    ],
+    "reranking_projection_variant_coverage": 1.0,
+    "projected_reranking_seconds": 166.90181352198124,
+    "is_partial": false,
+    "evaluation_costs_not_measured_by_these_probes": [
+      "classification and QA official-split inference",
+      "long-context evidence interventions",
+      "retention probes",
+      "512/4096/8192 latency p50/p95 sweep",
+      "BM25 candidate generation if not included in supplied prepared files"
+    ]
+  },
+  "long_context_projection_seconds_100_groups_per_language": 9068.957421556115,
+  "long_context_projection_method": "batch4, 4 real source groups/language; V0 rate represents V0/V1, V3 rate represents V2/V3",
+  "variants_covered_in_optimizer_calibration": [
+    "V0",
+    "V1",
+    "V2",
+    "V3"
+  ],
+  "sampling_note": "reranking timing uses 8 total sampled queries, balanced across languages",
+  "data_version_note": "QA optimizer timing preceded exact character-offset repair and train-only filler regeneration; counts/batch/length limits are unchanged. No quality claims are made from calibration heads.",
+  "budget_options": {
+    "25": {
+      "source_groups_per_language": 25,
+      "projected_gpu_hours": 3.915458525212876,
+      "gpu_hours_with_25_percent_margin": 4.894323156516095
+    },
+    "100": {
+      "source_groups_per_language": 100,
+      "projected_gpu_hours": 5.804824654703733,
+      "gpu_hours_with_25_percent_margin": 7.256030818379666
+    }
+  },
+  "unmeasured_reserves": [
+    "held-out MLM inference and latency sweep",
+    "checkpoint IO/startup beyond the measured single save/resume"
+  ],
+  "scale_interpretation": "The implemented 11.53M-token branch is a small architecture-validation run, not evidence of convergence or sufficient formal adaptation.",
+  "larger_mlm_only_scenarios": {
+    "50000000": {
+      "input_tokens_per_full_variant_branch": 50000000,
+      "same_downstream_subsets_and_25_long_groups_per_language": true,
+      "projected_gpu_hours_with_25_percent_margin": 7.064244581534425,
+      "status": "unmeasured linear token-throughput extrapolation; larger-batch calibration and additional source data not prepared"
+    },
+    "100000000": {
+      "input_tokens_per_full_variant_branch": 100000000,
+      "same_downstream_subsets_and_25_long_groups_per_language": true,
+      "projected_gpu_hours_with_25_percent_margin": 9.884839885723546,
+      "status": "unmeasured linear token-throughput extrapolation; larger-batch calibration and additional source data not prepared"
+    }
+  }
+}

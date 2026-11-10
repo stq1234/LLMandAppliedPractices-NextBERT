@@ -1,0 +1,32 @@
+{
+  "archive": "pilot_wiki.tar.gz",
+  "bytes": 1304007,
+  "sha256": "8ee240c21339ea360556a1ef797978611ab9b73edd989c29ae652137c7ea9163",
+  "members": [
+    "data/prepared/manifest_wiki.json",
+    "data/prepared/wiki_1024.jsonl",
+    "data/prepared/wiki_1024.npy",
+    "data/prepared/wiki_1024_dev.jsonl",
+    "data/prepared/wiki_1024_dev.npy",
+    "data/prepared/wiki_1024_test.jsonl",
+    "data/prepared/wiki_1024_test.npy",
+    "data/prepared/wiki_4096.jsonl",
+    "data/prepared/wiki_4096.npy",
+    "data/prepared/wiki_4096_dev.jsonl",
+    "data/prepared/wiki_4096_dev.npy",
+    "data/prepared/wiki_4096_test.jsonl",
+    "data/prepared/wiki_4096_test.npy",
+    "data/prepared/wiki_512.jsonl",
+    "data/prepared/wiki_512.npy",
+    "data/prepared/wiki_512_dev.jsonl",
+    "data/prepared/wiki_512_dev.npy",
+    "data/prepared/wiki_512_test.jsonl",
+    "data/prepared/wiki_512_test.npy",
+    "data/prepared/wiki_8192.jsonl",
+    "data/prepared/wiki_8192.npy",
+    "data/prepared/wiki_8192_dev.jsonl",
+    "data/prepared/wiki_8192_dev.npy",
+    "data/prepared/wiki_8192_test.jsonl",
+    "data/prepared/wiki_8192_test.npy"
+  ]
+}
