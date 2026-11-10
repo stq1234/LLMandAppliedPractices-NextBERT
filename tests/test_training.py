@@ -22,6 +22,7 @@ from train_nextbert import (  # noqa: E402
     _save_checkpoint,
     _scheduler,
     _epoch_sample_indices,
+    adaptation_stage_schedule,
     _encode_retrieval,
     _initialize_backbone_from_checkpoint,
     optimizer_for,
@@ -30,6 +31,8 @@ from train_nextbert import (  # noqa: E402
     retrieval_logical_batch,
     retrieval_to_reranking_records,
     pair_tokens,
+    qa_phase_steps,
+    read_plan,
     collate_sequences,
     run_training,
     train_mlm_step,
@@ -49,6 +52,8 @@ from qa_metrics import answer_em, answer_f1  # noqa: E402
 from nextbert_lab import make_tiny_config  # noqa: E402
 from train_nextbert import load_nextbert  # noqa: E402
 import run_pilot  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+import run_training_matrix  # noqa: E402
 
 
 class TinyNextBert(nn.Module):
@@ -118,6 +123,27 @@ class TrainingPrimitiveTests(unittest.TestCase):
             self.assertTrue(torch.all(labels[ids.eq(special)] == -100).item())
         self.assertTrue(torch.all(labels[ids.eq(0)] == -100).item())
         self.assertTrue(torch.all(selected.sum(dim=1) > 0).item())
+
+    def test_long_span_corruption_is_exact_bounded_and_seed_reproducible(self) -> None:
+        ids = torch.full((1, 8192), 9, dtype=torch.long)
+        ids[0, 0], ids[0, -1] = 2, 1
+        ids[0, 2048], ids[0, 4096], ids[0, 6144] = 4, 2, 1
+        mask = torch.ones_like(ids)
+        kwargs = {"vocab_size": 64, "special_ids": (0, 1, 2, 4), "mask_token_id": 4,
+                  "seed": 20261111, "mode": "span", "mask_rate": 0.30,
+                  "span_mean": 3.0, "span_max": 10}
+        first = corrupt_mlm(ids, mask, **kwargs)
+        second = corrupt_mlm(ids, mask, **kwargs)
+        eligible = mask.bool()
+        for special in kwargs["special_ids"]:
+            eligible &= ids.ne(special)
+        target_count = max(1, int(round(int(eligible.sum()) * kwargs["mask_rate"])))
+        selected = first[2]
+        self.assertEqual(int(selected.sum()), target_count)
+        self.assertFalse((selected & ~eligible).any().item())
+        self.assertTrue(torch.equal(first[0], second[0]))
+        self.assertTrue(torch.equal(first[1], second[1]))
+        self.assertTrue(torch.equal(first[2], second[2]))
 
     def test_mlm_step_updates_parameters_and_logs_tokens(self) -> None:
         model = TinyNextBert()
@@ -208,7 +234,7 @@ class TrainingPrimitiveTests(unittest.TestCase):
         torch.manual_seed(991)
         cached_result = train_retrieval_step(
             cached, cache_optimizer, rows, device=self.device, step=0,
-            physical_document_batch=2, temperature=0.05)
+            physical_document_batch=2, physical_query_batch=2, temperature=0.05)
         self.assertAlmostEqual(cached_result.loss, float(direct_loss.detach()), places=6)
         for (direct_name, direct_parameter), (cache_name, cache_parameter) in zip(
             direct.named_parameters(), cached.named_parameters()
@@ -216,6 +242,148 @@ class TrainingPrimitiveTests(unittest.TestCase):
             self.assertEqual(direct_name, cache_name)
             self.assertTrue(torch.allclose(direct_parameter, cache_parameter, atol=2e-6, rtol=1e-5),
                             msg=f"gradient-cache update differs for {direct_name}")
+
+    def test_logical64_gradient_cache_replays_query_chunks_of32_and_matches_direct_update(self) -> None:
+        rows = [
+            {"query_ids": [2, 3 + (i % 58), 1],
+             "positive_ids": [2, 3 + ((i * 3 + 7) % 58), 1],
+             "negative_ids": [2, 3 + ((i * 7 + 19) % 58), 1]}
+            for i in range(64)
+        ]
+        torch.manual_seed(614)
+        base = TinyNextBert()
+        direct, cached = copy.deepcopy(base), copy.deepcopy(base)
+        direct_optimizer = AdamW(direct.parameters(), lr=1e-3)
+        cache_optimizer = AdamW(cached.parameters(), lr=1e-3)
+        logical = retrieval_logical_batch(rows, device=self.device)
+
+        torch.manual_seed(901)
+        direct_optimizer.zero_grad(set_to_none=True)
+        query_vectors = []
+        for start in range(0, 64, 32):
+            ids, mask = collate_sequences(
+                [row["query_ids"] for row in rows[start:start + 32]],
+                                          pad_token_id=0, device=self.device)
+            query_vectors.append(_encode_retrieval(direct, ids, mask))
+        doc_sequences = [row["positive_ids"] for row in rows] + [row["negative_ids"] for row in rows]
+        document_vectors = []
+        for start in range(0, len(doc_sequences), 4):
+            ids, mask = collate_sequences(doc_sequences[start:start + 4], pad_token_id=0, device=self.device)
+            document_vectors.append(_encode_retrieval(direct, ids, mask))
+        q, d = torch.cat(query_vectors), torch.cat(document_vectors)
+        logits = q.float() @ d.float().T / 0.05
+        logits = logits.masked_fill(~logical["valid_negative"], torch.finfo(logits.dtype).min)
+        loss = F.cross_entropy(logits, logical["positive_columns"])
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(direct.parameters(), 1.0)
+        direct_optimizer.step()
+
+        call_sizes: list[int] = []
+        original_encode = cached.encode_retrieval
+        def spy_encode(*, input_ids, attention_mask=None, content_mask=None):
+            call_sizes.append(int(input_ids.shape[0]))
+            return original_encode(input_ids=input_ids, attention_mask=attention_mask,
+                                   content_mask=content_mask)
+
+        cached.encode_retrieval = spy_encode
+        torch.manual_seed(901)
+        cache_result = train_retrieval_step(
+            cached, cache_optimizer, rows, device=self.device, step=0,
+            physical_query_batch=32, physical_document_batch=4, temperature=0.05)
+        self.assertEqual(tuple(logical["valid_negative"].shape), (64, 128))
+        self.assertEqual(call_sizes[:2], [32, 32])
+        self.assertEqual(call_sizes[2:34], [4] * 32)
+        self.assertAlmostEqual(cache_result.loss, float(loss.detach()), places=6)
+        for (direct_name, direct_parameter), (cache_name, cache_parameter) in zip(
+            direct.named_parameters(), cached.named_parameters()
+        ):
+            self.assertEqual(direct_name, cache_name)
+            self.assertTrue(torch.allclose(direct_parameter, cache_parameter, atol=2e-6, rtol=1e-5),
+                            msg=f"logical64 gradient-cache update differs for {direct_name}")
+
+    def test_new_plan_drives_mlm_stage_offsets_and_downstream_batches(self) -> None:
+        plan = read_plan()
+        schedule = adaptation_stage_schedule(plan)
+        self.assertEqual([(row["max_length"], row["start_step"], row["end_step"])
+                          for row in schedule],
+                         [(512, 0, 192), (1024, 192, 384), (4096, 384, 448), (8192, 448, 512)])
+        self.assertEqual(qa_phase_steps(plan), {"regular": 625, "long": 63})
+        self.assertEqual(run_pilot._task_batch_signature("classification", "all", plan),
+                         {"physical_batch": 32, "gradient_accumulation": 2, "effective_batch": 64})
+        self.assertEqual(run_pilot._task_batch_signature("qa", "regular", plan)["effective_batch"], 32)
+        self.assertEqual(run_pilot._task_batch_signature("qa", "long", plan),
+                         {"physical_batch": 8, "gradient_accumulation": 4, "effective_batch": 32})
+        self.assertEqual(run_pilot._task_batch_signature("retrieval", "all", plan),
+                         {"physical_batch": 32, "gradient_accumulation": 1,
+                          "effective_batch": 64, "logical_retrieval_queries": 64,
+                          "physical_query_batch": 32, "physical_document_batch": 4})
+        self.assertEqual(run_pilot._task_batch_signature("reranking", "all", plan),
+                         {"physical_batch": 4, "gradient_accumulation": 2,
+                          "effective_batch": 8, "physical_pairs": 12, "effective_pairs": 24})
+        planned_qa = run_pilot._planned_task_steps(
+            "qa", {"qa_rows": [
+                {"question_id": "r0", "input_ids": [1, 2]},
+                {"question_id": "r0", "input_ids": [1, 2]},
+                {"question_id": "r1", "input_ids": [1, 2]},
+                {"question_id": "l0", "input_ids": [1] * 513},
+            ]}, plan)
+        self.assertEqual(planned_qa["regular"]["planned_optimizer_steps"], 625)
+        self.assertEqual(planned_qa["regular"]["target_count_per_epoch"], 10000)
+        self.assertEqual(planned_qa["regular"]["source_count"], 2)
+        self.assertEqual(planned_qa["long"]["planned_optimizer_steps"], 63)
+        self.assertEqual(planned_qa["long"]["target_count_per_epoch"], 1000)
+        self.assertEqual(planned_qa["long"]["source_count"], 1)
+
+    def test_v3_balanced_projection_averages_matching_token_and_span_medians(self) -> None:
+        plan = read_plan()
+        cases = []
+        for mode, times in (("token", [2.0, 4.0, 6.0]), ("span", [4.0, 6.0, 8.0])):
+            cases.append({
+                "variant": "V3", "length": 4096, "mode": mode,
+                "physical_microbatch": 8, "gradient_accumulation": 4,
+                "effective_sequences": 32,
+                "steps": [{"pilot_role": "measured", "mlm_mode": mode,
+                           "optimizer_step_seconds": value} for value in times],
+            })
+        projections = run_pilot._adaptation_projection(cases, plan)
+        row = next(item for item in projections
+                   if item["variant"] == "V3" and item["length"] == 4096)
+        self.assertEqual(row["objective_mode"], "balanced_token_span_50_50")
+        self.assertAlmostEqual(row["measured_pilot_step_seconds_median"], 5.0)
+        self.assertEqual(row["measured_pilot_sample_count"], 3)
+        self.assertEqual(row["measured_mode_sample_counts"], {"token": 3, "span": 3})
+        self.assertEqual(row["projected_seconds"], 320.0)
+
+        cases[0]["physical_microbatch"] = 4
+        rejected = next(item for item in run_pilot._adaptation_projection(cases, plan)
+                        if item["variant"] == "V3" and item["length"] == 4096)
+        self.assertEqual(rejected["projection_status"], "unmeasured_batch_mismatch")
+        self.assertIsNone(rejected["projected_seconds"])
+
+    def test_training_matrix_uses_dynamic_absolute_mlm_targets_and_profile(self) -> None:
+        plan = read_plan()
+        commands = run_training_matrix.build_commands(
+            Path("model"), None, Path("out"), plan)
+        mlm = [cmd for cmd in commands if cmd[cmd.index("--task") + 1] == "mlm"]
+        self.assertEqual(len(mlm), 14)
+        self.assertTrue(all("--final-weights-only" not in cmd for cmd in mlm))
+        v3 = [cmd for cmd in mlm if cmd[cmd.index("--variant") + 1] == "V3"]
+        self.assertEqual([cmd[cmd.index("--steps") + 1] for cmd in v3], ["448", "512"])
+        self.assertTrue(all("balanced" in cmd for cmd in v3))
+        self.assertIn("--shared-prefix-resume", v3[0])
+        self.assertIn("--resume-from", v3[0])
+        self.assertEqual(run_training_matrix._default_data_dir(plan),
+                         run_training_matrix.ROOT / "data" / "prepared" / "full_67m")
+        prefix = Path("out/mlm/V2/1024/V2_mlm_checkpoint.pt")
+        self.assertFalse(run_training_matrix._should_delete_resumed_checkpoint(
+            "V2", prefix, prefix))
+        self.assertTrue(run_training_matrix._should_delete_resumed_checkpoint(
+            "V3", prefix, prefix))
+        qa_commands = [cmd for cmd in commands if cmd[cmd.index("--task") + 1] == "qa"]
+        self.assertTrue(qa_commands)
+        self.assertTrue(all(cmd[cmd.index("--steps") + 1] == "688" for cmd in qa_commands))
+        downstream_commands = [cmd for cmd in commands if cmd[cmd.index("--task") + 1] != "mlm"]
+        self.assertTrue(all("--final-weights-only" in cmd for cmd in downstream_commands))
 
     def test_checkpoint_restores_model_optimizer_and_scheduler(self) -> None:
         model = TinyNextBert()

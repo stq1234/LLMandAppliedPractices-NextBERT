@@ -7,4 +7,4 @@ data/raw/
 runs/
 .pytest_cache/
 data/prepared/
-results/formal/
+results/formal*/

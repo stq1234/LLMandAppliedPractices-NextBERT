@@ -1,0 +1,10 @@
+{
+  "archive": "full_67m_qa.tar.gz",
+  "bytes": 7953910,
+  "sha256": "5f8972bfcebbf178d7a0b54f0ac75bf5806d9b286d9065423e1a5866f62560f9",
+  "members": [
+    "data/prepared/full_67m/manifest_qa.json",
+    "data/prepared/full_67m/qa_dev.jsonl",
+    "data/prepared/full_67m/qa_test.jsonl"
+  ]
+}

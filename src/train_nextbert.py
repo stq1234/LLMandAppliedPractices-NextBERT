@@ -30,7 +30,6 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = PACKAGE_ROOT / "configs" / "experiment_plan.json"
 ADAPTATION_PATH = PACKAGE_ROOT / "configs" / "mmbert_adaptation.json"
 TASKS = ("mlm", "classification", "qa", "retrieval", "reranking")
-MLM_STAGE_STARTS = {512: 0, 1024: 256, 4096: 512, 8192: 640}
 TASK_HEAD_KEY_PARTS = (
     "classification_head", "classifier", "classification", "qa_head", "span_head",
     "qa_outputs", "start_head", "end_head", "retrieval_projection", "retrieval_head",
@@ -40,6 +39,53 @@ TASK_HEAD_KEY_PARTS = (
 
 def read_plan(path: Path = PLAN_PATH) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def adaptation_stage_schedule(plan: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Return plan stages with cumulative absolute ``start_step``/``end_step``."""
+    adaptation = plan.get("adaptation", plan)
+    stages = adaptation.get("stages", [])
+    if not stages:
+        raise ValueError("experiment plan has no adaptation stages")
+    schedule: list[dict[str, Any]] = []
+    offset = 0
+    seen_lengths: set[int] = set()
+    for raw_stage in stages:
+        stage = dict(raw_stage)
+        length = int(stage["max_length"])
+        steps = int(stage["optimizer_steps"])
+        if length in seen_lengths or steps < 1:
+            raise ValueError("adaptation stages must have unique lengths and positive optimizer_steps")
+        seen_lengths.add(length)
+        stage["start_step"] = offset
+        stage["end_step"] = offset + steps
+        schedule.append(stage)
+        offset += steps
+    return schedule
+
+
+def qa_phase_steps(plan: Mapping[str, Any]) -> dict[str, int]:
+    """Compute regular and long QA optimizer targets from plan counts and batches."""
+    downstream = plan["downstream"]
+    qa = downstream["qa"]
+    long = qa.get("long_augmentation", {})
+    epochs = int(downstream.get("shared", {}).get("epochs", 2))
+    language_count = int(qa.get("language_count", len(qa.get("sources", ("zh", "en")))))
+    regular_questions_per_language = int(qa.get("train_questions_per_language", 0))
+    regular_target = int(qa.get("regular_target_questions",
+                                regular_questions_per_language * language_count))
+    regular_effective = int(qa.get("effective_batch", int(qa.get("physical_batch", 16))
+                                * int(qa.get("accumulation", 2))))
+    regular_steps = int(qa.get("regular_steps", math.ceil(regular_target * epochs / regular_effective)))
+
+    long_target = long.get("train_questions_total")
+    if long_target is None:
+        fraction = float(long.get("fraction_of_regular_training_windows", 0.0))
+        long_target = math.ceil(regular_target * fraction)
+    long_effective = int(long.get("effective_batch", int(long.get("physical_batch", 1))
+                              * int(long.get("accumulation", 1))))
+    long_steps = int(long.get("steps", math.ceil(int(long_target) * epochs / max(1, long_effective))))
+    return {"regular": regular_steps, "long": long_steps}
 
 
 def _seed_everything(seed: int) -> None:
@@ -439,22 +485,33 @@ def corrupt_mlm(input_ids: Tensor, attention_mask: Tensor, *, vocab_size: int,
             perm = torch.randperm(len(candidates), generator=generator).tolist()
             selected[row, [candidates[index] for index in perm[:target_count]]] = True
             continue
+        # A random permutation is the same without-replacement ordering as
+        # repeatedly drawing a uniform start from the remaining candidates.
+        # Pre-sampling one truncated geometric length per candidate avoids
+        # rebuilding a shrinking O(L) candidate list for every span.
+        permutation = torch.randperm(len(candidates), generator=generator).tolist()
+        probability = min(1.0, 1.0 / span_mean)
+        if span_max == 1 or probability >= 1.0:
+            span_lengths = torch.ones(len(candidates), dtype=torch.long)
+        else:
+            uniforms = torch.rand(len(candidates), generator=generator, dtype=torch.float64)
+            geometric = torch.floor(torch.log1p(-uniforms) / math.log1p(-probability)).long() + 1
+            span_lengths = geometric.clamp_(max=span_max)
         chosen: set[int] = set()
-        while len(chosen) < target_count:
-            remaining = [position for position in candidates if position not in chosen]
-            start = remaining[int(torch.randint(len(remaining), (1,), generator=generator).item())]
-            # Geometric lengths have mean close to the configured span mean,
-            # truncated at span_max.  Truncate at special/padding boundaries.
-            probability = min(1.0, 1.0 / span_mean)
-            length = 1
-            while length < span_max and torch.rand((), generator=generator).item() > probability:
-                length += 1
-            for position in range(start, min(start + length, ids_cpu.shape[1])):
+        for candidate_index in permutation:
+            start = candidates[candidate_index]
+            if start in chosen:
+                continue
+            span_length = int(span_lengths[candidate_index])
+            for delta in range(min(span_length, ids_cpu.shape[1] - start)):
+                position = start + delta
                 if not eligible[row, position] or position in chosen:
                     break
                 chosen.add(position)
                 if len(chosen) == target_count:
                     break
+            if len(chosen) == target_count:
+                break
         selected[row, list(chosen)] = True
 
     labels = torch.full_like(ids_cpu, -100)
@@ -739,10 +796,13 @@ def _encode_microbatches(model: nn.Module, sequences: Sequence[Sequence[int]], *
 def train_retrieval_step(model: nn.Module, optimizer: AdamW,
                          records: Sequence[Mapping[str, Any]], *, device: torch.device,
                          step: int, physical_document_batch: int = 4,
+                         physical_query_batch: int = 32,
                          temperature: float = 0.05, pad_token_id: int = 0) -> StepRecord:
     """Gradient-cache InfoNCE over the full logical query batch, then RNG replay."""
     if physical_document_batch < 2:
         raise ValueError("physical_document_batch must be at least 2")
+    if physical_query_batch < 1:
+        raise ValueError("physical_query_batch must be positive")
     logical = retrieval_logical_batch(records, device=device, pad_token_id=pad_token_id)
     q_sequences = logical["query_tokens"]
     d_sequences = logical["document_tokens"]
@@ -755,7 +815,7 @@ def train_retrieval_step(model: nn.Module, optimizer: AdamW,
     try:
         with torch.no_grad():
             q_cache, q_states = _encode_microbatches(
-                model, q_sequences, device=device, microbatch=physical_document_batch,
+                model, q_sequences, device=device, microbatch=physical_query_batch,
                 pad_token_id=pad_token_id, collect_rng=True)
             d_cache, d_states = _encode_microbatches(
                 model, d_sequences, device=device, microbatch=physical_document_batch,
@@ -773,9 +833,9 @@ def train_retrieval_step(model: nn.Module, optimizer: AdamW,
     q_gradient = q_leaf.grad.detach()
     d_gradient = d_leaf.grad.detach()
     q_offset = d_offset = 0
-    for sequence_start in range(0, len(q_sequences), physical_document_batch):
+    for sequence_start in range(0, len(q_sequences), physical_query_batch):
         _restore_rng(q_states[q_offset], device)
-        sequences = q_sequences[sequence_start:sequence_start + physical_document_batch]
+        sequences = q_sequences[sequence_start:sequence_start + physical_query_batch]
         ids, mask = collate_sequences(sequences, pad_token_id=pad_token_id, device=device)
         q_live = _encode_retrieval(model, ids, mask)
         gradients = q_gradient[sequence_start:sequence_start + len(sequences)]
@@ -967,6 +1027,7 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
         raise ValueError(f"task must be one of {TASKS}")
     if steps < 1:
         raise ValueError("steps must be explicitly positive; full matrix auto-run is disabled")
+    plan = read_plan()
     if task == "mlm":
         if length not in {512, 1024, 4096, 8192}:
             raise ValueError("MLM requires an explicit length in {512,1024,4096,8192}")
@@ -978,26 +1039,26 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
         if len(array) < 1:
             raise ValueError("MLM prepared array has no rows")
         mlm_split_provenance = validate_mlm_split_sidecar(data_path, len(array))
-        adaptation = read_plan()["adaptation"]
-        stage = next(item for item in adaptation["stages"] if item["max_length"] == length)
+        adaptation = plan["adaptation"]
+        stage = next(item for item in adaptation["stages"] if int(item["max_length"]) == length)
+        stage_schedule = next(item for item in adaptation_stage_schedule(plan)
+                              if int(item["max_length"]) == length)
         per_device = batch_size or stage["physical_microbatch"]
         accum = accumulation or stage["gradient_accumulation"]
         if per_device < 2:
             raise ValueError("physical microbatch one is prohibited by the experiment plan")
         if model_dir is None:
             raise ValueError("--model-dir is required for local offline model construction")
-        plan = read_plan()
         model_config = json.loads((model_dir / "config.json").read_text(encoding="utf-8"))
         vocab_size = int(model_config.get("vocab_size", 256000))
         mask_token_id = int(model_config.get("mask_token_id", 4))
         special_ids = _special_ids()
         data_records = None
-        sampler_stage_start = MLM_STAGE_STARTS[length]
+        sampler_stage_start = int(stage_schedule["start_step"])
         qa_groups: dict[str, list[dict[str, Any]]] = {}
         qa_regular_steps = 0
     else:
         records = load_jsonl(data_path)
-        plan = read_plan()
         vocab_size = 0
         mask_token_id = 4
         special_ids = _special_ids()
@@ -1006,38 +1067,50 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
         qa_groups = {}
         qa_regular_steps = 0
         if task == "retrieval":
-            per_device = physical_document_batch
+            task_plan = plan["downstream"]["retrieval"]
+            logical_retrieval_queries = int(task_plan["logical_batch_queries"])
+            physical_query_batch = int(task_plan["physical_query_batch"])
+            per_device = (physical_document_batch if physical_document_batch is not None
+                          else int(task_plan["physical_document_batch"]))
             accum = 1
             if per_device is not None and per_device < 2:
                 raise ValueError("physical document batch must be at least 2")
-            if batch_size is not None and batch_size != 32:
-                raise ValueError("retrieval logical batch must remain 32; configure physical document batch")
+            if batch_size is not None and batch_size != logical_retrieval_queries:
+                raise ValueError(f"retrieval logical query batch is {logical_retrieval_queries}; "
+                                 "configure document microbatch with --physical-document-batch")
         elif task == "reranking":
-            per_device = batch_size or 4
-            accum = accumulation or 2
+            task_plan = plan["downstream"]["reranking"]
+            per_device = batch_size or int(task_plan["physical_query_groups"])
+            accum = accumulation or int(task_plan["accumulation"])
         elif task == "qa":
+            task_plan = plan["downstream"]["qa"]
+            long_plan = task_plan.get("long_augmentation", {})
+            regular_max_length = int(task_plan["max_length"])
             qa_groups = {
                 "regular": [row for row in records
-                            if len(row["input_ids"]) <= 512 and row.get("window_type") != "long"],
+                            if len(row["input_ids"]) <= regular_max_length
+                            and row.get("window_type") != "long"],
                 "long": [row for row in records
-                         if len(row["input_ids"]) > 512 or row.get("window_type") == "long"],
+                         if len(row["input_ids"]) > regular_max_length
+                         or row.get("window_type") == "long"],
             }
             if not qa_groups["regular"]:
-                raise ValueError("prepared QA data has no regular <=512-token features")
-            qa_regular_steps = math.ceil(len(qa_groups["regular"]) * 2 / 32)
-            per_device = batch_size or 16
-            accum = accumulation or 2
-            planned_long_steps = math.ceil((len(qa_groups["long"]) or
-                                            math.ceil(len(qa_groups["regular"]) * 0.1)) * 2 / 8)
+                raise ValueError(f"prepared QA data has no regular <={regular_max_length}-token features")
+            qa_steps = qa_phase_steps(plan)
+            qa_regular_steps = qa_steps["regular"]
+            planned_long_steps = qa_steps["long"]
+            per_device = batch_size or int(task_plan["physical_batch"])
+            accum = accumulation or int(task_plan["accumulation"])
             if steps > qa_regular_steps and not qa_groups["long"]:
-                raise ValueError("requested QA steps include the 4K augmentation phase, but no long windows are prepared")
+                raise ValueError("requested QA steps include the long augmentation phase, "
+                                 "but no long windows are prepared")
             if steps > qa_regular_steps + planned_long_steps:
                 raise ValueError(f"requested QA budget {steps} exceeds prepared regular+long schedule "
                                  f"({qa_regular_steps + planned_long_steps})")
         else:
-            default = 16 if task == "classification" else 16
-            per_device = batch_size or default
-            accum = accumulation or 2
+            task_plan = plan["downstream"][task]
+            per_device = batch_size or int(task_plan["physical_batch"])
+            accum = accumulation or int(task_plan["accumulation"])
     if task != "retrieval" and per_device < 2:
         raise ValueError("physical batch size one is prohibited by the experiment plan")
     model.train()
@@ -1066,6 +1139,9 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
                                       allow_shared_variant_alias=shared_prefix_resume)
         if start_step >= steps:
             raise ValueError(f"resume checkpoint already completed {start_step} of {steps} steps")
+    if task == "mlm" and start_step < sampler_stage_start:
+        raise ValueError(f"length {length} begins at absolute step {sampler_stage_start}; "
+                         "resume from the preceding planned MLM stage")
     run_steps = min(steps - start_step, stop_after_steps or steps)
     if run_steps < 1:
         raise ValueError("no remaining steps requested")
@@ -1095,8 +1171,8 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
                 optimizer_step=global_step,
             )
         elif task == "retrieval":
-            indices = _epoch_sample_indices(len(data_records or []), 32, seed=seed,
-                                            offset=global_step * 32)
+            indices = _epoch_sample_indices(len(data_records or []), logical_retrieval_queries,
+                                            seed=seed, offset=global_step * logical_retrieval_queries)
             sampled_row_indices.extend(int(index) for index in indices)
             row_batch = [(data_records or [])[int(index)] for index in indices]
             retrieval_physical_batch = choose_retrieval_physical_batch(
@@ -1104,6 +1180,7 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
             step_record = train_retrieval_step(
                 model, optimizer, row_batch, device=device, step=global_step,
                 physical_document_batch=retrieval_physical_batch,
+                physical_query_batch=physical_query_batch,
             )
         elif task == "reranking":
             rerank_rows = retrieval_to_reranking_records(data_records or [], max_length=1024)
@@ -1128,11 +1205,15 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
             if global_step < qa_regular_steps:
                 current_rows = qa_groups["regular"]
                 current_step = global_step
-                current_physical, current_accumulation, subphase = 16, 2, "regular"
+                current_physical = int(task_plan["physical_batch"])
+                current_accumulation = int(task_plan["accumulation"])
+                subphase = "regular"
             else:
                 current_rows = qa_groups["long"]
                 current_step = global_step - qa_regular_steps
-                current_physical, current_accumulation, subphase = 4, 2, "long"
+                current_physical = int(task_plan["long_augmentation"]["physical_batch"])
+                current_accumulation = int(task_plan["long_augmentation"]["accumulation"])
+                subphase = "long"
             row_count = current_physical * current_accumulation
             indices = _epoch_sample_indices(len(current_rows), row_count, seed=seed,
                                             offset=current_step * row_count)
@@ -1165,9 +1246,17 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
         record.update({"task": task, "variant": variant, "seed": seed,
                        "length": length, "mlm_mode": effective_mode if task == "mlm" else None,
                        "data_sha256": data_sha256,
+                       "physical_batch": (current_physical if task == "qa" else
+                                          per_device if task != "retrieval" else None),
+                       "gradient_accumulation": (current_accumulation if task == "qa" else accum),
+                       "effective_batch": (current_physical * current_accumulation if task == "qa" else
+                                           logical_retrieval_queries if task == "retrieval" else
+                                           per_device * accum),
                        "learning_rates": [float(group["lr"]) for group in optimizer.param_groups]})
         if task == "retrieval":
             record["physical_document_batch"] = retrieval_physical_batch
+            record["physical_query_batch"] = physical_query_batch
+            record["logical_retrieval_queries"] = logical_retrieval_queries
         records_out.append(record)
         _write_jsonl(log_path, [record])
         is_final = local_step == run_steps - 1
@@ -1179,8 +1268,10 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
                 "planned_total_steps": schedule_total_steps or steps,
                 "sampler": {"seed": seed, "next_global_step": global_step + 1,
                             "stage_start_step": sampler_stage_start,
-                            "rows_per_optimizer_step": 32 if task == "retrieval" else per_device * accum,
+                            "rows_per_optimizer_step": (logical_retrieval_queries if task == "retrieval"
+                                                        else per_device * accum),
                             "physical_document_batch": retrieval_physical_batch if task == "retrieval" else None,
+                            "physical_query_batch": physical_query_batch if task == "retrieval" else None,
                             "qa_regular_steps": qa_regular_steps if task == "qa" else None,
                             "qa_regular_rows": len(qa_groups.get("regular", [])),
                             "qa_long_rows": len(qa_groups.get("long", [])),

@@ -1,7 +1,7 @@
 {
   "archive": "full_wiki.tar.gz",
   "bytes": 20133571,
-  "sha256": "2974f762e006b5d11b2faf72267e16aac0a345d1b667b274b9a6b967c2dc5bae",
+  "sha256": "0e957a230f77de351848875324556c0df3e6044db97962d1dacfa70858b6287d",
   "members": [
     "data/prepared/full/manifest_wiki.json",
     "data/prepared/full/wiki_1024.jsonl",

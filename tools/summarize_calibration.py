@@ -22,7 +22,7 @@ def item(report, name):
 
 
 def main():
-    plan = read_plan()
+    plan = read_plan(ROOT / 'configs/calibration_small_plan.json')
     mlm = read('results/pilot_mlm7/pilot_report.json')['mlm_calibration_cases']
     tasks = read('results/pilot_qa_cls7/pilot_report.json')['downstream_calibration_cases']
     tasks += read_lines('results/pilot_retrieval_final7/pilot_cases.jsonl')

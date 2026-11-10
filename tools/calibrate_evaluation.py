@@ -273,7 +273,23 @@ def _derive_split_path(data_path: Path, split: str) -> Path | None:
     return candidate if candidate.is_file() else None
 
 
-def _probe_rows(rows: Sequence[Mapping[str, Any]], task: str, count: int = PROBE_BATCH_SIZE) -> list[dict[str, Any]]:
+def _probe_rows(
+    rows: Sequence[Mapping[str, Any]],
+    task: str,
+    count: int = PROBE_BATCH_SIZE,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    before = len(rows)
+    if task == "qa":
+        rows = [
+            row for row in rows
+            if row.get("input_ids")
+            and len(row["input_ids"]) <= 512
+            and row.get("window_type") != "long"
+        ]
+        filter_rule = "input_ids length <= 512 and window_type != 'long'"
+    else:
+        filter_rule = "no length filter"
+    after_length_filter = len(rows)
     valid: list[Mapping[str, Any]] = []
     for row in rows:
         if not row.get("input_ids"):
@@ -290,10 +306,23 @@ def _probe_rows(rows: Sequence[Mapping[str, Any]], task: str, count: int = PROBE
         valid.append(row)
     sample = _stratified_sample(valid, count, unique_question=(task == "qa"))
     if not sample:
-        return []
+        return [], {
+            "rule": filter_rule,
+            "rows_before": before,
+            "rows_after_length_filter": after_length_filter,
+            "rows_probe_eligible": len(valid),
+            "rows_sampled": 0,
+        }
     while len(sample) < count:
         sample.extend(sample[: min(count - len(sample), len(sample))])
-    return sample[:count]
+    sample = sample[:count]
+    return sample, {
+        "rule": filter_rule,
+        "rows_before": before,
+        "rows_after_length_filter": after_length_filter,
+        "rows_probe_eligible": len(valid),
+        "rows_sampled": len(sample),
+    }
 
 
 def _run_probe(
@@ -304,7 +333,7 @@ def _run_probe(
     device: torch.device,
     seed: int,
 ) -> dict[str, Any]:
-    rows = _probe_rows(train_rows, task)
+    rows, train_filter = _probe_rows(train_rows, task)
     if len(rows) != PROBE_BATCH_SIZE:
         raise ValueError(f"need at least one valid {task} training row to fill batch {PROBE_BATCH_SIZE}")
     _reset_probe_head(model, task, seed)
@@ -351,6 +380,7 @@ def _run_probe(
         "total_updates_executed": PROBE_WARMUP_UPDATES + PROBE_TIMED_UPDATES,
         "physical_batch_size": PROBE_BATCH_SIZE,
         "sampled_train_rows": len(rows),
+        "training_filter": train_filter,
         "mean_input_length": statistics.mean(len(row["input_ids"]) for row in rows),
         "timed_step_seconds": durations,
         "mean_timed_step_seconds": statistics.mean(durations),

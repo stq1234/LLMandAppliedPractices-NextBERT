@@ -1,7 +1,8 @@
 {
   "archive_root": "repository root",
   "large_file_rule_mib": 96,
-  "rebuild_command": "python src/prepare_data.py --profile full",
+  "rebuild_command": "python src/prepare_data.py --profile full_67m --plan configs/experiment_plan.json",
+  "legacy_rebuild_command": "python src/prepare_data.py --profile full --plan configs/calibration_small_plan.json",
   "included": [
     "data/archives/pilot_wiki.tar.gz",
     "data/archives/pilot_classification.tar.gz",
@@ -10,7 +11,11 @@
     "data/archives/full_wiki.tar.gz",
     "data/archives/full_classification.tar.gz",
     "data/archives/full_qa.tar.gz",
-    "data/archives/full_retrieval.tar.gz"
+    "data/archives/full_retrieval.tar.gz",
+    "data/archives/full_67m_wiki.tar.gz",
+    "data/archives/full_67m_classification.tar.gz",
+    "data/archives/full_67m_qa.tar.gz",
+    "data/archives/full_67m_retrieval.tar.gz"
   ],
   "excluded_large_files": [
     {
@@ -52,6 +57,56 @@
       "path": "data/prepared/full/retrieval_train.jsonl",
       "bytes": 152046721,
       "sha256": "d21e9304b199391258f0577d7a09294c99d6cc139390879d5f221cd2f7eedaf4"
+    },
+    {
+      "path": "data/prepared/full_67m/wiki_1024.npy",
+      "bytes": 100663424,
+      "sha256": "705bb1c6f761651028684194603b395f1a36245e80153fac9897cd878f5bb835"
+    },
+    {
+      "path": "data/prepared/full_67m/wiki_512.npy",
+      "bytes": 100663424,
+      "sha256": "3ff2d8eb5e820294140ac76e42df15736f3311dca29226eef38cfe6618fec3ad"
+    },
+    {
+      "path": "data/prepared/full_67m/qa_long_augmentation.jsonl",
+      "bytes": 100930751,
+      "sha256": "6272a0c51950c1ed604fa1b81bded3801f7199a9dea3d653d2ed74e205cbf5cd"
+    },
+    {
+      "path": "data/prepared/full_67m/qa_train.jsonl",
+      "bytes": 168450297,
+      "sha256": "75048622f4b4beadc165ac16614cda460bc04e8f51f8345397a7c4e10eb1dfe8"
+    },
+    {
+      "path": "data/prepared/full_67m/reranking_dev.jsonl",
+      "bytes": 186498151,
+      "sha256": "c1e838b098a1ea95dfd3da6af837eceffad13a6c42adb42947178e5707e7aba4"
+    },
+    {
+      "path": "data/prepared/full_67m/reranking_test.jsonl",
+      "bytes": 361918315,
+      "sha256": "473ded8b30a60430395cda56d3c3c3cc5d21a59290f17fe7a4a08babb5148d19"
+    },
+    {
+      "path": "data/prepared/full_67m/reranking_train.jsonl",
+      "bytes": 297212955,
+      "sha256": "0b2c114a6f57e7a7e494c01a930ff6a47398dda9572f2d014617bf2a61638c9d"
+    },
+    {
+      "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+      "bytes": 794181538,
+      "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0"
+    },
+    {
+      "path": "data/prepared/full_67m/retrieval_test.jsonl",
+      "bytes": 131211324,
+      "sha256": "64c4be675843d09c29cf95caf7932c949cae3ae53422cc7ee6b7ce0af0348070"
+    },
+    {
+      "path": "data/prepared/full_67m/retrieval_train.jsonl",
+      "bytes": 303099264,
+      "sha256": "a8e766e99bf9fd583dd4da56f2e166159222a12925744f330d7742575f795ec3"
     }
   ]
 }

@@ -1,7 +1,8 @@
 {
-  "status": "small_scale_implementation_calibrated_awaiting_training_scale_decision",
+  "status": "standard_67m_candidate_under_real_batch_calibration",
   "date": "2026-11-11",
-  "scope_note": "The 704-step branch is a small architecture-validation schedule. Its size and effective batches are not established convergence requirements or an approved formal training recipe.",
+  "data_profile": "full_67m",
+  "scope_note": "Candidate: 67,108,864 input tokens per complete warm-start branch, 131,072 tokens per optimizer update. Run short real-batch calibration only; full training awaits the user's budget decision. This token budget is a fixed experimental budget, not a claim of convergence.",
   "proposal_document": "重做实验方案.md",
   "checkpoint": {
     "model_id": "jhu-clsp/mmBERT-base",
@@ -144,7 +145,7 @@
         21
       ],
       "dual_scale": true,
-      "objective": "token MLM for first 512 steps; final 192 steps balanced token/span within each length stage",
+      "objective": "token MLM for first 384 steps; final 128 steps balanced token/span within each length stage",
       "tasks": [
         "classification",
         "qa",
@@ -164,50 +165,50 @@
     "stages": [
       {
         "max_length": 512,
-        "physical_microbatch": 16,
-        "gradient_accumulation": 2,
-        "effective_sequences": 32,
-        "optimizer_steps": 256,
-        "input_tokens": 4194304
+        "physical_microbatch": 64,
+        "gradient_accumulation": 4,
+        "effective_sequences": 256,
+        "optimizer_steps": 192,
+        "input_tokens": 25165824
       },
       {
         "max_length": 1024,
-        "physical_microbatch": 8,
-        "gradient_accumulation": 2,
-        "effective_sequences": 16,
-        "optimizer_steps": 256,
-        "input_tokens": 4194304
+        "physical_microbatch": 32,
+        "gradient_accumulation": 4,
+        "effective_sequences": 128,
+        "optimizer_steps": 192,
+        "input_tokens": 25165824
       },
       {
         "max_length": 4096,
-        "physical_microbatch": 4,
-        "gradient_accumulation": 1,
-        "effective_sequences": 4,
-        "optimizer_steps": 128,
-        "input_tokens": 2097152
+        "physical_microbatch": 8,
+        "gradient_accumulation": 4,
+        "effective_sequences": 32,
+        "optimizer_steps": 64,
+        "input_tokens": 8388608
       },
       {
         "max_length": 8192,
-        "physical_microbatch": 2,
-        "gradient_accumulation": 1,
-        "effective_sequences": 2,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 4,
+        "effective_sequences": 16,
         "optimizer_steps": 64,
-        "input_tokens": 1048576
+        "input_tokens": 8388608
       }
     ],
-    "full_branch_steps": 704,
-    "full_branch_input_tokens": 11534336,
+    "full_branch_steps": 512,
+    "full_branch_input_tokens": 67108864,
     "shared_prefix": {
       "variants": [
         "V2",
         "V3"
       ],
-      "steps": 512,
-      "input_tokens": 8388608,
+      "steps": 384,
+      "input_tokens": 50331648,
       "share_optimizer_state": true
     },
-    "total_executed_steps": 2304,
-    "total_input_tokens": 37748736,
+    "total_executed_steps": 1664,
+    "total_input_tokens": 218103808,
     "masking": {
       "ratio": 0.3,
       "mask_random_keep": [
@@ -223,8 +224,8 @@
     "optimizer": {
       "name": "AdamW",
       "full_parameter": true,
-      "backbone_lr": 0.00002,
-      "gate_lr": 0.001,
+      "backbone_lr": 0.00001,
+      "gate_lr": 0.0001,
       "weight_decay": 0.01,
       "clip_norm": 1,
       "warmup_fraction": 0.05,
@@ -253,12 +254,12 @@
         "facebook/xnli zh",
         "facebook/xnli en"
       ],
-      "train_per_language": 2000,
+      "train_per_language": 10000,
       "max_length": 256,
-      "physical_batch": 16,
+      "physical_batch": 32,
       "accumulation": 2,
-      "effective_batch": 32,
-      "steps": 250,
+      "effective_batch": 64,
+      "steps": 625,
       "backbone_lr": 0.00002,
       "head": "masked content mean; 768->3; cross entropy"
     },
@@ -267,7 +268,7 @@
         "SQuAD1.1",
         "CMRC2018"
       ],
-      "train_questions_per_language": 2000,
+      "train_questions_per_language": 5000,
       "max_length": 512,
       "physical_batch": 16,
       "accumulation": 2,
@@ -275,14 +276,14 @@
       "long_augmentation": {
         "fraction_of_regular_training_windows": 0.1,
         "max_length": 4096,
-        "physical_batch": 4,
-        "accumulation": 2,
-        "effective_batch": 8,
+        "physical_batch": 8,
+        "accumulation": 4,
+        "effective_batch": 32,
         "train_sources_only": true
       },
       "steps_estimate": [
-        350,
-        500
+        688,
+        688
       ],
       "step_rule": "complete regular feature list for 2 epochs, add 10% long features; ceil by batch separately and freeze actual counts",
       "backbone_lr": 0.00002,
@@ -290,13 +291,11 @@
     },
     "retrieval": {
       "source": "Shitao/MLDR zh and en",
-      "train_queries_per_language": 1000,
+      "train_queries_per_language": 2000,
       "steps": 125,
-      "logical_batch_queries": 32,
-      "physical_document_batch": [
-        2,
-        4
-      ],
+      "logical_batch_queries": 64,
+      "physical_document_batch": 4,
+      "physical_query_batch": 32,
       "query_max_length": 128,
       "document_length_proportions": {
         "512": 0.9,
@@ -313,7 +312,7 @@
     },
     "reranking": {
       "source": "same MLDR training queries",
-      "train_queries_total": 2000,
+      "train_queries_total": 4000,
       "negatives_per_positive": 2,
       "physical_query_groups": 4,
       "physical_pairs": 12,
@@ -321,7 +320,7 @@
       "effective_query_groups": 8,
       "effective_pairs": 24,
       "max_pair_length": 1024,
-      "steps": 500,
+      "steps": 1000,
       "backbone_lr": 0.00001,
       "head": "joint query-document encoder;mean;768->1;groupwise cross entropy"
     },
@@ -399,7 +398,7 @@
       ]
     },
     "long_context": {
-      "source_groups_per_language": 100,
+      "source_groups_per_language": 50,
       "lengths": [
         1024,
         4096,
@@ -412,8 +411,9 @@
       ],
       "interventions": [
         "intact",
-        "equal-length decisive fact replacement",
-        "irrelevant background replacement"
+        "evidence_deleted",
+        "counterfactual",
+        "background_replaced"
       ],
       "baselines": [
         "first512",
@@ -449,28 +449,28 @@
     "gpu_type": "RTX A6000 48GB",
     "max_physical_gpus": 1,
     "target_physical_gpu_hours": [
-      5,
-      7.5
+      10,
+      11
     ],
-    "hard_cap_physical_gpu_hours": 8,
-    "budget_scope": "provisional small-scale matrix only; includes 25 or 100 long-evidence groups/language; no formal training has been authorized",
+    "hard_cap_physical_gpu_hours": 12,
+    "budget_scope": "standard 67M candidate, 50 long-evidence groups/language; 8.114 projected GPU-hours, 10.142 with 25 percent margin; full training remains unapproved",
     "measured": true,
     "measurement_scope": "short optimizer calibration on GPU7, complete training-case coverage; full-run durations and convergence remain unmeasured",
-    "calibration_summary": "results/calibration_summary.json",
+    "calibration_summary": "results/calibration_standard67m_summary.json",
     "caps_gpu_hours": {
       "calibration": 0.5,
-      "adaptation": 0.65,
-      "classification": 0.12,
-      "qa": 0.5,
-      "retrieval": 1.1,
-      "reranking": 0.26,
-      "evaluation": 3.6,
-      "recovery": 0.6
+      "adaptation": 3.4,
+      "classification": 0.35,
+      "qa": 1.25,
+      "retrieval": 1.5,
+      "reranking": 0.55,
+      "evaluation": 3.0,
+      "recovery": 1.5
     },
     "physical_microbatch_one_allowed": false,
     "max_jobs_per_gpu": 1,
     "concurrency_rule": "two simultaneous 512-token jobs measured about 5 percent less aggregate throughput; use one process on GPU7 and reserve >=6GiB",
-    "storage_target_GB": 40,
+    "storage_target_GB": 50,
     "remote_host": "a6000",
     "remote_workdir": "~/LLM/nextbert",
     "preferred_pilot_gpu": 7,
@@ -480,7 +480,8 @@
   "execution_status": {
     "implemented": true,
     "data_frozen": true,
-    "data_scope": "small-scale profile; additional data for larger token budgets has not been prepared",
+    "data_scope": "standard 67M profile prepared and validated; old small-profile inputs retained as the real-batch calibration source",
+    "candidate_recipe_frozen": true,
     "formal_training_scale_selected": false,
     "training_started": false,
     "pilot_training_started": true,

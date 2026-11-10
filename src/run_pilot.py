@@ -22,9 +22,10 @@ import torch
 from train_nextbert import (
     PACKAGE_ROOT, _amp_context, _device, _epoch_batch, _epoch_sample_indices,
     _load_checkpoint, _prepare_downstream_batch, _save_checkpoint, _scheduler,
-    _seed_everything, _special_ids, choose_retrieval_physical_batch, collate_sequences,
+    _seed_everything, _special_ids, adaptation_stage_schedule,
+    choose_retrieval_physical_batch, collate_sequences,
     dataset_fingerprint, load_jsonl, load_nextbert, optimizer_for, pair_tokens,
-    read_plan, retrieval_to_reranking_records, train_mlm_step,
+    qa_phase_steps, read_plan, retrieval_to_reranking_records, train_mlm_step,
     train_retrieval_step, train_supervised_step, validate_mlm_split_sidecar,
 )
 from evaluate_nextbert import evaluate_reranking, evaluate_retrieval
@@ -161,15 +162,17 @@ def _mlm_case(*, variant: str, length: int, mode: str, model_dir: Path,
         for offset in range(0, len(chosen), physical):
             ids = torch.from_numpy(np.asarray(rows[chosen[offset:offset + physical]], dtype=np.int64)).to(device)
             batches.append((ids, ids.ne(0).long()))
+        effective_mode = ("token" if index % 2 == 0 else "span") if mode == "balanced" else mode
         record = train_mlm_step(
             model, optimizer, batches, device=device, vocab_size=vocab_size,
             special_ids=special_ids, mask_token_id=mask_token_id,
-            seed=seed + index * accumulation, mode=mode, accumulation=accumulation,
+            seed=seed + index * accumulation, mode=effective_mode, accumulation=accumulation,
             gate_ramp_updates=0, optimizer_step=index,
         )
         scheduler.step()
         step_records.append(_measured_record(record, ordinal=index + 1,
                                              warmup_steps=warmup_steps, mode=mode))
+        step_records[-1]["objective_mode_this_step"] = effective_mode
     if save_resume_probe:
         save_resume = _save_resume_probe(
             model=model, optimizer=optimizer, scheduler=scheduler, task="mlm",
@@ -211,14 +214,80 @@ def _prepare_reranking(records: Sequence[Mapping[str, Any]]) -> list[dict[str, A
     return retrieval_to_reranking_records(records, max_length=1024)
 
 
-def _qa_groups(rows: Sequence[Mapping[str, Any]]) -> dict[str, list[Mapping[str, Any]]]:
+def _qa_groups(rows: Sequence[Mapping[str, Any]], max_regular_length: int = 512) -> dict[str, list[Mapping[str, Any]]]:
     regular, long = [], []
     for row in rows:
-        if len(row["input_ids"]) > 512 or row.get("window_type") == "long":
+        if len(row["input_ids"]) > max_regular_length or row.get("window_type") == "long":
             long.append(row)
         else:
             regular.append(row)
     return {"regular": regular, "long": long}
+
+
+def _target_count(task: str, subphase: str, plan: Mapping[str, Any]) -> dict[str, Any]:
+    downstream = plan["downstream"]
+    epochs = int(downstream.get("shared", {}).get("epochs", 2))
+    cfg = downstream[task]
+    if task == "classification":
+        per_language = int(cfg.get("train_per_language", 0))
+        languages = int(cfg.get("language_count", len(cfg.get("sources", ("zh", "en")))))
+        per_epoch = per_language * languages
+        unit = "examples"
+    elif task == "qa":
+        languages = int(cfg.get("language_count", len(cfg.get("sources", ("zh", "en")))))
+        if subphase == "regular":
+            per_epoch = int(cfg.get("train_questions_per_language", 0)) * languages
+        else:
+            long_cfg = cfg.get("long_augmentation", {})
+            regular_per_epoch = int(cfg.get("train_questions_per_language", 0)) * languages
+            per_epoch = int(long_cfg.get(
+                "train_questions_total",
+                math.ceil(regular_per_epoch * float(long_cfg.get("fraction_of_regular_training_windows", 0.0))),
+            ))
+        unit = "questions"
+    elif task == "retrieval":
+        languages = int(cfg.get("language_count", len(cfg.get("sources", ("zh", "en")))))
+        per_epoch = int(cfg.get("train_queries_per_language", 0)) * languages
+        unit = "queries"
+    elif task == "reranking":
+        per_epoch = int(cfg.get("train_queries_total", 0))
+        unit = "query_groups"
+    else:
+        return {"target_count_per_epoch": None, "target_count_total_epochs": None,
+                "target_count_unit": None, "epochs": epochs}
+    return {"target_count_per_epoch": per_epoch,
+            "target_count_total_epochs": per_epoch * epochs,
+            "target_count_unit": unit, "epochs": epochs}
+
+
+def _task_batch_signature(task: str, subphase: str,
+                          plan: Mapping[str, Any],
+                          retrieval_document_batch_override: int | None = None) -> dict[str, int]:
+    cfg = plan["downstream"][task]
+    if task == "qa" and subphase == "long":
+        cfg = cfg["long_augmentation"]
+    if task == "retrieval":
+        logical = int(cfg["logical_batch_queries"])
+        query_physical = int(cfg["physical_query_batch"])
+        document_physical = (retrieval_document_batch_override
+                             if retrieval_document_batch_override is not None
+                             else int(cfg["physical_document_batch"]))
+        return {"physical_batch": query_physical, "gradient_accumulation": 1,
+                "effective_batch": logical, "logical_retrieval_queries": logical,
+                "physical_query_batch": query_physical,
+                "physical_document_batch": document_physical}
+    if task == "reranking":
+        physical = int(cfg["physical_query_groups"])
+        accumulation = int(cfg["accumulation"])
+        pairs_per_group = 1 + int(cfg["negatives_per_positive"])
+        return {"physical_batch": physical, "gradient_accumulation": accumulation,
+                "effective_batch": physical * accumulation,
+                "physical_pairs": physical * pairs_per_group,
+                "effective_pairs": physical * accumulation * pairs_per_group}
+    physical = int(cfg["physical_batch"])
+    accumulation = int(cfg["accumulation"])
+    return {"physical_batch": physical, "gradient_accumulation": accumulation,
+            "effective_batch": int(cfg.get("effective_batch", physical * accumulation))}
 
 
 def _task_case(*, phase: Mapping[str, Any], subphase: str,
@@ -230,19 +299,25 @@ def _task_case(*, phase: Mapping[str, Any], subphase: str,
     plan = read_plan()
     task, variant, seed = str(phase["task"]), str(phase["variant"]), int(phase["seed"])
     source_rows = load_jsonl(data_path)
+    batch_signature = _task_batch_signature(task, subphase, plan,
+                                            retrieval_physical_document_batch)
     if task == "qa":
-        rows = _qa_groups(source_rows)[subphase]
-        physical = 16 if subphase == "regular" else 4
-        accumulation = 2
+        max_regular_length = int(plan["downstream"]["qa"]["max_length"])
+        rows = _qa_groups(source_rows, max_regular_length)[subphase]
+        physical = batch_signature["physical_batch"]
+        accumulation = batch_signature["gradient_accumulation"]
     elif task == "classification":
         rows = source_rows
-        physical, accumulation = 16, 2
+        physical = batch_signature["physical_batch"]
+        accumulation = batch_signature["gradient_accumulation"]
     elif task == "retrieval":
         rows = source_rows
-        physical, accumulation = 32, 1
+        physical = batch_signature["physical_query_batch"]
+        accumulation = batch_signature["gradient_accumulation"]
     else:
         rows = _prepare_reranking(source_rows)
-        physical, accumulation = 4, 2
+        physical = batch_signature["physical_batch"]
+        accumulation = batch_signature["gradient_accumulation"]
     if not rows:
         return {"variant": variant, "task": task, "seed": seed,
                 "subphase": subphase, "status": "unmeasured_no_prepared_rows",
@@ -260,15 +335,17 @@ def _task_case(*, phase: Mapping[str, Any], subphase: str,
     sampled_row_indices: list[int] = []
     for index in range(schedule_steps):
         if task == "retrieval":
-            selected_indices = _epoch_sample_indices(len(rows), 32, seed=sample_seed,
-                                                     offset=index * 32)
+            logical_queries = batch_signature["logical_retrieval_queries"]
+            selected_indices = _epoch_sample_indices(len(rows), logical_queries, seed=sample_seed,
+                                                     offset=index * logical_queries)
             sampled_row_indices.extend(int(value) for value in selected_indices)
             logical_rows = [rows[int(value)] for value in selected_indices]
             physical_docs = choose_retrieval_physical_batch(
-                logical_rows, override=retrieval_physical_document_batch)
+                logical_rows, override=batch_signature["physical_document_batch"])
             record = train_retrieval_step(
                 model, optimizer, logical_rows, device=device, step=index,
-                physical_document_batch=physical_docs, temperature=0.05,
+                physical_document_batch=physical_docs,
+                physical_query_batch=batch_signature["physical_query_batch"], temperature=0.05,
             )
         elif task == "reranking":
             group_count = physical * accumulation
@@ -303,14 +380,37 @@ def _task_case(*, phase: Mapping[str, Any], subphase: str,
                                          warmup_steps=warmup_steps)
         if task == "retrieval":
             measured_step["physical_document_batch"] = physical_docs
+            measured_step["physical_query_batch"] = batch_signature["physical_query_batch"]
+            measured_step["logical_retrieval_queries"] = batch_signature["logical_retrieval_queries"]
+        elif task == "reranking":
+            measured_step["physical_pairs"] = batch_signature["physical_pairs"]
+            measured_step["effective_pairs"] = batch_signature["effective_pairs"]
         step_records.append(measured_step)
+    target_info = _target_count(task, subphase, plan)
+    if task == "qa":
+        question_ids = {str(row["question_id"]) for row in rows if row.get("question_id") is not None}
+        source_count = len(question_ids) if question_ids else len(rows)
+        source_count_unit = "questions" if question_ids else "feature_rows_without_question_id"
+    elif task == "reranking":
+        source_count = len(rows)
+        source_count_unit = "query_groups"
+    elif task == "retrieval":
+        source_count = len(rows)
+        source_count_unit = "queries"
+    else:
+        source_count = len(rows)
+        source_count_unit = "examples"
     result = {
         "variant": variant, "task": task, "seed": seed, "subphase": subphase,
         "physical_batch": physical, "gradient_accumulation": accumulation,
-        "effective_batch": physical * accumulation if task != "retrieval" else 32,
-        "logical_retrieval_queries": 32 if task == "retrieval" else None,
+        "effective_batch": batch_signature["effective_batch"],
+        **{key: value for key, value in batch_signature.items()
+           if key not in {"physical_batch", "gradient_accumulation", "effective_batch"}},
         "retrieval_physical_document_batch_override": retrieval_physical_document_batch
         if task == "retrieval" else None,
+        **target_info, "source_count": source_count,
+        "source_count_unit": source_count_unit,
+        "source_feature_rows": len(rows) if task == "qa" else None,
         "warmup_steps": warmup_steps, "measured_steps": measured_steps,
         "gate_ramp": 1.0, "data_file": str(data_path),
         "data_rows": len(rows), "data_sha256": dataset_fingerprint(data_path),
@@ -339,92 +439,196 @@ def _median_step_seconds(case: Mapping[str, Any], *, mode: str | None = None) ->
 
 
 def _adaptation_projection(mlm_cases: Sequence[Mapping[str, Any]], plan: Mapping[str, Any]) -> list[dict[str, Any]]:
-    lookup = {(row["variant"], row["length"], row["mode"]): _median_step_seconds(row)
+    lookup = {(str(row["variant"]), int(row["length"]), str(row["mode"])): row
               for row in mlm_cases}
-    stages = plan["adaptation"]["stages"]
+    stages = adaptation_stage_schedule(plan)
+    shared_steps = int(plan["adaptation"].get("shared_prefix", {}).get("steps", 0))
     projections: list[dict[str, Any]] = []
     for variant in VARIANTS:
         for stage in stages:
             length = int(stage["max_length"])
             steps = int(stage["optimizer_steps"])
-            if variant in {"V2", "V3"} and length in {512, 1024}:
+            shared_stage = (variant in {"V2", "V3"}
+                            and int(stage["end_step"]) <= shared_steps)
+            if shared_stage:
                 execution = "shared_prefix_V2_V3"
-                measured = lookup.get(("V2", length, "token"))
+                source_variant, requested_mode = "V2", "token"
             else:
                 execution = f"{variant}_branch"
-                if variant == "V3" and length in {4096, 8192}:
-                    token = lookup.get((variant, length, "token"))
-                    span = lookup.get((variant, length, "span"))
-                    measured = (token + span) / 2.0 if token is not None and span is not None else None
+                source_variant = variant
+                requested_mode = "balanced" if variant == "V3" and int(stage["start_step"]) >= shared_steps else "token"
+            expected = {"physical_microbatch": int(stage["physical_microbatch"]),
+                        "gradient_accumulation": int(stage["gradient_accumulation"]),
+                        "effective_sequences": int(stage.get(
+                            "effective_sequences", int(stage["physical_microbatch"])
+                            * int(stage["gradient_accumulation"]))) }
+
+            def matching_case(mode_name: str) -> tuple[Mapping[str, Any] | None, bool]:
+                candidate = lookup.get((source_variant, length, mode_name))
+                if candidate is None:
+                    return None, False
+                candidate_signature = {key: candidate.get(key) for key in expected}
+                return candidate, any(candidate_signature.get(key) != value
+                                      for key, value in expected.items())
+
+            if variant == "V3" and not shared_stage and int(stage["start_step"]) >= shared_steps:
+                balanced_case, balanced_mismatch = matching_case("balanced")
+                token_case, token_mismatch = matching_case("token")
+                span_case, span_mismatch = matching_case("span")
+                if balanced_case is not None and not balanced_mismatch:
+                    mode = "balanced"
+                    cases_for_projection = {"balanced": balanced_case}
+                    measured = _median_step_seconds(balanced_case, mode="balanced")
+                    measured_count = sum(1 for row in balanced_case.get("steps", [])
+                                         if row.get("pilot_role") == "measured" and row.get("mlm_mode") == "balanced")
+                    batch_mismatch = False
+                elif token_case is not None and span_case is not None and not token_mismatch and not span_mismatch:
+                    mode = "balanced_token_span_50_50"
+                    cases_for_projection = {"token": token_case, "span": span_case}
+                    token_median = _median_step_seconds(token_case, mode="token")
+                    span_median = _median_step_seconds(span_case, mode="span")
+                    measured = ((token_median + span_median) / 2.0
+                                if token_median is not None and span_median is not None else None)
+                    token_count = sum(1 for row in token_case.get("steps", [])
+                                      if row.get("pilot_role") == "measured" and row.get("mlm_mode") == "token")
+                    span_count = sum(1 for row in span_case.get("steps", [])
+                                     if row.get("pilot_role") == "measured" and row.get("mlm_mode") == "span")
+                    measured_count = min(token_count, span_count)
+                    batch_mismatch = False
                 else:
-                    measured = lookup.get((variant, length, "token"))
+                    mode = "balanced_token_span_50_50"
+                    cases_for_projection = {key: value for key, value in
+                                            (("balanced", balanced_case), ("token", token_case), ("span", span_case))
+                                            if value is not None}
+                    measured = None
+                    measured_count = 0
+                    batch_mismatch = any((case is not None and mismatch) for case, mismatch in
+                                         ((balanced_case, balanced_mismatch),
+                                          (token_case, token_mismatch), (span_case, span_mismatch)))
+            else:
+                mode = requested_mode
+                case, batch_mismatch = matching_case(mode)
+                cases_for_projection = {mode: case} if case is not None else {}
+                measured = None if case is None or batch_mismatch else _median_step_seconds(case, mode=mode)
+                measured_count = (sum(1 for row in case.get("steps", [])
+                                      if row.get("pilot_role") == "measured" and row.get("mlm_mode") == mode)
+                                  if case is not None and not batch_mismatch else 0)
+            observed = ({mode_name: {key: case.get(key) for key in expected}
+                         for mode_name, case in cases_for_projection.items()}) or None
             projections.append({
                 "variant": variant, "length": length, "planned_optimizer_steps": steps,
+                "absolute_start_step": int(stage["start_step"]),
+                "absolute_end_step": int(stage["end_step"]), "objective_mode": mode,
                 "physical_microbatch": int(stage["physical_microbatch"]),
                 "gradient_accumulation": int(stage["gradient_accumulation"]),
                 "execution_accounting": execution,
                 "measured_pilot_step_seconds_median": measured,
-                "measured_pilot_sample_count": sum(
-                    1 for row in next((c for c in mlm_cases if c["variant"] ==
-                        ("V2" if execution == "shared_prefix_V2_V3" else variant) and
-                        c["length"] == length and c["mode"] == "token"), {}).get("steps", [])
-                    if row.get("pilot_role") == "measured"),
+                "measured_pilot_sample_count": measured_count,
+                "measured_mode_sample_counts": {
+                    mode_name: sum(1 for row in case.get("steps", [])
+                                   if row.get("pilot_role") == "measured" and row.get("mlm_mode") == mode_name)
+                    for mode_name, case in cases_for_projection.items()},
+                "batch_signature_match": bool(cases_for_projection) and not batch_mismatch,
+                "expected_batch_signature": expected, "observed_batch_signature": observed,
                 "projected_seconds": measured * steps if measured is not None else None,
-                "projection_status": "projected_from_measured_pilot" if measured is not None
-                                     else "unmeasured_missing_pilot",
+                "projection_status": ("projected_from_measured_pilot" if measured is not None
+                                       else "unmeasured_batch_mismatch" if batch_mismatch
+                                       else "unmeasured_missing_pilot"),
             })
     return projections
 
 
-def _planned_task_steps(task: str, task_data: Mapping[str, Any], plan: Mapping[str, Any]) -> dict[str, int | list[int] | None]:
+def _task_source_counts(task: str, subphase: str, task_data: Mapping[str, Any],
+                        plan: Mapping[str, Any]) -> dict[str, Any]:
     if task == "qa":
         rows = task_data.get("qa_rows", [])
-        groups = _qa_groups(rows) if rows else {"regular": [], "long": []}
-        regular_n = len(groups["regular"])
-        long_n = len(groups["long"])
-        # Two full epochs; long features are separately batched by their
-        # recorded count and the plan's eight-question effective batch.
-        regular_steps = math.ceil(regular_n * 2 / 32) if regular_n else None
-        if long_n:
-            long_steps = math.ceil(long_n * 2 / 8)
-        elif regular_n:
-            long_steps = math.ceil(regular_n * 0.1 * 2 / 8)
-        else:
-            long_steps = None
-        return {"regular": regular_steps, "long": long_steps}
+        regular_limit = int(plan["downstream"]["qa"]["max_length"])
+        phase_rows = _qa_groups(rows, regular_limit).get(subphase, [])
+        ids = {str(row["question_id"]) for row in phase_rows if row.get("question_id") is not None}
+        return {"source_count": len(ids) if ids else len(phase_rows),
+                "source_count_unit": "questions" if ids else "feature_rows_without_question_id",
+                "source_feature_rows": len(phase_rows)}
     if task == "classification":
-        return {"all": int(plan["downstream"]["classification"]["steps"])}
+        rows = task_data.get("classification_rows", [])
+        return {"source_count": len(rows), "source_count_unit": "examples"}
     if task == "retrieval":
-        return {"all": int(plan["downstream"]["retrieval"]["steps"])}
+        rows = task_data.get("retrieval_rows", [])
+        return {"source_count": len(rows), "source_count_unit": "queries"}
     if task == "reranking":
-        return {"all": int(plan["downstream"]["reranking"]["steps"])}
-    return {"all": None}
+        rows = task_data.get("retrieval_rows", [])
+        return {"source_count": len(rows), "source_count_unit": "query_groups"}
+    return {"source_count": None, "source_count_unit": None}
+
+
+def _planned_task_steps(task: str, task_data: Mapping[str, Any], plan: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    downstream = plan["downstream"]
+    epochs = int(downstream.get("shared", {}).get("epochs", 2))
+    if task == "qa":
+        counts = qa_phase_steps(plan)
+        return {phase: {"planned_optimizer_steps": steps,
+                        **_target_count(task, phase, plan),
+                        **_task_source_counts(task, phase, task_data, plan)}
+                for phase, steps in counts.items()}
+    cfg = downstream[task]
+    target = _target_count(task, "all", plan)
+    if "steps" in cfg:
+        steps = int(cfg["steps"])
+    else:
+        physical = int(cfg.get("effective_batch", 1))
+        steps = math.ceil(int(target["target_count_total_epochs"] or 0) / physical)
+    return {"all": {"planned_optimizer_steps": steps, **target,
+                    **_task_source_counts(task, "all", task_data, plan)}}
+
+
+def _task_case_matches_plan(case: Mapping[str, Any], task: str, subphase: str,
+                            plan: Mapping[str, Any]) -> tuple[bool, dict[str, int], dict[str, Any]]:
+    expected = _task_batch_signature(task, subphase, plan)
+    keys = ["physical_batch", "gradient_accumulation", "effective_batch"]
+    if task == "retrieval":
+        keys += ["logical_retrieval_queries", "physical_query_batch", "physical_document_batch"]
+    elif task == "reranking":
+        keys += ["physical_pairs", "effective_pairs"]
+    observed = {key: case.get(key) for key in keys}
+    matched = all(observed.get(key) == expected.get(key) for key in keys)
+    return matched, {key: int(expected[key]) for key in keys}, observed
 
 
 def _downstream_projection(phases: Sequence[Mapping[str, Any]],
                            task_cases: Sequence[Mapping[str, Any]],
                            task_data: Mapping[str, Any], plan: Mapping[str, Any]) -> list[dict[str, Any]]:
     lookup = {(case["variant"], case["task"], int(case["seed"]), case["subphase"]):
-              _median_step_seconds(case) for case in task_cases}
+              case for case in task_cases}
     projections: list[dict[str, Any]] = []
     for phase_id, phase in enumerate(phases, 1):
         task = str(phase["task"])
         substeps = _planned_task_steps(task, task_data, plan)
-        for subphase, steps in substeps.items():
-            measured = lookup.get((phase["variant"], task, int(phase["seed"]), subphase))
+        for subphase, target in substeps.items():
+            case = lookup.get((phase["variant"], task, int(phase["seed"]), subphase))
+            batch_match, expected_batch, observed_batch = (
+                _task_case_matches_plan(case, task, subphase, plan) if case is not None
+                else (False, _task_batch_signature(task, subphase, plan), None))
+            measured = _median_step_seconds(case) if case is not None and batch_match else None
+            status = ("projected_from_real_batch_pilot" if measured is not None
+                      and target["planned_optimizer_steps"] else
+                      "unmeasured_batch_mismatch" if case is not None and not batch_match
+                      else "unmeasured_missing_data_or_pilot")
             projections.append({
                 "phase_id": phase_id, "variant": phase["variant"], "task": task,
                 "seed": phase["seed"], "subphase": subphase,
-                "planned_optimizer_steps": steps,
+                **target,
+                "expected_batch_signature": expected_batch,
+                "observed_batch_signature": observed_batch,
+                "batch_signature_match": batch_match,
                 "measured_pilot_step_seconds_median": measured,
                 "measured_pilot_sample_count": sum(
                     1 for case in task_cases
                     if case["variant"] == phase["variant"] and case["task"] == task and
                     int(case["seed"]) == int(phase["seed"]) and case["subphase"] == subphase
+                    and _task_case_matches_plan(case, task, subphase, plan)[0]
                     for row in case.get("steps", []) if row.get("pilot_role") == "measured"),
-                "projected_seconds": measured * steps if measured is not None and steps else None,
-                "projection_status": "projected_from_real_batch_pilot" if measured is not None and steps
-                                     else "unmeasured_missing_data_or_pilot",
+                "projected_seconds": measured * target["planned_optimizer_steps"]
+                if measured is not None and target["planned_optimizer_steps"] else None,
+                "projection_status": status,
             })
     return projections
 
@@ -641,17 +845,20 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-dir", action="append", required=True, metavar="VARIANT=PATH",
                         help="provide one local adapted model directory for each selected variant")
-    parser.add_argument("--mlm-data-dir", type=Path, default=PACKAGE_ROOT / "data" / "prepared")
+    parser.add_argument("--mlm-data-dir", type=Path,
+                        help="prepared MLM profile directory; defaults to the profile selected in experiment_plan.json")
     parser.add_argument("--classification-data", type=Path)
     parser.add_argument("--qa-data", type=Path)
     parser.add_argument("--retrieval-data", type=Path)
     parser.add_argument("--retrieval-physical-document-batch", type=int,
-                        help="calibration-only override; defaults to 2 for a logical batch with any document >=4096 tokens, otherwise 4")
+                        help="calibration-only override; defaults to the planned physical document batch")
     parser.add_argument("--tasks", nargs="+", choices=("mlm", "classification", "qa", "retrieval", "reranking"),
                         default=["mlm", "classification", "qa", "retrieval", "reranking"])
     parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS))
     parser.add_argument("--lengths", nargs="+", type=int, choices=(512, 1024, 4096, 8192),
                         default=[512, 1024, 4096, 8192])
+    parser.add_argument("--mlm-modes", nargs="+", choices=("token", "span"),
+                        help="optional MLM objective filter; by default profile token for all and span for V3 4K/8K")
     parser.add_argument("--skip-save-resume", action="store_true",
                         help="omit the separate heavyweight checkpoint I/O probe")
     parser.add_argument("--evaluation-only", action="store_true",
@@ -686,12 +893,17 @@ def main() -> None:
             raise ValueError("--evaluation-only requires --evaluation-corpus")
         if args.evaluation_retrieval_queries is None and args.evaluation_reranking_data is None:
             raise ValueError("--evaluation-only requires retrieval query data, reranking data, or both")
+    plan = read_plan()
+    profile = str(plan.get("data_profile", ""))
+    if args.mlm_data_dir is None:
+        args.mlm_data_dir = (PACKAGE_ROOT / "data" / "prepared" / profile if profile
+                             else PACKAGE_ROOT / "data" / "prepared")
     variants = _map_assignments(args.model_dir, required=args.variants)
     data_files: dict[str, Path] = {}
     if not args.evaluation_only:
         for task in args.tasks:
             if task == "mlm":
-                for length in (512, 1024, 4096, 8192):
+                for length in (int(stage["max_length"]) for stage in plan["adaptation"]["stages"]):
                     path = args.mlm_data_dir / f"wiki_{length}.npy"
                     if not path.is_file():
                         raise FileNotFoundError(f"prepared MLM array missing: {path}")
@@ -709,7 +921,6 @@ def main() -> None:
                     raise ValueError(f"--retrieval-data is required when calibration includes {task}")
                 data_files[task] = args.retrieval_data.resolve()
                 data_files["retrieval"] = args.retrieval_data.resolve()
-    plan = read_plan()
     device = _device(args.device)
     _seed_everything(args.seed)
     memory_context = _device_memory_context(device)
@@ -726,10 +937,15 @@ def main() -> None:
     task_cases: list[dict[str, Any]] = []
     save_resume_done = False
     if not args.evaluation_only and "mlm" in args.tasks:
+        stages_by_length = {int(stage["max_length"]): stage
+                            for stage in adaptation_stage_schedule(plan)}
+        shared_prefix_steps = int(plan["adaptation"].get("shared_prefix", {}).get("steps", 0))
         for variant in args.variants:
             for length in args.lengths:
-                modes = ["token"]
-                if variant == "V3" and length in {4096, 8192}:
+                stage = stages_by_length[length]
+                modes = list(args.mlm_modes) if args.mlm_modes else ["token"]
+                if (args.mlm_modes is None and variant == "V3"
+                        and int(stage["start_step"]) >= shared_prefix_steps):
                     modes.append("span")
                 for mode in modes:
                     case = _mlm_case(
@@ -755,7 +971,8 @@ def main() -> None:
                 continue
             data_path = data_files["retrieval"] if task == "reranking" else data_files[task]
             if task == "qa":
-                groups = _qa_groups(source_data["qa"])
+                groups = _qa_groups(source_data["qa"],
+                                    int(plan["downstream"]["qa"]["max_length"]))
                 subphases = [name for name, rows in groups.items() if rows]
                 if not subphases:
                     subphases = ["regular"]
@@ -791,7 +1008,9 @@ def main() -> None:
         probe_file = args.output_dir / ".pilot_save_resume_probe.pt"
         if probe_file.exists():
             probe_file.unlink()
-    task_data = {"qa_rows": source_data.get("qa", [])}
+    task_data = {"qa_rows": source_data.get("qa", []),
+                 "classification_rows": source_data.get("classification", []),
+                 "retrieval_rows": source_data.get("retrieval", [])}
     if args.evaluation_only:
         projection = {"training_calibration_status": "not_run_evaluation_only"}
     else:

@@ -12,10 +12,13 @@ from torch import nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from diagnostics_nextbert import (  # noqa: E402
     _counterfactual_answer,
+    _profile_paths,
     _prepare_probe_training_rows,
+    build_parser,
     build_long_case,
     freeze_probe_parameters,
     load_heldout_backgrounds,
+    main as diagnostics_main,
     unique_source_questions,
 )
 
@@ -270,4 +273,31 @@ def test_frozen_qa_probe_excludes_long_augmentation_rows():
         "rows_after": 1,
         "rows_removed": 3,
     }
+
+
+def test_full_67m_profile_defaults_and_explicit_long_paths(monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    prepared, wiki = _profile_paths("full_67m")
+    assert prepared == root / "data" / "prepared" / "full_67m"
+    assert wiki == root / "artifacts" / "raw" / "full_67m" / "wikipedia"
+    assert "full_67m" in build_parser()._option_string_actions["--profile"].choices
+
+    captured = []
+    monkeypatch.setattr("diagnostics_nextbert.run_long_command", lambda args: captured.append(args))
+    diagnostics_main([
+        "--mode", "long", "--model-dir", "model", "--variant", "V0",
+        "--profile", "full_67m", "--max-source-groups", "4",
+    ])
+    assert captured[-1].qa_data == prepared / "qa_test.jsonl"
+    assert captured[-1].wiki_background_dir == wiki
+
+    custom_qa = root / "custom" / "qa.jsonl"
+    custom_wiki = root / "custom" / "wiki"
+    diagnostics_main([
+        "--mode", "long", "--model-dir", "model", "--variant", "V0",
+        "--profile", "full_67m", "--max-source-groups", "4",
+        "--qa-data", str(custom_qa), "--wiki-background-dir", str(custom_wiki),
+    ])
+    assert captured[-1].qa_data == custom_qa
+    assert captured[-1].wiki_background_dir == custom_wiki
 

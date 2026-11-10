@@ -11,6 +11,7 @@ import json
 import math
 import os
 import re
+import shutil
 import time
 import zlib
 from collections import Counter, defaultdict
@@ -157,30 +158,67 @@ def text_sha(text: str) -> str:
     return sha256_bytes(" ".join(text.split()).encode("utf-8"))
 
 
-def profile_targets(profile: str, qa_train: int, qa_dev: int, retrieval_train: int) -> dict[str, Any]:
+def profile_targets(
+    profile: str,
+    qa_train: int | None,
+    qa_dev: int | None,
+    retrieval_train: int | None,
+    classification_train: int | None = None,
+    plan: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     if profile == "pilot":
         wiki_train_per_language = 16
         wiki_eval_per_language = 8
-        classification_train = 64
+        classification_train = classification_train or 64
         classification_eval = 64
-        qa_train = min(qa_train, 64)
-        qa_dev = min(qa_dev, 32)
+        qa_train = min(qa_train or 64, 64)
+        qa_dev = min(qa_dev or 32, 32)
         qa_eval = 32
-        retrieval_train = min(retrieval_train, 64)
+        retrieval_train = min(retrieval_train or 64, 64)
         retrieval_dev = 16
         retrieval_test = 16
         retrieval_corpus = 64
-    else:
-        classification_train = 2000
+        wiki_train_rows_by_length = {length: 32 for length in WIKI_LENGTHS}
+    elif profile == "full_67m":
+        plan = plan or {}
+        stages = plan.get("adaptation", {}).get("stages", [])
+        wiki_train_rows_by_length = {
+            int(stage["max_length"]): int(stage["input_tokens"]) // int(stage["max_length"])
+            for stage in stages
+        }
+        expected_lengths = set(WIKI_LENGTHS)
+        if set(wiki_train_rows_by_length) != expected_lengths:
+            raise ValueError(f"Plan stages must cover Wiki lengths {sorted(expected_lengths)}")
+        if any(rows % 2 for rows in wiki_train_rows_by_length.values()):
+            raise ValueError("Bilingual Wiki window targets must divide evenly between languages")
+        downstream = plan.get("downstream", {})
+        classification_train = classification_train or int(downstream["classification"]["train_per_language"])
+        qa_train = qa_train or int(downstream["qa"]["train_questions_per_language"])
+        retrieval_train = retrieval_train or int(downstream["retrieval"]["train_queries_per_language"])
+        qa_dev = qa_dev or 200
+        wiki_train_per_language = {length: rows // 2 for length, rows in wiki_train_rows_by_length.items()}
+        wiki_eval_per_language = 32
         classification_eval = None
         qa_eval = None
+        retrieval_dev = int(plan.get("evaluation", {}).get("retrieval", {}).get("dev_queries_per_language", 100))
+        retrieval_test = int(plan.get("evaluation", {}).get("retrieval", {}).get("test_queries_per_language", 200))
+        retrieval_corpus = int(plan.get("evaluation", {}).get("retrieval", {}).get("corpus_documents_per_language", 5000))
+    else:
+        classification_train = classification_train or 2000
+        classification_eval = None
+        qa_train = qa_train or 2000
+        qa_dev = qa_dev or 200
+        qa_eval = None
+        retrieval_train = retrieval_train or 1000
         retrieval_dev = 100
         retrieval_test = 200
         retrieval_corpus = 5000
         wiki_train_per_language = None
+        wiki_train_rows_by_length = dict(FULL_WIKI_TRAIN_ROWS)
         wiki_eval_per_language = 16
     return {
         "wiki_train_per_language": wiki_train_per_language,
+        "wiki_train_rows_by_length": wiki_train_rows_by_length,
         "wiki_eval_per_language": wiki_eval_per_language,
         "classification_train": classification_train,
         "classification_eval": classification_eval,
@@ -195,11 +233,36 @@ def profile_targets(profile: str, qa_train: int, qa_dev: int, retrieval_train: i
 
 
 def artifact_root(profile: str) -> Path:
-    return PREPARED_ROOT if profile == "pilot" else PREPARED_ROOT / "full"
+    return PREPARED_ROOT if profile == "pilot" else PREPARED_ROOT / profile
 
 
 def raw_root(profile: str) -> Path:
     return RAW_ROOT / profile
+
+
+def save_plan_snapshot(profile: str, plan_path: Path, plan_bytes: bytes) -> tuple[str, str]:
+    """Persist the exact configuration bytes used by this preparation run."""
+    digest = sha256_bytes(plan_bytes)
+    snapshot = raw_root(profile) / "provenance" / f"experiment_plan_{digest}.json"
+    snapshot.parent.mkdir(parents=True, exist_ok=True)
+    if snapshot.is_file():
+        if sha256_file(snapshot) != digest:
+            raise RuntimeError(f"Plan snapshot path exists with different content: {snapshot}")
+    else:
+        temporary = snapshot.with_name(f"{snapshot.name}.{os.getpid()}.tmp")
+        temporary.write_bytes(plan_bytes)
+        temporary.replace(snapshot)
+    if sha256_file(snapshot) != digest:
+        raise RuntimeError(f"Plan snapshot hash mismatch after write: {snapshot}")
+    try:
+        snapshot_relative = str(snapshot.relative_to(ROOT))
+    except ValueError:
+        snapshot_relative = str(snapshot)
+    try:
+        plan_relative = str(plan_path.relative_to(ROOT))
+    except ValueError:
+        plan_relative = str(plan_path)
+    return plan_relative, snapshot_relative
 
 
 def manifest_template(profile: str, tokenizer_path: Path) -> dict[str, Any]:
@@ -255,11 +318,63 @@ def merge_task_manifests(profile: str) -> Path:
             continue
         part = json.loads(path.read_text(encoding="utf-8"))
         combined["artifacts"].update(part.get("artifacts", {}))
+        if "data_profile" in part:
+            combined["data_profile"] = part["data_profile"]
         if "qa_answer_offset_alignment" in part:
             combined["qa_answer_offset_alignment"] = part["qa_answer_offset_alignment"]
+        if "experiment_plan" in part:
+            combined["experiment_plan"] = part["experiment_plan"]
         task_files.append(path.name)
     combined["task_manifests"] = task_files
     return save_manifest(profile, combined, "manifest.json")
+
+
+def reuse_manifest_artifact(
+    source_profile: str,
+    target_profile: str,
+    task: str,
+    artifact_key: str,
+    manifest: dict[str, Any],
+    target_key: str | None = None,
+) -> dict[str, Any]:
+    """Hash-check and link a fixed artifact from an immutable earlier profile."""
+    source_manifest_path = artifact_root(source_profile) / f"manifest_{task}.json"
+    source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    item = dict(source_manifest["artifacts"][artifact_key])
+    for path_key, hash_key in (("path", "sha256"), ("raw_path", "raw_sha256")):
+        old_relative = item.get(path_key)
+        if not old_relative:
+            continue
+        source_path = ROOT / old_relative
+        expected_hash = item.get(hash_key)
+        if not source_path.is_file() or not expected_hash:
+            raise FileNotFoundError(f"Cannot reuse {artifact_key}: missing source or recorded hash at {old_relative}")
+        actual_hash = sha256_file(source_path)
+        if actual_hash != expected_hash:
+            raise RuntimeError(f"Refusing to reuse {old_relative}: SHA-256 {actual_hash} != {expected_hash}")
+        parts = Path(old_relative).parts
+        if parts[:2] == ("data", "prepared"):
+            destination = artifact_root(target_profile) / Path(*parts[3:])
+        elif parts[:2] == ("artifacts", "raw"):
+            destination = raw_root(target_profile) / Path(*parts[3:])
+        else:
+            raise ValueError(f"Unsupported reused artifact path: {old_relative}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        temporary = destination.with_name(destination.name + ".reuse.tmp")
+        if temporary.exists():
+            temporary.unlink()
+        try:
+            os.link(source_path, temporary)
+        except OSError:
+            shutil.copy2(source_path, temporary)
+        if sha256_file(temporary) != expected_hash:
+            temporary.unlink(missing_ok=True)
+            raise RuntimeError(f"Reused copy failed SHA-256 verification: {old_relative}")
+        temporary.replace(destination)
+        item[path_key] = str(destination.relative_to(ROOT))
+    item["reused_from_profile"] = source_profile
+    manifest["artifacts"][target_key or artifact_key] = item
+    return item
 
 
 def split_existing_wiki_files(profile: str) -> Path:
@@ -321,17 +436,18 @@ def split_existing_wiki_files(profile: str) -> Path:
         )
     manifest.setdefault("artifacts", {}).setdefault("wiki_profile", {})["train_arrays_exclude_holdouts"] = True
     # Earlier pilot files were written before raw assets were partitioned by profile.
-    for task in ("wikipedia", "xnli", "qa", "mldr"):
-        old_dir = RAW_ROOT / task
-        new_dir = raw_root(profile) / task
-        if old_dir.is_dir() and not new_dir.exists():
-            new_dir.parent.mkdir(parents=True, exist_ok=True)
-            old_dir.replace(new_dir)
-        elif old_dir.is_dir() and new_dir.is_dir():
-            for old_file in old_dir.iterdir():
-                new_file = new_dir / old_file.name
-                if old_file.is_file() and not new_file.exists():
-                    old_file.replace(new_file)
+    if profile != "full_67m":
+        for task in ("wikipedia", "xnli", "qa", "mldr"):
+            old_dir = RAW_ROOT / task
+            new_dir = raw_root(profile) / task
+            if old_dir.is_dir() and not new_dir.exists():
+                new_dir.parent.mkdir(parents=True, exist_ok=True)
+                old_dir.replace(new_dir)
+            elif old_dir.is_dir() and new_dir.is_dir():
+                for old_file in old_dir.iterdir():
+                    new_file = new_dir / old_file.name
+                    if old_file.is_file() and not new_file.exists():
+                        old_file.replace(new_file)
     for artifact in manifest.get("artifacts", {}).values():
         if isinstance(artifact, dict) and isinstance(artifact.get("path"), str):
             artifact["path"] = artifact["path"].replace("artifacts/raw/", f"artifacts/raw/{profile}/")
@@ -350,18 +466,21 @@ def split_existing_wiki_files(profile: str) -> Path:
     return save_manifest(profile, manifest, "manifest_wiki.json")
 
 
-def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
+def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any], data_targets: dict[str, Any]) -> None:
     out_root = artifact_root(profile)
     out_root.mkdir(parents=True, exist_ok=True)
     if profile == "pilot":
         train_per_language = {length: 16 for length in WIKI_LENGTHS}
         eval_per_language = {"dev": 8, "test": 8}
+    elif profile == "full_67m":
+        train_per_language = data_targets["wiki_train_per_language"]
+        eval_per_language = {"dev": 32, "test": 32}
     else:
         train_per_language = {length: FULL_WIKI_TRAIN_ROWS[length] // 2 for length in WIKI_LENGTHS}
         eval_per_language = {"dev": 16, "test": 16}
-    targets: dict[int, dict[str, dict[str, int]]] = {}
+    split_targets: dict[int, dict[str, dict[str, int]]] = {}
     for length in WIKI_LENGTHS:
-        targets[length] = {
+        split_targets[length] = {
             "train": {"en": train_per_language[length], "zh": train_per_language[length]},
             "dev": {"en": eval_per_language["dev"], "zh": eval_per_language["dev"]},
             "test": {"en": eval_per_language["test"], "zh": eval_per_language["test"]},
@@ -393,7 +512,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
             for length in WIKI_LENGTHS
             for split in ("train", "dev", "test")
             for lang in ("en", "zh")
-            if counts[length][f"{split}:{lang}"] < targets[length][split][lang]
+            if counts[length][f"{split}:{lang}"] < split_targets[length][split][lang]
         ]
         if not missing:
             break
@@ -418,7 +537,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
             seen_hashes.add(dedup_key)
             split = wiki_split(source_id)
             needed_for_article = {
-                length: targets[length][split][lang] - counts[length][f"{split}:{lang}"]
+                length: split_targets[length][split][lang] - counts[length][f"{split}:{lang}"]
                 for length in WIKI_LENGTHS
             }
             if not any(value > 0 for value in needed_for_article.values()):
@@ -437,7 +556,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
                 width = length - 2
                 article_windows = 0
                 for offset in range(0, len(token_ids) - width + 1, width):
-                    if article_windows >= 8 or counts[length][f"{split}:{lang}"] >= targets[length][split][lang]:
+                    if article_windows >= 8 or counts[length][f"{split}:{lang}"] >= split_targets[length][split][lang]:
                         break
                     content = token_ids[offset : offset + width]
                     if len(content) != width:
@@ -477,7 +596,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
                 )
                 progressed = True
             if processed[lang] % 1000 == 0:
-                print(f"[{profile}] Wikipedia articles read {dict(processed)}; train 512 rows {counts[512]['train:en'] + counts[512]['train:zh']}/{sum(targets[512]['train'].values())}.", flush=True)
+                print(f"[{profile}] Wikipedia articles read {dict(processed)}; train 512 rows {counts[512]['train:en'] + counts[512]['train:zh']}/{sum(split_targets[512]['train'].values())}.", flush=True)
         if not progressed and exhausted == {"en", "zh"}:
             break
         if exhausted == {"en", "zh"}:
@@ -497,10 +616,10 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
             }
             for split in ("train", "dev", "test")
         }
-        expected_train = sum(targets[length]["train"].values())
+        expected_train = sum(split_targets[length]["train"].values())
         actual_train = length_counts["train"]["en"] + length_counts["train"]["zh"]
         if actual_train < min(32, expected_train) or any(
-            length_counts[split][lang] < targets[length][split][lang]
+            length_counts[split][lang] < split_targets[length][split][lang]
             for split in ("train", "dev", "test")
             for lang in ("en", "zh")
         ):
@@ -522,7 +641,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
             if split == "train":
                 train_rows = split_metadata
             split_artifacts[split] = {
-                "status": "complete" if all(length_counts[split][lang] == targets[length][split][lang] for lang in ("en", "zh")) else "partial",
+                "status": "complete" if all(length_counts[split][lang] == split_targets[length][split][lang] for lang in ("en", "zh")) else "partial",
                 "npy_path": str(npy_path.relative_to(ROOT)),
                 "npy_sha256": sha256_file(npy_path),
                 "metadata_path": str(meta_path.relative_to(ROOT)),
@@ -533,10 +652,10 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
                 "tokens_per_row": length,
                 "rows": int(split_array.shape[0]),
                 "padding_rows": 0,
-                "targets": targets[length][split],
+                "targets": split_targets[length][split],
             }
         manifest["artifacts"][f"wiki_{length}"] = {
-            "status": "complete" if all(length_counts[s][l] == targets[length][s][l] for s in targets[length] for l in targets[length][s]) else "partial",
+            "status": "complete" if all(length_counts[s][l] == split_targets[length][s][l] for s in split_targets[length] for l in split_targets[length][s]) else "partial",
             "npy_path": split_artifacts["train"]["npy_path"],
             "npy_sha256": split_artifacts["train"]["npy_sha256"],
             "metadata_path": split_artifacts["train"]["metadata_path"],
@@ -547,7 +666,7 @@ def prepare_wiki(tokenizer, profile: str, manifest: dict[str, Any]) -> None:
             "tokens_per_row": length,
             "full_window_rows": split_artifacts["train"]["rows"],
             "padding_rows": 0,
-            "targets": targets[length]["train"],
+            "targets": split_targets[length]["train"],
             "evaluation_splits": {
                 split: {key: value for key, value in artifact.items() if key != "targets"}
                 for split, artifact in split_artifacts.items()
@@ -583,9 +702,16 @@ def prepare_classification(tokenizer, profile: str, targets: dict[str, Any], man
     out_rows: dict[str, list[dict[str, Any]]] = {split: [] for split in ("train", "dev", "test")}
     raw_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
     counts: Counter[str] = Counter()
+    if profile == "full_67m":
+        for split in ("dev", "test"):
+            reuse_manifest_artifact("full", profile, "classification", f"classification_{split}", manifest)
+        for lang, source_split in (("en", "validation"), ("zh", "validation"), ("en", "test"), ("zh", "test")):
+            reuse_manifest_artifact("full", profile, "classification", f"raw_xnli_{lang}_{source_split}", manifest)
     for lang in ("en", "zh"):
         source = DATASET_SOURCES["xnli"]
         for output_split, source_split in (("train", "train"), ("dev", "validation"), ("test", "test")):
+            if profile == "full_67m" and output_split != "train":
+                continue
             limit = targets["classification_train"] if output_split == "train" else targets["classification_eval"]
             stream = get_stream(source["id"], source["configs"][lang], source_split, source["revision"], shuffle=output_split == "train")
             count = 0
@@ -625,6 +751,8 @@ def prepare_classification(tokenizer, profile: str, targets: dict[str, Any], man
                 count += 1
             counts[f"{output_split}:{lang}"] = count
     for split, rows in out_rows.items():
+        if profile == "full_67m" and split != "train":
+            continue
         path = out_root / f"classification_{split}.jsonl"
         dump_jsonl(path, rows)
         manifest["artifacts"][f"classification_{split}"] = {
@@ -938,9 +1066,10 @@ def prepare_long_qa(tokenizer, profile: str, targets: dict[str, Any], train_rows
     background_profile = profile
     for lang in ("en", "zh"):
         path = raw_root(profile) / "wikipedia" / f"selected_{lang}.jsonl"
-        if not path.is_file() and profile == "full":
-            path = raw_root("pilot") / "wikipedia" / f"selected_{lang}.jsonl"
-            background_profile = "pilot"
+        if not path.is_file() and profile != "pilot":
+            source_profile = "full" if profile == "full_67m" else "pilot"
+            path = raw_root(source_profile) / "wikipedia" / f"selected_{lang}.jsonl"
+            background_profile = source_profile
         if not path.is_file():
             raise RuntimeError(f"Long QA augmentation needs prepared Wiki source backgrounds: {path}")
         background_by_lang[lang] = [
@@ -952,21 +1081,19 @@ def prepare_long_qa(tokenizer, profile: str, targets: dict[str, Any], train_rows
         raise RuntimeError("Long QA augmentation has no retained Wiki background documents")
 
     quotas = {lang: (16 if profile == "pilot" else math.ceil(targets["qa_train"] * 0.1)) for lang in ("en", "zh")}
-    selected: dict[str, list[dict[str, Any]]] = {"en": [], "zh": []}
-    seen_questions = {lang: set() for lang in ("en", "zh")}
-    for row in train_rows:
-        lang = row["language"]
-        qid = row["question_id"]
-        if qid in seen_questions[lang] or len(selected[lang]) >= quotas[lang]:
-            continue
-        seen_questions[lang].add(qid)
-        selected[lang].append(row)
-
     long_rows = []
     counts: Counter[str] = Counter()
+    seen_questions = {"en": set(), "zh": set()}
     for lang in ("en", "zh"):
-        for index, base in enumerate(selected[lang]):
-            position = ("first", "middle", "last")[index % 3]
+        for base in train_rows:
+            if counts[lang] >= quotas[lang]:
+                break
+            if base["language"] != lang:
+                continue
+            if base["question_id"] in seen_questions[lang]:
+                continue
+            seen_questions[lang].add(base["question_id"])
+            position = ("first", "middle", "last")[counts[lang] % 3]
             example = make_long_qa_example(tokenizer, base, background_by_lang[lang], position)
             if example is not None:
                 long_rows.append(example)
@@ -1008,11 +1135,30 @@ def prepare_qa(tokenizer, profile: str, targets: dict[str, Any], manifest: dict[
         "en": ("squad", DATASET_SOURCES["squad"]["configs"]["en"]),
         "zh": ("cmrc2018", DATASET_SOURCES["cmrc2018"]["configs"]["zh"]),
     }
+    if profile == "full_67m":
+        old_qa_manifest = json.loads((artifact_root("full") / "manifest_qa.json").read_text(encoding="utf-8"))
+        for split in ("dev", "test"):
+            item = reuse_manifest_artifact("full", profile, "qa", f"qa_{split}", manifest)
+            for lang in ("en", "zh"):
+                counts[f"{split}:{lang}"] = int(item.get("question_counts", {}).get(lang, 0))
+                feature_counts[f"{split}:{lang}"] = int(item.get("feature_counts", {}).get(lang, 0))
+        for lang in ("en", "zh"):
+            reuse_manifest_artifact("full", profile, "qa", f"raw_qa_{lang}_train_dev", manifest)
+            reuse_manifest_artifact("full", profile, "qa", f"raw_qa_{lang}_public_validation", manifest)
+            input_sources[lang] = "pinned stream for expanded train; fixed dev/public evaluation reused from full"
+        old_alignment = old_qa_manifest.get("qa_answer_offset_alignment", {})
+        for key, values in old_alignment.get("counts_by_output_split_and_language", {}).items():
+            if key.startswith(("dev:", "test:")):
+                alignment_stats[key].update(values)
+        for key, values in old_alignment.get("reasons_by_output_split_and_language", {}).items():
+            if key.startswith(("dev:", "test:")):
+                alignment_reasons[key].update(values)
     for lang, (source_key, config) in source_for_lang.items():
         source = DATASET_SOURCES[source_key]
         train_limit = targets["qa_train"]
         dev_limit = targets["qa_dev"]
-        train_count = dev_count = 0
+        train_count = 0
+        dev_count = dev_limit if profile == "full_67m" else 0
         train_cache = raw_root(profile) / "qa" / f"{lang}_train_train.jsonl"
         dev_cache = raw_root(profile) / "qa" / f"{lang}_train_dev.jsonl"
         if train_cache.is_file() and dev_cache.is_file():
@@ -1150,11 +1296,14 @@ def prepare_qa(tokenizer, profile: str, targets: dict[str, Any], manifest: dict[
 
         public_eval_limit = targets["qa_eval"]
         validation_cache = raw_root(profile) / "qa" / f"{lang}_public_validation.jsonl"
-        validation = (
-            list(iter_jsonl_file(validation_cache))
-            if validation_cache.is_file()
-            else get_stream(source["id"], config, "validation", source["revision"], shuffle=False)
-        )
+        if profile == "full_67m":
+            validation = ()
+        else:
+            validation = (
+                list(iter_jsonl_file(validation_cache))
+                if validation_cache.is_file()
+                else get_stream(source["id"], config, "validation", source["revision"], shuffle=False)
+            )
         eval_count = 0
         for row in validation:
             if public_eval_limit is not None and eval_count >= public_eval_limit:
@@ -1204,11 +1353,14 @@ def prepare_qa(tokenizer, profile: str, targets: dict[str, Any], manifest: dict[
                     }
                 )
             eval_count += 1
-        counts[f"test:{lang}"] = eval_count
+        if profile != "full_67m":
+            counts[f"test:{lang}"] = eval_count
     long_rows = prepare_long_qa(tokenizer, profile, targets, output_rows["train"], manifest)
     for lang in ("en", "zh"):
         feature_counts[f"train:{lang}"] += sum(1 for row in long_rows if row["language"] == lang)
     for split, rows in output_rows.items():
+        if profile == "full_67m" and split in {"dev", "test"}:
+            continue
         path = out_root / f"qa_{split}.jsonl"
         dump_jsonl(path, rows)
         manifest["artifacts"][f"qa_{split}"] = {
@@ -1338,6 +1490,11 @@ def iter_mldr_gzip(lang: str, split: str, limit: int | None = None, profile: str
     file_hash = sibling.lfs.sha256 if sibling.lfs else None
     prefix_path = raw_root(profile) / "mldr" / "prefixes" / f"{lang}_{split}.jsonl.gz.prefix"
     prefix_path.parent.mkdir(parents=True, exist_ok=True)
+    if profile == "full_67m" and split == "train" and not prefix_path.exists():
+        earlier_prefix = raw_root("full") / "mldr" / "prefixes" / prefix_path.name
+        if earlier_prefix.is_file():
+            shutil.copy2(earlier_prefix, prefix_path)
+            print(f"Seeded resumable MLDR prefix from previous full profile: {prefix_path.name} ({prefix_path.stat().st_size:,} bytes)", flush=True)
     chunk_size = 1024 * 1024 if profile == "pilot" else 8 * 1024 * 1024
     available_rows: list[dict[str, Any]] = []
     while len(available_rows) < limit and (prefix_path.stat().st_size if prefix_path.exists() else 0) < file_size:
@@ -1439,6 +1596,9 @@ def bm25_rank(
 
 
 def prepare_retrieval(tokenizer, profile: str, targets: dict[str, Any], manifest: dict[str, Any]) -> None:
+    if profile == "full_67m":
+        prepare_retrieval_full_67m(tokenizer, profile, targets, manifest)
+        return
     out_root = artifact_root(profile)
     query_rows: dict[str, list[dict[str, Any]]] = {split: [] for split in ("train", "dev", "test")}
     raw_query_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1723,19 +1883,176 @@ def prepare_retrieval(tokenizer, profile: str, targets: dict[str, Any], manifest
         }
 
 
+def prepare_retrieval_full_67m(tokenizer, profile: str, targets: dict[str, Any], manifest: dict[str, Any]) -> None:
+    out_root = artifact_root(profile)
+    query_rows: list[dict[str, Any]] = []
+    raw_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    counts: Counter[str] = Counter()
+    for lang in ("en", "zh"):
+        raw_count = 0
+        for row in iter_mldr_gzip(lang, "train", limit=targets["retrieval_train"], profile=profile):
+            query_id = str(row.get("query_id") or f"{lang}:train:{raw_count}")
+            query_text = str(row.get("query") or "")
+            positives = [item for item in (row.get("positive_passages") or []) if item.get("text")]
+            source_negatives = [item for item in (row.get("negative_passages") or []) if item.get("text")]
+            if not query_text or not positives or len(source_negatives) < 2:
+                continue
+            positive = positives[0]
+            selected_negatives = sorted(
+                source_negatives,
+                key=lambda item: hashlib.sha256(f"{SEED}:{query_id}:{mldr_doc_id(item, '')}".encode("utf-8")).hexdigest(),
+            )[:2]
+            qids = encode_ids(tokenizer, query_text, 128)
+            positive_docid = mldr_doc_id(positive, f"{query_id}:positive:0")
+            positive_cap = _train_doc_cap(query_id, positive_docid)
+            positive_ids = encode_ids(tokenizer, str(positive["text"]), positive_cap)
+            negative_records = []
+            for index, item in enumerate(selected_negatives):
+                doc_id = mldr_doc_id(item, f"{query_id}:negative:{index}")
+                cap = _train_doc_cap(query_id, doc_id)
+                negative_records.append(
+                    {
+                        "docid": doc_id,
+                        "text": str(item["text"]),
+                        "input_ids": encode_ids(tokenizer, str(item["text"]), cap),
+                        "max_length": cap,
+                    }
+                )
+            query_rows.append(
+                {
+                    "query_ids": qids,
+                    "positive_ids": positive_ids,
+                    "negative_ids": negative_records[0]["input_ids"],
+                    "language": lang,
+                    "id": query_id,
+                    "positive_docid": positive_docid,
+                    "relevant_doc_ids": [mldr_doc_id(item, f"{query_id}:positive:{i}") for i, item in enumerate(positives)],
+                    "negative_docid": negative_records[0]["docid"],
+                    "negative_candidates": negative_records,
+                    "query": query_text,
+                    "positive_text": str(positive["text"]),
+                    "source_id": DATASET_SOURCES["mldr"]["id"],
+                    "source_revision": DATASET_SOURCES["mldr"]["revision"],
+                    "source_split": "train",
+                    "document_window_policy": "train hash assigns maximum token-prefix cap 512/4096/8192 at 90/8/2 percent; evaluation uses the first 8192 tokens; natural short lengths retained",
+                }
+            )
+            raw_rows[f"{lang}_train"].append(
+                {
+                    "query_id": query_id,
+                    "query": query_text,
+                    "positive_passages": positives,
+                    "negative_passages": source_negatives,
+                    "source_revision": DATASET_SOURCES["mldr"]["revision"],
+                    "source_split": "train",
+                }
+            )
+            raw_count += 1
+        counts[f"train:{lang}"] = raw_count
+
+    train_path = out_root / "retrieval_train.jsonl"
+    dump_jsonl(train_path, query_rows)
+    manifest["artifacts"]["retrieval_train"] = {
+        "path": str(train_path.relative_to(ROOT)),
+        "sha256": sha256_file(train_path),
+        "rows": len(query_rows),
+        "language_counts": {lang: counts[f"train:{lang}"] for lang in ("en", "zh")},
+        "query_max_length": 128,
+        "document_length_proportions": {"512": 0.9, "4096": 0.08, "8192": 0.02},
+        "document_window_policy": "hash-assigned maximum token-prefix cap; first-token truncation",
+        "evaluation_data_profile": "full",
+    }
+    for key, rows in raw_rows.items():
+        raw_path = raw_root(profile) / "mldr" / f"{key}.jsonl"
+        dump_jsonl(raw_path, rows)
+        manifest["artifacts"][f"raw_mldr_{key}"] = {
+            "path": str(raw_path.relative_to(ROOT)),
+            "rows": len(rows),
+            "sha256": sha256_file(raw_path),
+            "revision": DATASET_SOURCES["mldr"]["revision"],
+            "source_prefix": MLDR_PREFIX_RECORDS.get((profile, key.split("_", 1)[0], "train")),
+        }
+
+    old_manifest = json.loads((artifact_root("full") / "manifest_retrieval.json").read_text(encoding="utf-8"))
+    for key in (
+        "retrieval_dev",
+        "retrieval_test",
+        "retrieval_corpus",
+        "retrieval_queries_dev",
+        "retrieval_queries_test",
+        "reranking_dev",
+        "reranking_test",
+    ):
+        reuse_manifest_artifact("full", profile, "retrieval", key, manifest)
+    for lang in ("en", "zh"):
+        for split in ("dev", "test"):
+            reuse_manifest_artifact("full", profile, "retrieval", f"raw_mldr_{lang}_{split}", manifest)
+    manifest["artifacts"]["bm25_index"] = dict(old_manifest["artifacts"]["bm25_index"])
+    manifest["artifacts"]["bm25_index"]["reused_from_profile"] = "full"
+
+    rerank_rows = []
+    for row in query_rows:
+        negatives = row["negative_candidates"]
+        candidate_texts = [row["positive_text"], negatives[0]["text"], negatives[1]["text"]]
+        rerank_rows.append(
+            {
+                "id": row["id"],
+                "language": row["language"],
+                "query_ids": row["query_ids"],
+                "candidate_ids": [encode_ids(tokenizer, text, 1024) for text in candidate_texts],
+                "labels": [1, 0, 0],
+                "candidate_docids": [row["positive_docid"], negatives[0]["docid"], negatives[1]["docid"]],
+                "query": row["query"],
+                "candidate_texts": candidate_texts,
+                "source_id": DATASET_SOURCES["mldr"]["id"],
+                "source_revision": DATASET_SOURCES["mldr"]["revision"],
+            }
+        )
+    path = out_root / "reranking_train.jsonl"
+    dump_jsonl(path, rerank_rows)
+    manifest["artifacts"]["reranking_train"] = {
+        "path": str(path.relative_to(ROOT)),
+        "sha256": sha256_file(path),
+        "rows": len(rerank_rows),
+        "language_counts": {lang: sum(1 for row in rerank_rows if row["language"] == lang) for lang in ("en", "zh")},
+        "candidates_per_group": 3,
+        "candidate_source": "two deterministic MLDR hard negatives",
+    }
+
+
 def _train_doc_cap(query_id: str, doc_id: str) -> int:
     bucket = stable_int(f"mldr-length-v1:{SEED}:{query_id}:{doc_id}") % 100
     return 512 if bucket < 90 else 4096 if bucket < 98 else 8192
 
 
-def run(profile: str, only: list[str], tokenizer_path: Path, qa_train: int, qa_dev: int, retrieval_train: int) -> None:
+def run(
+    profile: str,
+    only: list[str],
+    tokenizer_path: Path,
+    qa_train: int | None,
+    qa_dev: int | None,
+    retrieval_train: int | None,
+    classification_train: int | None,
+    plan: dict[str, Any],
+    plan_path: Path,
+    plan_bytes: bytes,
+) -> None:
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True, use_fast=True)
     if not tokenizer.is_fast:
         raise RuntimeError("A fast tokenizer is required to preserve QA offsets and context masks")
-    targets = profile_targets(profile, qa_train, qa_dev, retrieval_train)
+    targets = profile_targets(profile, qa_train, qa_dev, retrieval_train, classification_train, plan)
     manifest = manifest_template(profile, tokenizer_path)
+    manifest["data_profile"] = profile
+    plan_relative, plan_snapshot_relative = save_plan_snapshot(profile, plan_path, plan_bytes)
+    manifest["experiment_plan"] = {
+        "path": plan_relative,
+        "sha256": sha256_bytes(plan_bytes),
+        "snapshot_path": plan_snapshot_relative,
+        "profile_id": plan.get("data_profile"),
+    }
+    manifest["data_targets"] = targets
     if "wiki" in only:
-        prepare_wiki(tokenizer, profile, manifest)
+        prepare_wiki(tokenizer, profile, manifest, targets)
     if "classification" in only:
         prepare_classification(tokenizer, profile, targets, manifest)
     if "qa" in only:
@@ -1749,12 +2066,14 @@ def run(profile: str, only: list[str], tokenizer_path: Path, qa_train: int, qa_d
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=("pilot", "full"), default="pilot")
+    parser.add_argument("--profile", choices=("pilot", "full", "full_67m"), default="pilot")
     parser.add_argument("--only", default="wiki,classification,qa,retrieval", help="Comma-separated task names")
     parser.add_argument("--tokenizer-path", type=Path, default=TOKENIZER_DIR)
-    parser.add_argument("--qa-train", type=int, default=2000)
-    parser.add_argument("--qa-dev", type=int, default=200)
-    parser.add_argument("--retrieval-train", type=int, default=1000)
+    parser.add_argument("--plan", type=Path, default=ROOT / "configs" / "experiment_plan.json")
+    parser.add_argument("--classification-train", type=int)
+    parser.add_argument("--qa-train", type=int)
+    parser.add_argument("--qa-dev", type=int)
+    parser.add_argument("--retrieval-train", type=int)
     parser.add_argument("--merge-manifest", action="store_true", help="Merge independent manifest_{task}.json files into manifest.json")
     parser.add_argument("--split-existing-wiki", action="store_true", help="Separate already-prepared combined Wiki rows into train/dev/test files without reacquiring source data")
     args = parser.parse_args()
@@ -1770,9 +2089,23 @@ def main() -> int:
     valid = {"wiki", "classification", "qa", "retrieval"}
     if not only or any(item not in valid for item in only):
         parser.error(f"--only values must be comma-separated members of {sorted(valid)}")
-    if min(args.qa_train, args.qa_dev, args.retrieval_train) < 1:
+    if any(value is not None and value < 1 for value in (args.classification_train, args.qa_train, args.qa_dev, args.retrieval_train)):
         parser.error("sample count options must be positive")
-    run(args.profile, only, args.tokenizer_path, args.qa_train, args.qa_dev, args.retrieval_train)
+    plan_path = args.plan if args.plan.is_absolute() else ROOT / args.plan
+    plan_bytes = plan_path.read_bytes()
+    plan = json.loads(plan_bytes)
+    run(
+        args.profile,
+        only,
+        args.tokenizer_path,
+        args.qa_train,
+        args.qa_dev,
+        args.retrieval_train,
+        args.classification_train,
+        plan,
+        plan_path,
+        plan_bytes,
+    )
     return 0
 
 

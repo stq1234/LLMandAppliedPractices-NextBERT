@@ -41,7 +41,7 @@ def main():
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     manifest = {'archive': target.name, 'bytes': target.stat().st_size,
                 'sha256': digest, 'members': [f.relative_to(root).as_posix() for f in sorted(set(files))]}
-    target.with_suffix(target.suffix + '.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+    target.with_suffix(target.suffix + '.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8', newline='\n')
     print(json.dumps({k: v for k, v in manifest.items() if k != 'members'}))
 
 

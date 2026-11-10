@@ -1,0 +1,490 @@
+{
+  "status": "small_scale_implementation_calibrated_awaiting_training_scale_decision",
+  "date": "2026-11-11",
+  "scope_note": "The 704-step branch is a small architecture-validation schedule. Its size and effective batches are not established convergence requirements or an approved formal training recipe.",
+  "proposal_document": "重做实验方案.md",
+  "checkpoint": {
+    "model_id": "jhu-clsp/mmBERT-base",
+    "revision": "8c1f42296af5de623b0ad6d3a5ed6a5a1838d82c",
+    "pretrained_mlm_parameters": 307786240
+  },
+  "architecture": {
+    "layers": 22,
+    "hidden_size": 768,
+    "heads": 12,
+    "intermediate_size_per_geglu_branch": 1152,
+    "vocabulary_size": 256000,
+    "max_length": 8192,
+    "retain": [
+      "tokenizer",
+      "RoPE with original positions",
+      "Pre-LayerNorm",
+      "GeGLU",
+      "tied input and MLM embeddings",
+      "QKV and output projection shapes"
+    ],
+    "global_layers": [
+      0,
+      6,
+      12,
+      18,
+      21
+    ],
+    "ordinary_local_layers": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15,
+      17,
+      19
+    ],
+    "dual_scale_layers": {
+      "2": 2,
+      "4": 4,
+      "8": 2,
+      "10": 4,
+      "14": 2,
+      "16": 4,
+      "20": 2
+    },
+    "local_radius": 64,
+    "dilated_key_rule": "abs(j-i)<=64*r AND (j-i)%r==0; valid positions in same document",
+    "dual_scale_heads": {
+      "ordinary": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "gated": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "gate": {
+      "parameters": 42,
+      "initial_logit": 0,
+      "mixing": "(1-alpha)*local+alpha*dilated",
+      "alpha": "sigmoid(logit) times first-64-update linear ramp",
+      "scope": "one scalar per gated head per dual-scale layer"
+    },
+    "mlm_parameters_with_gates": 307786282
+  },
+  "variants": [
+    {
+      "id": "V0",
+      "global_layers": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21
+      ],
+      "dual_scale": false,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "classification",
+        "qa",
+        "retrieval",
+        "reranking"
+      ]
+    },
+    {
+      "id": "V1",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": false,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "qa",
+        "retrieval"
+      ]
+    },
+    {
+      "id": "V2",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": true,
+      "objective": "token MLM throughout",
+      "tasks": [
+        "qa",
+        "retrieval"
+      ]
+    },
+    {
+      "id": "V3",
+      "global_layers": [
+        0,
+        6,
+        12,
+        18,
+        21
+      ],
+      "dual_scale": true,
+      "objective": "token MLM for first 512 steps; final 192 steps balanced token/span within each length stage",
+      "tasks": [
+        "classification",
+        "qa",
+        "retrieval",
+        "reranking"
+      ]
+    }
+  ],
+  "adaptation": {
+    "seed": 17,
+    "source": "wikimedia/wikipedia zh and en; freeze immutable revision and article-level splits before acquisition",
+    "language_balance_by_content_tokens": {
+      "zh": 0.5,
+      "en": 0.5
+    },
+    "sampling": "single-article contiguous full windows; no padding counted",
+    "stages": [
+      {
+        "max_length": 512,
+        "physical_microbatch": 16,
+        "gradient_accumulation": 2,
+        "effective_sequences": 32,
+        "optimizer_steps": 256,
+        "input_tokens": 4194304
+      },
+      {
+        "max_length": 1024,
+        "physical_microbatch": 8,
+        "gradient_accumulation": 2,
+        "effective_sequences": 16,
+        "optimizer_steps": 256,
+        "input_tokens": 4194304
+      },
+      {
+        "max_length": 4096,
+        "physical_microbatch": 4,
+        "gradient_accumulation": 1,
+        "effective_sequences": 4,
+        "optimizer_steps": 128,
+        "input_tokens": 2097152
+      },
+      {
+        "max_length": 8192,
+        "physical_microbatch": 2,
+        "gradient_accumulation": 1,
+        "effective_sequences": 2,
+        "optimizer_steps": 64,
+        "input_tokens": 1048576
+      }
+    ],
+    "full_branch_steps": 704,
+    "full_branch_input_tokens": 11534336,
+    "shared_prefix": {
+      "variants": [
+        "V2",
+        "V3"
+      ],
+      "steps": 512,
+      "input_tokens": 8388608,
+      "share_optimizer_state": true
+    },
+    "total_executed_steps": 2304,
+    "total_input_tokens": 37748736,
+    "masking": {
+      "ratio": 0.3,
+      "mask_random_keep": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "exclude_all_special_ids": true,
+      "span_mean": 3,
+      "span_max": 10,
+      "predict_same_target_count": true
+    },
+    "optimizer": {
+      "name": "AdamW",
+      "full_parameter": true,
+      "backbone_lr": 0.00002,
+      "gate_lr": 0.001,
+      "weight_decay": 0.01,
+      "clip_norm": 1,
+      "warmup_fraction": 0.05,
+      "schedule": "linear"
+    },
+    "implementation": [
+      "BF16 autocast",
+      "gradient checkpointing",
+      "genuine local attention kernel",
+      "MLM outputs only at supervised positions",
+      "fused loss or chunked loss with activation recomputation"
+    ]
+  },
+  "downstream": {
+    "shared": {
+      "epochs": 2,
+      "warmup_fraction": 0.05,
+      "weight_decay": 0.01,
+      "clip_norm": 1,
+      "head_lr": 0.0001,
+      "schedule": "linear",
+      "separate_task_branches": true
+    },
+    "classification": {
+      "sources": [
+        "facebook/xnli zh",
+        "facebook/xnli en"
+      ],
+      "train_per_language": 2000,
+      "max_length": 256,
+      "physical_batch": 16,
+      "accumulation": 2,
+      "effective_batch": 32,
+      "steps": 250,
+      "backbone_lr": 0.00002,
+      "head": "masked content mean; 768->3; cross entropy"
+    },
+    "qa": {
+      "sources": [
+        "SQuAD1.1",
+        "CMRC2018"
+      ],
+      "train_questions_per_language": 2000,
+      "max_length": 512,
+      "physical_batch": 16,
+      "accumulation": 2,
+      "effective_batch": 32,
+      "long_augmentation": {
+        "fraction_of_regular_training_windows": 0.1,
+        "max_length": 4096,
+        "physical_batch": 4,
+        "accumulation": 2,
+        "effective_batch": 8,
+        "train_sources_only": true
+      },
+      "steps_estimate": [
+        350,
+        500
+      ],
+      "step_rule": "complete regular feature list for 2 epochs, add 10% long features; ceil by batch separately and freeze actual counts",
+      "backbone_lr": 0.00002,
+      "head": "768->2; start/end cross entropy; context-only decoding"
+    },
+    "retrieval": {
+      "source": "Shitao/MLDR zh and en",
+      "train_queries_per_language": 1000,
+      "steps": 125,
+      "logical_batch_queries": 32,
+      "physical_document_batch": [
+        2,
+        4
+      ],
+      "query_max_length": 128,
+      "document_length_proportions": {
+        "512": 0.9,
+        "4096": 0.08,
+        "8192": 0.02
+      },
+      "train_window_rule": "deterministic first-token window capped at hash-assigned 512/4096/8192 tokens; retain natural short lengths; BM25 is used only for evaluation candidate selection",
+      "evaluation_window": "fixed first at most 8192 tokens, independent of test query",
+      "backbone_lr": 0.00001,
+      "head": "mean;768->256;L2 normalization",
+      "loss": "InfoNCE with explicit and true logical-batch negatives",
+      "temperature": 0.05,
+      "gradient_cache": true
+    },
+    "reranking": {
+      "source": "same MLDR training queries",
+      "train_queries_total": 2000,
+      "negatives_per_positive": 2,
+      "physical_query_groups": 4,
+      "physical_pairs": 12,
+      "accumulation": 2,
+      "effective_query_groups": 8,
+      "effective_pairs": 24,
+      "max_pair_length": 1024,
+      "steps": 500,
+      "backbone_lr": 0.00001,
+      "head": "joint query-document encoder;mean;768->1;groupwise cross entropy"
+    },
+    "run_matrix": [
+      {
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "tasks": [
+          "classification",
+          "qa",
+          "retrieval",
+          "reranking"
+        ],
+        "seeds": [
+          17
+        ],
+        "phases": 8
+      },
+      {
+        "variants": [
+          "V1",
+          "V2"
+        ],
+        "tasks": [
+          "qa",
+          "retrieval"
+        ],
+        "seeds": [
+          17
+        ],
+        "phases": 4
+      },
+      {
+        "variants": [
+          "V0",
+          "V3"
+        ],
+        "tasks": [
+          "classification",
+          "qa"
+        ],
+        "seeds": [
+          29
+        ],
+        "phases": 4
+      }
+    ],
+    "total_training_phases": 16
+  },
+  "evaluation": {
+    "classification": "official zh/en XNLI test; development selection uses validation",
+    "qa": "article-grouped dev from train for selection; public SQuAD/CMRC dev locked for final research evaluation; official metrics",
+    "retrieval": {
+      "dev_queries_per_language": 100,
+      "test_queries_per_language": 200,
+      "corpus_documents_per_language": 5000,
+      "known_relevant_plus_hash_sampled_distractors": true,
+      "metrics": [
+        "nDCG@10",
+        "Recall@10",
+        "Recall@100"
+      ],
+      "scope": "fixed reduced corpus"
+    },
+    "reranking": {
+      "candidates": "fixed BM25 top20, same for all variants",
+      "dev_queries_per_language": 100,
+      "test_queries_per_language": 200,
+      "metrics": [
+        "nDCG@10",
+        "MRR@10",
+        "candidate Recall@20"
+      ]
+    },
+    "long_context": {
+      "source_groups_per_language": 100,
+      "lengths": [
+        1024,
+        4096,
+        8192
+      ],
+      "evidence_positions": [
+        "first",
+        "middle",
+        "last"
+      ],
+      "interventions": [
+        "intact",
+        "equal-length decisive fact replacement",
+        "irrelevant background replacement"
+      ],
+      "baselines": [
+        "first512",
+        "fixed sliding512",
+        "full input"
+      ],
+      "resampling_unit": "source group"
+    },
+    "retention": "fixed bilingual MLM and frozen classification/QA probes; original pretrained reference, V0,V3, and retrieval-adapted state",
+    "performance": {
+      "lengths": [
+        512,
+        4096,
+        8192
+      ],
+      "physical_batches": [
+        16,
+        4,
+        2
+      ],
+      "measures": [
+        "forward latency",
+        "end-to-end latency",
+        "throughput",
+        "p50/p95",
+        "allocated/reserved peak memory",
+        "index build time",
+        "vector storage"
+      ]
+    }
+  },
+  "resources": {
+    "gpu_type": "RTX A6000 48GB",
+    "max_physical_gpus": 1,
+    "target_physical_gpu_hours": [
+      5,
+      7.5
+    ],
+    "hard_cap_physical_gpu_hours": 8,
+    "budget_scope": "provisional small-scale matrix only; includes 25 or 100 long-evidence groups/language; no formal training has been authorized",
+    "measured": true,
+    "measurement_scope": "short optimizer calibration on GPU7, complete training-case coverage; full-run durations and convergence remain unmeasured",
+    "calibration_summary": "results/calibration_summary.json",
+    "caps_gpu_hours": {
+      "calibration": 0.5,
+      "adaptation": 0.65,
+      "classification": 0.12,
+      "qa": 0.5,
+      "retrieval": 1.1,
+      "reranking": 0.26,
+      "evaluation": 3.6,
+      "recovery": 0.6
+    },
+    "physical_microbatch_one_allowed": false,
+    "max_jobs_per_gpu": 1,
+    "concurrency_rule": "two simultaneous 512-token jobs measured about 5 percent less aggregate throughput; use one process on GPU7 and reserve >=6GiB",
+    "storage_target_GB": 40,
+    "remote_host": "a6000",
+    "remote_workdir": "~/LLM/nextbert",
+    "preferred_pilot_gpu": 7,
+    "allowed_modification_scope": "~/LLM; conda llm environment as specified by project AGENTS.md",
+    "remote_network": "offline; acquire model/data on local Windows and use shared verified uploader"
+  },
+  "execution_status": {
+    "implemented": true,
+    "data_frozen": true,
+    "data_scope": "small-scale profile; additional data for larger token budgets has not been prepared",
+    "formal_training_scale_selected": false,
+    "training_started": false,
+    "pilot_training_started": true,
+    "formal_full_matrix_started": false,
+    "semantic_benchmark_run": false
+  }
+}

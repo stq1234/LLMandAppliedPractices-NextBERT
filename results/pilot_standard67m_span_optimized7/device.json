@@ -1,0 +1,12 @@
+{
+  "physical_gpu": 7,
+  "pid": 255018,
+  "free_before_bytes": 34622734336,
+  "total_bytes": 50897289216,
+  "reserve_bytes": 6442450944,
+  "allocator_fraction": 0.5536696320388962,
+  "started_unix": 1794332074.1367986,
+  "torch": "2.6.0+cu124",
+  "device": "NVIDIA RTX A6000",
+  "nvidia_smi_before": "7, GPU-56bb1092-c218-9cd3-ad85-9a2735522d28, 15521 MiB, 3 %"
+}

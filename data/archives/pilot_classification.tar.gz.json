@@ -1,7 +1,7 @@
 {
   "archive": "pilot_classification.tar.gz",
   "bytes": 49180,
-  "sha256": "decde0cf17cbeae7013bda6914d39d1f009f3e028b3c52c280135960ec1df226",
+  "sha256": "7ce6f8b44046682837772847b0a7702b535bc2fab927035d3aa9cc87715cd70c",
   "members": [
     "data/prepared/classification_dev.jsonl",
     "data/prepared/classification_test.jsonl",

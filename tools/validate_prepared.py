@@ -62,7 +62,7 @@ def validate(root, runtime_only=False):
     corpus_ids = {row['id'] for row in corpus}
     assert len(corpus_ids) == len(corpus)
     project = Path(__file__).resolve().parents[1]
-    profile = 'full' if root.name == 'full' else 'pilot'
+    profile = root.name if root.name != 'prepared' else 'pilot'
     backgrounds = project / 'artifacts/raw' / profile / 'wikipedia'
     if backgrounds.is_dir():
         train_sources = {}
@@ -80,9 +80,14 @@ def validate(root, runtime_only=False):
     for manifest in root.glob('manifest_*.json'):
         payload = json.loads(manifest.read_text(encoding='utf-8'))
         project = Path(__file__).resolve().parents[1]
+        plan_reference = payload.get('experiment_plan')
+        if isinstance(plan_reference, dict) and plan_reference.get('snapshot_path'):
+            snapshot = project / plan_reference['snapshot_path']
+            with snapshot.open('rb') as stream:
+                assert hashlib.file_digest(stream, 'sha256').hexdigest() == plan_reference['sha256'], str(snapshot)
         for item in payload.get('artifacts', {}).values():
             if isinstance(item, dict) and item.get('path') and item.get('sha256'):
-                path = project / item['path']
+                path = project / item.get('snapshot_path', item['path'])
                 if path.exists():
                     with path.open('rb') as stream:
                         assert hashlib.file_digest(stream, 'sha256').hexdigest() == item['sha256'], str(path)

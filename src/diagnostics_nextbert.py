@@ -949,9 +949,9 @@ def _load_model(model_dir: Path, variant: str, tokenizer: Any, device: torch.dev
 
 
 def _profile_paths(profile: str) -> tuple[Path, Path]:
-    prepared = ROOT / "data" / "prepared" / ("full" if profile == "full" else "")
-    if profile != "full":
-        prepared = ROOT / "data" / "prepared"
+    prepared = ROOT / "data" / "prepared"
+    if profile != "pilot":
+        prepared = prepared / profile
     raw_wiki = ROOT / "artifacts" / "raw" / profile / "wikipedia"
     return prepared, raw_wiki
 
@@ -1036,7 +1036,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--variant", required=True, choices=("V0", "V1", "V2", "V3"))
     parser.add_argument("--checkpoint", type=Path, help="Optional local trainer checkpoint state")
     parser.add_argument("--tokenizer-path", type=Path, default=ROOT / "artifacts" / "mmbert-base")
-    parser.add_argument("--profile", choices=("pilot", "full"), default="pilot")
+    parser.add_argument("--profile", choices=("pilot", "full", "full_67m"), default="pilot")
     parser.add_argument("--device", default=None)
     parser.add_argument("--output", type=Path)
 

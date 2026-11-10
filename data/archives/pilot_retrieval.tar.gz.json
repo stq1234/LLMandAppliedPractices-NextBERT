@@ -1,7 +1,7 @@
 {
   "archive": "pilot_retrieval.tar.gz",
   "bytes": 45183007,
-  "sha256": "3c6b743950166028437240a3a8629ae19f1def79f92e18943db261f5dea18495",
+  "sha256": "864e04a909e2cf4a4316f196fc8d2fcb2de70c4ce1060d93edefe3076a7d99be",
   "members": [
     "data/prepared/manifest_retrieval.json",
     "data/prepared/reranking_dev.jsonl",

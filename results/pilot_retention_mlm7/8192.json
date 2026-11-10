@@ -1,0 +1,22 @@
+{
+  "task": "fixed_mask_heldout_mlm",
+  "variant": "V0",
+  "seed": 1701,
+  "rows": 64,
+  "length": 8192,
+  "mask_rate": 0.3,
+  "mean_nll_per_target": 1.8596670739352703,
+  "by_language": {
+    "en": {
+      "targets": 78624,
+      "mean_nll_per_target": 1.7123478762805462
+    },
+    "zh": {
+      "targets": 78624,
+      "mean_nll_per_target": 2.0069862715899944
+    }
+  },
+  "elapsed_seconds": 6.427828709129244,
+  "data": "data/prepared/full_67m/wiki_8192_dev.npy",
+  "checkpoint": null
+}

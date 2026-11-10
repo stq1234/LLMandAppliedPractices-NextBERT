@@ -18,10 +18,16 @@ def main():
     output = ROOT / 'data/archives'
     output.mkdir(exist_ok=True)
     inventory = {'archive_root': 'repository root', 'large_file_rule_mib': args.max_file_mib,
-                 'rebuild_command': 'python src/prepare_data.py --profile full', 'included': [], 'excluded_large_files': []}
+                 'rebuild_command': 'python src/prepare_data.py --profile full_67m --plan configs/experiment_plan.json',
+                 'legacy_rebuild_command': 'python src/prepare_data.py --profile full --plan configs/calibration_small_plan.json',
+                 'included': [], 'excluded_large_files': []}
     commands = []
-    for profile in ('pilot', 'full'):
+    for profile in ('pilot', 'full', 'full_67m'):
         source = ROOT / 'data/prepared' / ('full' if profile == 'full' else '')
+        if profile == 'full_67m':
+            source = ROOT / 'data/prepared/full_67m'
+        if not source.is_dir():
+            continue
         for task in ('wiki', 'classification', 'qa', 'retrieval'):
             prefixes = {'wiki': ('wiki_',), 'classification': ('classification_',),
                         'qa': ('qa_',), 'retrieval': ('retrieval_', 'reranking_')}[task]
@@ -46,7 +52,7 @@ def main():
             future.result()
             if archive.stat().st_size >= 96 * 1024**2:
                 raise RuntimeError(f'Archive is too large for normal Git: {archive.name}; split its input groups')
-    (ROOT / 'data/archive_manifest.json').write_text(json.dumps(inventory, ensure_ascii=False, indent=2), encoding='utf-8')
+    (ROOT / 'data/archive_manifest.json').write_text(json.dumps(inventory, ensure_ascii=False, indent=2), encoding='utf-8', newline='\n')
     print(json.dumps({'archives': len(inventory['included']), 'excluded_large_files': len(inventory['excluded_large_files'])}))
 
 
