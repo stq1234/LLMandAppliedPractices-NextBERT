@@ -7,12 +7,14 @@ import unittest
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import run_two_lane_training as scheduler  # noqa: E402
+import train_worker  # noqa: E402
 from run_training_matrix import _load_plan, build_commands  # noqa: E402
 
 
@@ -76,7 +78,7 @@ class TwoLaneScheduleTests(unittest.TestCase):
             self.assertEqual(Path(_arg(command_job["command"], "--resume-from")), shared_checkpoint)
         self.assertIn("--shared-prefix-resume", v3_tail[0]["command"])
 
-    def test_optimizer_state_and_allocator_budgets_are_preserved(self) -> None:
+    def test_checkpoint_state_is_preserved_without_allocator_limits(self) -> None:
         jobs = [job for wave in self.waves for lane in wave["lanes"].values()
                 for job in lane]
         mlm_jobs = [job for job in jobs if job["task"] == "mlm"]
@@ -86,12 +88,10 @@ class TwoLaneScheduleTests(unittest.TestCase):
         self.assertTrue(all("--final-weights-only" in job["command"] for job in downstream))
         self.assertTrue(all("--init-from" in job["command"] for job in downstream))
 
-        budgets = {(job["task"], job["memory_budget_gib"], job["minimum_free_gib"])
-                   for job in jobs}
-        self.assertIn(("mlm", 12.0, 18.0), budgets)
-        self.assertIn(("qa", 11.0, 17.0), budgets)
-        self.assertIn(("classification", 8.0, 14.0), budgets)
-        self.assertIn(("reranking", 8.0, 14.0), budgets)
+        for job in jobs:
+            worker_command = scheduler._worker_command(job, gpu=7)
+            self.assertNotIn("--memory-budget-gib", worker_command)
+            self.assertNotIn("--minimum-free-gib", worker_command)
         public = scheduler._public_plan(
             self.waves, gpu=7, max_workers=1, data_dir=ROOT / "data/prepared/full_67m",
             output_dir=self.output, model_dir=ROOT / "artifacts/mmbert-base",
@@ -105,6 +105,22 @@ class TwoLaneScheduleTests(unittest.TestCase):
         )
         self.assertEqual(parallel["maximum_concurrent_tasks"], 2)
         self.assertEqual(parallel["global_preflight_minimum_free_gib"], 30.0)
+
+    def test_worker_runs_normal_training_without_setting_an_allocator_limit(self) -> None:
+        cuda = SimpleNamespace(
+            is_available=lambda: True, get_device_name=lambda _device: "test GPU",
+            synchronize=lambda _device: None, reset_peak_memory_stats=lambda _device: None,
+        )
+        # No allocation-limit API is supplied: invoking one would fail this test.
+        torch = SimpleNamespace(cuda=cuda)
+        with patch.dict(sys.modules, {"torch": torch}), \
+                patch.object(train_worker, "_stats", return_value={}), \
+                patch.object(train_worker.runpy, "run_path") as run, \
+                patch.dict(train_worker.os.environ), \
+                patch.object(sys, "argv", ["train_worker.py"]), redirect_stdout(StringIO()):
+            result = train_worker.main(["--gpu", "7", "--", "--task", "mlm"])
+        self.assertEqual(result, 0)
+        run.assert_called_once_with(str(train_worker.TRAIN_SCRIPT), run_name="__main__")
 
     def test_execution_modes_obey_worker_limit_and_save_final_checkpoints(self) -> None:
         for max_workers in (1, 2):

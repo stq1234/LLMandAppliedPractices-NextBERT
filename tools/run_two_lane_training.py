@@ -24,20 +24,9 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-GLOBAL_MIN_FREE_GIB = 30.0
-MAX_JOB_ALLOCATOR_GIB = 12.0
-LANE_COUNT = 2
-# A global 30 GiB minimum covers two 12 GiB allocators plus 6 GiB left free.
-# A task started after its lane peer allocated its full cap needs its own cap
-# plus that same 6 GiB reserve.
-PER_JOB_FREE_RESERVE_GIB = GLOBAL_MIN_FREE_GIB - LANE_COUNT * MAX_JOB_ALLOCATOR_GIB
-MEMORY_BUDGET_GIB = {
-    "mlm": 12.0,
-    "classification": 8.0,
-    "qa": 11.0,
-    "retrieval": 12.0,
-    "reranking": 8.0,
-}
+# Readiness checks only; these do not limit PyTorch's allocations.
+STARTUP_MIN_FREE_GIB = {1: 18.0, 2: 30.0}
+TRAINING_TASKS = {"mlm", "classification", "qa", "retrieval", "reranking"}
 
 
 def _flag(command: Sequence[str], name: str) -> str | None:
@@ -92,7 +81,7 @@ def _gib(value: int | float) -> float:
 def _make_job(index: int, command: list[str]) -> dict[str, Any]:
     task = _flag(command, "--task")
     variant = _flag(command, "--variant")
-    if task not in MEMORY_BUDGET_GIB or variant is None:
+    if task not in TRAINING_TASKS or variant is None:
         raise ValueError(f"unrecognized training command at index {index}: {command}")
     length_or_seed = _flag(command, "--length") if task == "mlm" else _flag(command, "--seed")
     if length_or_seed is None:
@@ -104,8 +93,6 @@ def _make_job(index: int, command: list[str]) -> dict[str, Any]:
         "task": task,
         "variant": variant,
         "steps": int(_flag(command, "--steps") or 0),
-        "memory_budget_gib": MEMORY_BUDGET_GIB[task],
-        "minimum_free_gib": MEMORY_BUDGET_GIB[task] + PER_JOB_FREE_RESERVE_GIB,
         "command": list(command),
     }
 
@@ -283,7 +270,7 @@ def wait_for_gpu(gpu: int, max_workers: int, poll_seconds: float = 30,
     """Wait until idle or only one allowed user's process remains, then train."""
     if poll_seconds <= 0:
         raise ValueError("poll_seconds must be positive")
-    required_free_gib = max_workers * MAX_JOB_ALLOCATOR_GIB + PER_JOB_FREE_RESERVE_GIB
+    required_free_gib = STARTUP_MIN_FREE_GIB[max_workers]
     required = int(required_free_gib * 1024**3)
     while True:
         processes = query_gpu_processes(gpu)
@@ -319,9 +306,7 @@ def _offline_env(gpu: int) -> dict[str, str]:
 def _worker_command(job: Mapping[str, Any], gpu: int) -> list[str]:
     original = job["command"]
     worker = ROOT / "tools" / "train_worker.py"
-    return [sys.executable, str(worker), "--gpu", str(gpu),
-            "--memory-budget-gib", str(job["memory_budget_gib"]),
-            "--minimum-free-gib", str(job["minimum_free_gib"]), "--",
+    return [sys.executable, str(worker), "--gpu", str(gpu), "--",
             *original[2:]]
 
 
@@ -404,8 +389,6 @@ def _execute_waves(waves: Sequence[Mapping[str, Any]], *, gpu: int, output_dir: 
             command = _worker_command(job, gpu)
             header = {
                 "wave": wave["wave"], "lane": lane_name, "job_id": job["job_id"],
-                "memory_budget_gib": job["memory_budget_gib"],
-                "minimum_free_gib": job["minimum_free_gib"],
                 "train_command": shlex.join(job["command"]),
                 "worker_command": shlex.join(command),
             }
@@ -533,8 +516,6 @@ def _public_plan(waves: Sequence[Mapping[str, Any]], *, gpu: int, max_workers: i
                 lanes[lane_name].append({
                     "job_id": job["job_id"], "task": job["task"],
                     "variant": job["variant"], "steps": job["steps"],
-                    "memory_budget_gib": job["memory_budget_gib"],
-                    "minimum_free_gib_at_start": job["minimum_free_gib"],
                     "command": shlex.join(job["command"]),
                 })
         public_waves.append({"wave": wave["wave"], "name": wave["name"], "lanes": lanes})
@@ -554,8 +535,7 @@ def _public_plan(waves: Sequence[Mapping[str, Any]], *, gpu: int, max_workers: i
         "downstream_job_count": sum(1 for wave in waves for jobs in wave["lanes"].values()
                                      for job in jobs if job["task"] != "mlm"),
         "maximum_concurrent_tasks": max_workers,
-        "global_preflight_minimum_free_gib": max_workers * MAX_JOB_ALLOCATOR_GIB + PER_JOB_FREE_RESERVE_GIB,
-        "per_job_free_reserve_gib": PER_JOB_FREE_RESERVE_GIB,
+        "global_preflight_minimum_free_gib": STARTUP_MIN_FREE_GIB[max_workers],
         "checkpoint_cleanup": "consumed MLM intermediates are removed only after their dependent wave succeeds; final 8192 checkpoints are retained",
         "evaluation": "run separately with the existing evaluation CLI after training",
         "waves": public_waves,

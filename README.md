@@ -96,7 +96,7 @@ python tools/launch_pilot.py --gpu 7 --reserve-gib 6 `
 
 完整训练入口为 `tools/run_all_training.py`。默认只打印计划且不等待 GPU；加 `--execute` 后先等待 GPU 7 满足资源条件，再自动按固定的 5 波双路计划完成全部 14 个 MLM 阶段和 12 个下游阶段并保存 checkpoint。每波两条 lane 同时运行，lane 内顺序执行，波间设置 barrier；如需串行，可传入 `--max-workers 1`。评估不包含在训练调度中，训练后继续使用下文现有评估 CLI。
 
-带 `--execute` 时，程序每 30 秒检查一次 GPU 计算进程和显存：计算进程数须为 0，或仅有一个 owner 为 `shaotianqi` 的进程；同时默认双路要求至少空闲 30 GiB，串行模式要求 18 GiB。条件未满足时继续等待，不设置等待截止时间或预留开始时段；一旦满足便立即自动进入训练。检查只使用 `nvidia-smi` 和进程 owner 查询，不会预先导入 PyTorch 或初始化 CUDA。每个 worker 启动前还会按任务复核当前可用显存。MLM 和检索 worker 的 PyTorch allocator 上限为 12 GiB，QA 为 11 GiB，分类和重排为 8 GiB；这些是 allocator 上限，不是涵盖 CUDA context 和其他库分配的进程硬配额。48 GiB A6000 若有 15 GiB 常驻占用，理论空闲约 33 GiB，仍须通过执行时的实际检查。启动命令：
+带 `--execute` 时，程序每 30 秒检查一次 GPU 计算进程和显存：计算进程数须为 0，或仅有一个 owner 为 `shaotianqi` 的进程；同时默认双路要求至少空闲 30 GiB，串行模式要求 18 GiB。条件未满足时继续等待，不设置等待截止时间或预留开始时段；一旦满足便立即自动进入训练。检查只使用 `nvidia-smi` 和进程 owner 查询，不会预先导入 PyTorch 或初始化 CUDA。训练开始后，各 worker 按正常 PyTorch 显存分配方式运行，不设置每进程显存额度，也不增加阶段间显存门槛；训练参数和 batch 保持既定配置。48 GiB A6000 若有 15 GiB 常驻占用，理论空闲约 33 GiB，仍须通过执行时的实际检查。启动命令：
 
 ```powershell
 python tools/run_all_training.py --gpu 7 --output-dir results/formal_67m --execute
