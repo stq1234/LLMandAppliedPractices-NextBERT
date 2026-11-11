@@ -170,6 +170,56 @@ class TwoLaneScheduleTests(unittest.TestCase):
                 downstream = list((output / "downstream").rglob("*_checkpoint.pt"))
                 self.assertEqual(len(downstream), 12)
 
+    def test_gpu_wait_retries_until_process_owner_and_memory_are_ready(self) -> None:
+        gib = 1024**3
+        process_rows = [
+            [{"pid": 20, "owner": "another-user"}],
+            [{"pid": 20, "owner": "shaotianqi"}, {"pid": 21, "owner": "another-user"}],
+            [{"pid": 20, "owner": "shaotianqi"}],
+        ]
+        memory_rows = [(35 * gib, 48 * gib), (35 * gib, 48 * gib), (31 * gib, 48 * gib)]
+        with patch.object(scheduler, "query_gpu_processes", side_effect=process_rows) as processes, \
+                patch.object(scheduler, "query_gpu_memory", side_effect=memory_rows) as memory, \
+                patch.object(scheduler.time, "sleep") as sleep:
+            result = scheduler.wait_for_gpu(
+                gpu=7, max_workers=2, poll_seconds=30, allowed_owner="shaotianqi",
+            )
+
+        self.assertEqual(result, (31 * gib, 48 * gib))
+        self.assertEqual(processes.call_count, 3)
+        self.assertEqual(memory.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+        sleep.assert_called_with(30)
+
+    def test_gpu_wait_does_not_accept_other_owner_multiple_processes_or_low_memory(self) -> None:
+        gib = 1024**3
+        invalid_states = [
+            ([{"pid": 20, "owner": "another-user"}], (35 * gib, 48 * gib)),
+            ([{"pid": 20, "owner": "shaotianqi"}, {"pid": 21, "owner": "shaotianqi"}],
+             (35 * gib, 48 * gib)),
+            ([], (29 * gib, 48 * gib)),
+        ]
+        for process_rows, memory_row in invalid_states:
+            with self.subTest(processes=process_rows, free=memory_row[0]):
+                with patch.object(scheduler, "query_gpu_processes", return_value=process_rows), \
+                        patch.object(scheduler, "query_gpu_memory", return_value=memory_row), \
+                        patch.object(scheduler.time, "sleep", side_effect=KeyboardInterrupt):
+                    with self.assertRaises(KeyboardInterrupt):
+                        scheduler.wait_for_gpu(
+                            gpu=7, max_workers=2, poll_seconds=30, allowed_owner="shaotianqi",
+                        )
+
+    def test_cli_dry_run_does_not_wait_for_gpu_or_execute(self) -> None:
+        with patch.object(scheduler, "wait_for_gpu") as wait, \
+                patch.object(scheduler, "_execute_waves") as execute, \
+                redirect_stdout(StringIO()):
+            result = scheduler.main([
+                "--gpu", "7", "--output-dir", str(Path(self.temp.name) / "dry-run"),
+            ])
+        self.assertEqual(result, 0)
+        wait.assert_not_called()
+        execute.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

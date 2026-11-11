@@ -14,6 +14,7 @@ import shlex
 import subprocess
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
@@ -244,22 +245,62 @@ def _validate_execute_inputs(waves: Sequence[Mapping[str, Any]], model_dir: Path
                     )
 
 
-def _check_global_preflight(gpu: int, max_workers: int) -> tuple[int, int]:
-    free, total = query_gpu_memory(gpu)
+def query_gpu_processes(gpu: int) -> list[dict[str, Any]]:
+    """Read this GPU's compute PIDs and their Linux owners without CUDA."""
+    device = subprocess.run(
+        ["nvidia-smi", "-i", str(gpu), "--query-gpu=uuid", "--format=csv,noheader"],
+        check=True, capture_output=True, text=True, timeout=15,
+    )
+    gpu_uuid = device.stdout.strip()
+    if not gpu_uuid or len(gpu_uuid.splitlines()) != 1:
+        raise RuntimeError(f"could not identify physical GPU {gpu}")
+    applications = subprocess.run(
+        ["nvidia-smi", "--query-compute-apps=gpu_uuid,pid", "--format=csv,noheader,nounits"],
+        check=True, capture_output=True, text=True, timeout=15,
+    )
+    pids: set[int] = set()
+    for row in applications.stdout.splitlines():
+        fields = [part.strip() for part in row.split(",")]
+        if len(fields) == 2 and fields[0] == gpu_uuid:
+            pids.add(int(fields[1]))
+    processes: list[dict[str, Any]] = []
+    for pid in sorted(pids):
+        owner = subprocess.run(
+            ["ps", "-p", str(pid), "-o", "user:64="],
+            capture_output=True, text=True, timeout=15,
+        )
+        if owner.returncode == 1 and not owner.stdout.strip():
+            # The process can exit between nvidia-smi and ps.
+            continue
+        if owner.returncode != 0 or not owner.stdout.strip():
+            raise RuntimeError(f"could not read owner of GPU process {pid}")
+        processes.append({"pid": pid, "owner": owner.stdout.strip()})
+    return processes
+
+
+def wait_for_gpu(gpu: int, max_workers: int, poll_seconds: float = 30,
+                 allowed_owner: str = "shaotianqi") -> tuple[int, int]:
+    """Wait until idle or only one allowed user's process remains, then train."""
+    if poll_seconds <= 0:
+        raise ValueError("poll_seconds must be positive")
     required_free_gib = max_workers * MAX_JOB_ALLOCATOR_GIB + PER_JOB_FREE_RESERVE_GIB
     required = int(required_free_gib * 1024**3)
-    if free < required:
-        raise RuntimeError(
-            f"GPU {gpu} has {_gib(free):.2f} GiB free; execution requires "
-            f"at least {required_free_gib:.0f} GiB for {max_workers} worker(s). "
-            "No training process was started."
+    while True:
+        processes = query_gpu_processes(gpu)
+        free, total = query_gpu_memory(gpu)
+        if total < required:
+            raise RuntimeError(f"GPU {gpu} is smaller than the required {required_free_gib:.0f} GiB")
+        process_ready = not processes or (
+            len(processes) == 1 and processes[0]["owner"] == allowed_owner
         )
-    if total < required:
-        raise RuntimeError(
-            f"GPU {gpu} has only {_gib(total):.2f} GiB total; the schedule requires "
-            f"a device with at least {required_free_gib:.0f} GiB."
-        )
-    return free, total
+        if process_ready and free >= required:
+            print(f"[GPU ready] GPU {gpu}: processes={processes}, free={_gib(free):.2f} GiB; "
+                  "starting the fixed training schedule", flush=True)
+            return free, total
+        print(f"[waiting for GPU {gpu}] processes={processes}, free={_gib(free):.2f} GiB; "
+              f"need idle or one {allowed_owner} process and >= {required_free_gib:.0f} GiB free; "
+              f"checking again in {poll_seconds:g}s", flush=True)
+        time.sleep(poll_seconds)
 
 
 def _offline_env(gpu: int) -> dict[str, str]:
@@ -500,6 +541,7 @@ def _public_plan(waves: Sequence[Mapping[str, Any]], *, gpu: int, max_workers: i
     return {
         "status": "dry_run",
         "execute_requires_flag": "--execute",
+        "startup_wait": "poll every 30s until GPU is idle or only one shaotianqi compute process remains, with sufficient free memory",
         "execution_mode": "serial" if max_workers == 1 else "two_lane_parallel",
         "gpu": gpu,
         "data_dir": str(data_dir),
@@ -529,14 +571,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--gpu", type=int, default=7)
     parser.add_argument("--max-workers", type=int, choices=(1, 2), default=2,
                         help="1 runs strictly serially; 2 runs the two planned lanes in parallel")
-    parser.add_argument("--execute", action="store_true", help="start training; default is dry-run")
+    parser.add_argument("--execute", action="store_true",
+                        help="wait for the GPU, then train automatically; default is dry-run")
     args = parser.parse_args(argv)
 
-    # A low-free-memory execution request must fail before importing the
-    # existing command builder (which imports train_nextbert and torch).
+    # Waiting uses nvidia-smi and ps only; it does not load torch or acquire CUDA.
     preflight: tuple[int, int] | None = None
     if args.execute:
-        preflight = _check_global_preflight(args.gpu, args.max_workers)
+        preflight = wait_for_gpu(args.gpu, args.max_workers)
 
     from run_training_matrix import _default_data_dir, _load_plan, build_commands
 
