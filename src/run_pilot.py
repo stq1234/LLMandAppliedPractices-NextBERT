@@ -637,7 +637,9 @@ def _evaluation_work(plan: Mapping[str, Any]) -> list[dict[str, Any]]:
     evaluation = plan["evaluation"]
     return [
         {"stage": "classification_validation_and_official_test", "languages": ["zh", "en"],
-         "variants": ["V0", "V3"], "runs": 4, "measured_seconds": None,
+         "variants": ["V0", "V3"],
+         "runs": sum(phase["task"] == "classification" for phase in _task_phases(plan)),
+         "measured_seconds": None,
          "projected_seconds": None, "status": "unmeasured", "gpu_hour_cap": None},
         {"stage": "qa_article_grouped_selection_and_locked_final_eval", "sources": ["SQuAD1.1", "CMRC2018"],
          "variants": ["V0", "V1", "V2", "V3"], "measured_seconds": None,

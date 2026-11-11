@@ -354,23 +354,9 @@
           17
         ],
         "phases": 4
-      },
-      {
-        "variants": [
-          "V0",
-          "V3"
-        ],
-        "tasks": [
-          "classification",
-          "qa"
-        ],
-        "seeds": [
-          29
-        ],
-        "phases": 4
       }
     ],
-    "total_training_phases": 16
+    "total_training_phases": 12
   },
   "evaluation": {
     "classification": "official zh/en XNLI test; development selection uses validation",
@@ -449,11 +435,11 @@
     "gpu_type": "RTX A6000 48GB",
     "max_physical_gpus": 1,
     "target_physical_gpu_hours": [
-      10,
-      11
+      9,
+      10
     ],
     "hard_cap_physical_gpu_hours": 12,
-    "budget_scope": "standard 67M candidate, 50 long-evidence groups/language; 8.114 projected GPU-hours, 10.142 with 25 percent margin; full training remains unapproved",
+    "budget_scope": "single run per model/task; 12 downstream phases; 7.606 projected GPU-hours, 9.507 with 25 percent margin; full training remains unapproved",
     "measured": true,
     "measurement_scope": "short optimizer calibration on GPU7, complete training-case coverage; full-run durations and convergence remain unmeasured",
     "calibration_summary": "results/calibration_standard67m_summary.json",

@@ -5,23 +5,23 @@
   "input_tokens_per_full_branch": 67108864,
   "executed_mlm_input_tokens_including_shared_prefix": 218103808,
   "adaptation_steps": 1664,
-  "downstream_training_phases": 16,
+  "downstream_training_phases": 12,
   "components_seconds": {
     "mlm_training": 9751.501657105982,
-    "classification_training": 866.6463512054179,
-    "qa_training": 3557.149032883346,
+    "classification_training": 398.85983816930093,
+    "qa_training": 2373.531476651551,
     "retrieval_training": 4210.191959020449,
     "reranking_training": 1467.4916111398488,
     "index_build_four_variants": 2800.589773032698,
     "retrieval_dev_and_test_queries": 54.25182102411054,
     "reranking_dev_and_test": 166.90181352198124,
-    "classification_and_qa_dev_test_inference": 481.17052627373414,
+    "classification_and_qa_dev_test_inference": 302.15047600059916,
     "long_context_50_groups_per_language": 4534.478710778058,
     "retention_mlm_probes_and_latency_reserve": 600.0,
     "checkpoint_io_and_startup_reserve": 720.0
   },
-  "projected_gpu_hours": 8.113992571107119,
-  "gpu_hours_with_25_percent_margin": 10.142490713883898,
+  "projected_gpu_hours": 7.605541426790161,
+  "gpu_hours_with_25_percent_margin": 9.506926783487701,
   "optimizer_projection": {
     "adaptation_steps_planned": 1664,
     "adaptation_unique_steps_including_shared_prefix": 1664,
@@ -538,7 +538,7 @@
     "adaptation_projected_seconds_from_pilot": 9751.501657105982,
     "adaptation_projection_coverage": 1.0,
     "adaptation_projection_is_partial": false,
-    "downstream_phase_count": 16,
+    "downstream_phase_count": 12,
     "downstream_phase_projections": [
       {
         "phase_id": 1,
@@ -1043,187 +1043,9 @@
         "measured_pilot_sample_count": 3,
         "projected_seconds": 1191.561702027684,
         "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 13,
-        "variant": "V0",
-        "task": "classification",
-        "seed": 29,
-        "subphase": "all",
-        "planned_optimizer_steps": 625,
-        "target_count_per_epoch": 20000,
-        "target_count_total_epochs": 40000,
-        "target_count_unit": "examples",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "examples",
-        "expected_batch_signature": {
-          "physical_batch": 32,
-          "gradient_accumulation": 2,
-          "effective_batch": 64
-        },
-        "observed_batch_signature": {
-          "physical_batch": 32,
-          "gradient_accumulation": 2,
-          "effective_batch": 64
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 0.30944785894826055,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 193.40491184266284,
-        "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 14,
-        "variant": "V0",
-        "task": "qa",
-        "seed": 29,
-        "subphase": "regular",
-        "planned_optimizer_steps": 625,
-        "target_count_per_epoch": 10000,
-        "target_count_total_epochs": 20000,
-        "target_count_unit": "questions",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "feature_rows_without_question_id",
-        "source_feature_rows": 0,
-        "expected_batch_signature": {
-          "physical_batch": 16,
-          "gradient_accumulation": 2,
-          "effective_batch": 32
-        },
-        "observed_batch_signature": {
-          "physical_batch": 16,
-          "gradient_accumulation": 2,
-          "effective_batch": 32
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 0.47841273387894034,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 299.0079586743377,
-        "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 14,
-        "variant": "V0",
-        "task": "qa",
-        "seed": 29,
-        "subphase": "long",
-        "planned_optimizer_steps": 63,
-        "target_count_per_epoch": 1000,
-        "target_count_total_epochs": 2000,
-        "target_count_unit": "questions",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "feature_rows_without_question_id",
-        "source_feature_rows": 0,
-        "expected_batch_signature": {
-          "physical_batch": 8,
-          "gradient_accumulation": 4,
-          "effective_batch": 32
-        },
-        "observed_batch_signature": {
-          "physical_batch": 8,
-          "gradient_accumulation": 4,
-          "effective_batch": 32
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 4.302310744998977,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 271.0455769349355,
-        "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 15,
-        "variant": "V3",
-        "task": "classification",
-        "seed": 29,
-        "subphase": "all",
-        "planned_optimizer_steps": 625,
-        "target_count_per_epoch": 20000,
-        "target_count_total_epochs": 40000,
-        "target_count_unit": "examples",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "examples",
-        "expected_batch_signature": {
-          "physical_batch": 32,
-          "gradient_accumulation": 2,
-          "effective_batch": 64
-        },
-        "observed_batch_signature": {
-          "physical_batch": 32,
-          "gradient_accumulation": 2,
-          "effective_batch": 64
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 0.4390105619095266,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 274.3816011934541,
-        "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 16,
-        "variant": "V3",
-        "task": "qa",
-        "seed": 29,
-        "subphase": "regular",
-        "planned_optimizer_steps": 625,
-        "target_count_per_epoch": 10000,
-        "target_count_total_epochs": 20000,
-        "target_count_unit": "questions",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "feature_rows_without_question_id",
-        "source_feature_rows": 0,
-        "expected_batch_signature": {
-          "physical_batch": 16,
-          "gradient_accumulation": 2,
-          "effective_batch": 32
-        },
-        "observed_batch_signature": {
-          "physical_batch": 16,
-          "gradient_accumulation": 2,
-          "effective_batch": 32
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 0.5417740899138153,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 338.60880619613454,
-        "projection_status": "projected_from_real_batch_pilot"
-      },
-      {
-        "phase_id": 16,
-        "variant": "V3",
-        "task": "qa",
-        "seed": 29,
-        "subphase": "long",
-        "planned_optimizer_steps": 63,
-        "target_count_per_epoch": 1000,
-        "target_count_total_epochs": 2000,
-        "target_count_unit": "questions",
-        "epochs": 2,
-        "source_count": 0,
-        "source_count_unit": "feature_rows_without_question_id",
-        "source_feature_rows": 0,
-        "expected_batch_signature": {
-          "physical_batch": 8,
-          "gradient_accumulation": 4,
-          "effective_batch": 32
-        },
-        "observed_batch_signature": {
-          "physical_batch": 8,
-          "gradient_accumulation": 4,
-          "effective_batch": 32
-        },
-        "batch_signature_match": true,
-        "measured_pilot_step_seconds_median": 4.364368482958525,
-        "measured_pilot_sample_count": 3,
-        "projected_seconds": 274.9552144263871,
-        "projection_status": "projected_from_real_batch_pilot"
       }
     ],
-    "downstream_projected_seconds_from_real_batch_pilots": 10101.478954249062,
+    "downstream_projected_seconds_from_real_batch_pilots": 8450.07488498115,
     "downstream_projection_coverage": 1.0,
     "downstream_projection_is_partial": false,
     "evaluation_and_indexing_work": [
@@ -1237,7 +1059,7 @@
           "V0",
           "V3"
         ],
-        "runs": 4,
+        "runs": 2,
         "measured_seconds": null,
         "projected_seconds": null,
         "status": "unmeasured",
@@ -1362,7 +1184,7 @@
       "recovery": 1.5,
       "hard_cap_physical_gpu_hours": 12.0
     },
-    "total_projected_training_seconds": 19852.980611355044,
+    "total_projected_training_seconds": 18201.576542087132,
     "total_schedule_wall_seconds": null,
     "interpretation": "Pilot durations are observed on short real optimizer runs. Projected training seconds multiply their measured median step duration by the planned count; they are projections, not completed-run measurements. Evaluation and index construction remain unmeasured because no such timed run was made."
   },

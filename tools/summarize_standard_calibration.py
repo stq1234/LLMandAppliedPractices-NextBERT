@@ -58,10 +58,15 @@ def main():
     ordinary_inference = 0.0
     inference_sources = []
     long_sample_rates = {}
+    inference_runs = Counter()
+    for phase in _task_phases(plan):
+        family = 'V0' if phase['variant'] in ('V0', 'V1') else 'V3'
+        inference_runs[(family, phase['task'])] += 1
     for variant in ('V0', 'V3'):
         inference = read(f'results/calibration/calibration_{variant}.json')
         inference_sources.append(f'results/calibration/calibration_{variant}.json')
-        for task, runs in (('classification', 2), ('qa', 3)):
+        for task in ('classification', 'qa'):
+            runs = inference_runs[(variant, task)]
             case = get_item(inference, f'{task}_official_split_inference')
             ratio = old_validation[f'{task}_dev']['rows'] / old_validation[f'{task}_test']['rows']
             ordinary_inference += case['estimated_full_split_seconds_linear'] * runs * (1 + ratio)
@@ -106,7 +111,7 @@ def main():
         'span_masking_implementation': 'linear candidate scan with pre-sampled geometric spans; optimized span cases supersede prior quadratic-scanning cases when present',
     }
     output = ROOT / 'results/calibration_standard67m_summary.json'
-    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8', newline='\n')
     print(json.dumps({
         'components_minutes': {k: round(value / 60, 2) for k,value in components.items()},
         'projected_gpu_hours': round(total / 3600, 3),
