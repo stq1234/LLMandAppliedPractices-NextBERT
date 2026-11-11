@@ -43,6 +43,7 @@ from train_nextbert import (  # noqa: E402
     _seed_everything,
     collate_sequences,
     load_jsonl,
+    restore_gate_state,
 )
 from transformers import AutoTokenizer  # noqa: E402
 
@@ -945,6 +946,7 @@ def _load_model(model_dir: Path, variant: str, tokenizer: Any, device: torch.dev
         bad_missing = [name for name in missing if not name.startswith(allowed)]
         if bad_missing or unexpected:
             raise ValueError(f"checkpoint backbone mismatch: missing={bad_missing[:5]}, unexpected={unexpected[:5]}")
+        restore_gate_state(model, payload if isinstance(payload, Mapping) else {})
     return model.to(device)
 
 

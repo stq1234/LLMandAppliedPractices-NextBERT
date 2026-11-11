@@ -104,6 +104,16 @@ python tools/run_all_training.py --gpu 7 --output-dir results/formal_67m --execu
 
 脚本会拒绝含有 checkpoint 的既有输出目录；阶段失败时会中止剩余任务并保留日志与未消费的 checkpoint。双路模式只会终止本调度器启动的另一 lane worker。每个 job 的独立日志位于输出目录下 `logs/<run timestamp>/`，总控同时逐项打印开始/结束状态。成功完成时会在依赖波次结束后清理已消费的 MLM 中间 checkpoint，保留四个最终 MLM checkpoint 和 12 个下游 checkpoint；评测命令单独执行。
 
+## 六项门控微调补训
+
+`tools/retrain_gated_downstream.py` 是独立的六任务入口，复用各任务训练命令，不调用或修改原五波调度器。本轮固定只使用 GPU 5 和 GPU 7：GPU 5 同时运行 V2 检索、V3 检索、V3 QA、V3 分类；GPU 7 同时运行 V2 QA、V3 重排。启动前按既有预跑峰值与每进程约 1 GiB CUDA 开销检查各卡空闲显存，不设置每进程显存上限。
+
+所有任务从 `results/formal_67m/mlm/` 中相应版本的最终预训练 checkpoint 初始化，保留原数据、batch、步数和学习率。下游微调显式启用结构门控，checkpoint metadata 保存其运行状态。新 checkpoint 和训练记录写入 `results/formal_67m_gatefix/`；入口汇总各 GPU 的实际任务数、更新步数、进程计时与显存峰值。该卡号安排仅用于本轮补训，不改变原训练入口默认 GPU 7。
+
+```bash
+python tools/retrain_gated_downstream.py --execute
+```
+
 ## 评估与长程诊断
 
 各任务评估通过本地 checkpoint 执行；`--model-dir` 指向原始 mmBERT 目录，提供配置和 tokenizer。例：

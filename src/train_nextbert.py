@@ -238,6 +238,62 @@ def _scheduler(optimizer: AdamW, total_steps: int, warmup_fraction: float):
     return torch.optim.lr_scheduler.LambdaLR(optimizer, scale)
 
 
+_GATE_RAMP_WARMUP_UPDATES = 64
+
+
+def gate_state_metadata(model: nn.Module) -> dict[str, int | float]:
+    """Return the effective structural-gate ramp state for a checkpoint."""
+    return {
+        "gate_ramp": float(getattr(model, "gate_ramp", 0.0)),
+        "adaptation_updates": int(getattr(model, "adaptation_updates", 0)),
+    }
+
+
+def restore_gate_state(model: nn.Module, payload: Mapping[str, Any], *,
+                       fallback_task: str | None = None) -> dict[str, int | float]:
+    """Restore effective gate state, inferring only legacy MLM checkpoints.
+
+    Older MLM checkpoints did not persist the non-parameter warmup counter, so
+    their saved optimizer step determines the ramp. Legacy downstream states
+    did not train with an enabled ramp and therefore restore with gates off.
+    """
+    raw_metadata = payload.get("metadata", {})
+    metadata = raw_metadata if isinstance(raw_metadata, Mapping) else {}
+    task = str(payload.get("task", fallback_task or ""))
+    updates_value = metadata.get("adaptation_updates")
+    if updates_value is None:
+        updates = int(payload.get("step", 0)) if task == "mlm" else 0
+    else:
+        updates = max(0, int(updates_value))
+
+    set_update = getattr(model, "set_adaptation_step", None)
+    if callable(set_update):
+        set_update(updates)
+
+    saved_ramp = metadata.get("gate_ramp")
+    if saved_ramp is not None:
+        ramp = min(1.0, max(0.0, float(saved_ramp)))
+    elif "adaptation_updates" in metadata or task == "mlm":
+        if callable(set_update):
+            ramp = float(getattr(model, "gate_ramp", 0.0))
+        else:
+            ramp = min(1.0, updates / _GATE_RAMP_WARMUP_UPDATES)
+    else:
+        ramp = 0.0
+    _apply_gate_ramp(model, ramp)
+    return {
+        "gate_ramp": float(getattr(model, "gate_ramp", ramp)),
+        "adaptation_updates": int(getattr(model, "adaptation_updates", updates)),
+    }
+
+
+def _metadata_with_gate_state(model: nn.Module,
+                              metadata: Mapping[str, Any] | None) -> dict[str, Any]:
+    result = dict(metadata or {})
+    result.update(gate_state_metadata(model))
+    return result
+
+
 def _save_checkpoint(path: Path, *, model: nn.Module, optimizer: AdamW,
                      scheduler: Any, step: int, task: str, variant: str,
                      seed: int, metadata: Mapping[str, Any] | None = None) -> None:
@@ -256,7 +312,7 @@ def _save_checkpoint(path: Path, *, model: nn.Module, optimizer: AdamW,
         "numpy_rng": np.random.get_state(),
         "torch_rng": torch.get_rng_state(),
         "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
-        "metadata": dict(metadata or {}),
+        "metadata": _metadata_with_gate_state(model, metadata),
     }
     temporary = path.with_suffix(path.suffix + ".tmp")
     torch.save(payload, temporary)
@@ -276,7 +332,7 @@ def _save_weights_only(path: Path, *, model: nn.Module, step: int, task: str,
         "task": task,
         "variant": variant,
         "seed": seed,
-        "metadata": dict(metadata or {}),
+        "metadata": _metadata_with_gate_state(model, metadata),
     }
     temporary = path.with_suffix(path.suffix + ".tmp")
     torch.save(payload, temporary)
@@ -306,6 +362,7 @@ def _load_checkpoint(path: Path, *, model: nn.Module, optimizer: AdamW,
     torch.set_rng_state(payload["torch_rng"].cpu())
     if torch.cuda.is_available() and payload.get("cuda_rng") is not None:
         torch.cuda.set_rng_state_all([state.cpu() for state in payload["cuda_rng"]])
+    restore_gate_state(model, payload, fallback_task=task)
     return int(payload["step"])
 
 
@@ -328,6 +385,7 @@ def _initialize_backbone_from_checkpoint(model: nn.Module, path: Path,
                    if not any(part in name.lower() for part in TASK_HEAD_KEY_PARTS)]
     if bad_missing or unexpected:
         raise ValueError(f"checkpoint backbone mismatch; missing={bad_missing[:5]}, unexpected={unexpected[:5]}")
+    _apply_gate_ramp(model, 1.0)
     return {"checkpoint": str(path.resolve()), "loaded_tensors": len(filtered),
             "source_variant": source_variant, "retained_task_head_tensors": len(missing),
             "retained_task_head_names": list(missing)}
@@ -1141,6 +1199,11 @@ def run_training(*, model: nn.Module, task: str, variant: str, data_path: Path,
                                       allow_shared_variant_alias=shared_prefix_resume)
         if start_step >= steps:
             raise ValueError(f"resume checkpoint already completed {start_step} of {steps} steps")
+    elif task != "mlm":
+        # A fresh downstream branch starts from an adapted MLM checkpoint (or
+        # the base model) with the structural gates fully active. Resumed
+        # downstream jobs retain the checkpoint's saved/legacy ramp instead.
+        _apply_gate_ramp(model, 1.0)
     if task == "mlm" and start_step < sampler_stage_start:
         raise ValueError(f"length {length} begins at absolute step {sampler_stage_start}; "
                          "resume from the preceding planned MLM stage")

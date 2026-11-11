@@ -19,13 +19,16 @@ import torch.nn.functional as F
 from train_nextbert import (
     PACKAGE_ROOT, _amp_context, _device, _embeddings, _field, _logits,
     _memory_stats, _method, _seed_everything, _special_ids, collate_sequences,
-    load_jsonl, load_nextbert, pair_tokens,
+    load_jsonl, load_nextbert, pair_tokens, restore_gate_state,
 )
 
 
 def _load_checkpoint(model: torch.nn.Module, checkpoint: Path, device: torch.device) -> None:
     payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
-    model.load_state_dict(payload.get("model", payload))
+    state = payload.get("model", payload) if isinstance(payload, Mapping) else payload
+    model.load_state_dict(state)
+    if isinstance(payload, Mapping):
+        restore_gate_state(model, payload)
 
 
 def _content_mask(model: torch.nn.Module, input_ids: torch.Tensor,
