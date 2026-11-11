@@ -480,7 +480,9 @@ class TrainingPrimitiveTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             checkpoint = Path(directory) / "adapted.pt"
             torch.save({"model": source.state_dict()}, checkpoint)
-            result = _initialize_backbone_from_checkpoint(fresh, checkpoint, self.device, variant="V3")
+            with patch("train_nextbert.torch.load", wraps=torch.load) as loader:
+                result = _initialize_backbone_from_checkpoint(fresh, checkpoint, self.device, variant="V3")
+                self.assertEqual(loader.call_args.kwargs["map_location"], "cpu")
         self.assertTrue(torch.equal(fresh.embedding.weight.detach(), expected_backbone))
         self.assertTrue(torch.equal(fresh.classification_head.weight.detach(), expected_fresh_head))
         self.assertGreater(result["retained_task_head_tensors"], 0)

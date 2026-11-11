@@ -287,7 +287,9 @@ def _load_checkpoint(path: Path, *, model: nn.Module, optimizer: AdamW,
                      scheduler: Any, task: str, variant: str,
                      map_location: torch.device,
                      allow_shared_variant_alias: bool = False) -> int:
-    payload = torch.load(path, map_location=map_location, weights_only=False)
+    # Stage the serialized model and Adam states in host RAM. Loading the whole
+    # payload on CUDA temporarily duplicates large weights beside the live model.
+    payload = torch.load(path, map_location="cpu", weights_only=False)
     if payload.get("checkpoint_kind") == "weights_only":
         raise ValueError("weights-only checkpoint cannot resume optimizer/RNG state; use --init-from")
     saved_variant = payload.get("variant")
@@ -311,7 +313,7 @@ def _initialize_backbone_from_checkpoint(model: nn.Module, path: Path,
                                          map_location: torch.device,
                                          variant: str | None = None) -> dict[str, Any]:
     """Load adaptation weights but retain freshly initialized task heads."""
-    payload = torch.load(path, map_location=map_location, weights_only=False)
+    payload = torch.load(path, map_location="cpu", weights_only=False)
     state = payload.get("model", payload)
     if not isinstance(state, Mapping):
         raise TypeError("initialization checkpoint has no model state mapping")

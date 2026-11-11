@@ -73,7 +73,7 @@ python tools/validate_prepared.py data/prepared/full_67m
 
 短预跑核对实际模型和实际数据 batch 的吞吐、显存和恢复开销。默认每个训练案例执行 2 次 warm-up 和 3 次计时更新，结果逐项写入 JSON/JSONL。新配方的 MLM、下游任务和优化后的 span 校准分别保存在 `results/pilot_standard67m_mlm7`、`results/pilot_standard67m_tasks7` 和 `results/pilot_standard67m_span_optimized7`，综合投影保存在 `results/calibration_standard67m_summary.json`。这些测量用于计算运行预算，不作为模型质量结果。
 
-矩阵保留最终 MLM checkpoint 的 optimizer、scheduler 和 RNG 状态，以支持继续适配；下游最终 checkpoint 保存纯权重。中间 MLM 状态在后续阶段成功消费后清理，V2 的共享前缀保留到 V3 已使用。
+矩阵保留最终 MLM checkpoint 的 optimizer、scheduler 和 RNG 状态，以支持继续适配；下游最终 checkpoint 保存纯权重。双路调度只在依赖阶段成功结束后清理已消费的 MLM 中间 checkpoint；V2 的共享前缀会等 V2 与 V3 两路续训均完成后再清理。最终 8192-token MLM checkpoint 与全部下游 checkpoint 会保留。
 
 完整校准入口：
 
@@ -94,7 +94,15 @@ python tools/launch_pilot.py --gpu 7 --reserve-gib 6 `
   --output-dir results/pilot_67m
 ```
 
-只在 GPU 7 空闲且资源已确认时执行；单卡同时只运行一个任务，并至少预留 6 GiB。正式矩阵入口为 `tools/run_training_matrix.py`，但本轮正式训练仍待校准结果和用户预算决定；不要通过 `--execute` 启动未经批准的完整训练。
+完整训练入口为 `tools/run_all_training.py`。默认只打印计划；加 `--execute` 会按固定的 5 波双路计划完成全部 14 个 MLM 阶段和 12 个下游阶段，并保存 checkpoint。每波两条 lane 同时运行，lane 内顺序执行，波间设置 barrier；如需串行，可传入 `--max-workers 1`。评估不包含在训练调度中，训练后继续使用下文现有评估 CLI。
+
+执行前仅用 `nvidia-smi` 检查显存，不会预先导入 PyTorch 或初始化 CUDA。默认双路要求 GPU 7 至少空闲 30 GiB；串行模式的门槛为 18 GiB。每个 worker 启动前还会按任务复核当前可用显存。MLM 和检索 worker 的 PyTorch allocator 上限为 12 GiB，QA 为 11 GiB，分类和重排为 8 GiB；这些是 allocator 上限，不是涵盖 CUDA context 和其他库分配的进程硬配额。48 GiB A6000 若有 15 GiB 常驻占用，理论空闲约 33 GiB，仍须通过执行时的实际 `nvidia-smi` 检查。启动命令：
+
+```powershell
+python tools/run_all_training.py --gpu 7 --output-dir results/formal_67m --execute
+```
+
+脚本会拒绝含有 checkpoint 的既有输出目录；阶段失败时会中止剩余任务并保留日志与未消费的 checkpoint。双路模式只会终止本调度器启动的另一 lane worker。每个 job 的独立日志位于输出目录下 `logs/<run timestamp>/`，总控同时逐项打印开始/结束状态。成功完成时会在依赖波次结束后清理已消费的 MLM 中间 checkpoint，保留四个最终 MLM checkpoint 和 12 个下游 checkpoint；评测命令单独执行。
 
 ## 评估与长程诊断
 

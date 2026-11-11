@@ -24,7 +24,7 @@ from train_nextbert import (
 
 
 def _load_checkpoint(model: torch.nn.Module, checkpoint: Path, device: torch.device) -> None:
-    payload = torch.load(checkpoint, map_location=device, weights_only=False)
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
     model.load_state_dict(payload.get("model", payload))
 
 
