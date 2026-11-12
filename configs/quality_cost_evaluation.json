@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "physical_gpu": 7,
+  "training_changes": false,
+  "variants": ["V0", "V1", "V2", "V3"],
+  "comparisons": {
+    "V0_to_V1": "quality versus cost of reducing global attention layers",
+    "V1_to_V2": "long-evidence recovery versus extra dilated-attention cost",
+    "V2_to_V3": "training-objective effect with the same inference architecture"
+  },
+  "downstream": {
+    "reuse_saved_predictions": true,
+    "split": "test",
+    "tasks": {"V0": ["classification", "qa", "retrieval", "reranking"], "V1": ["qa", "retrieval"], "V2": ["qa", "retrieval"], "V3": ["classification", "qa", "retrieval", "reranking"]},
+    "language_aggregation": "equal en/zh macro; also report each language",
+    "bootstrap_replicates": 2000,
+    "confidence_level": 0.95,
+    "resampling_units": {"classification": "shared XNLI premise cluster with synchronized EN/ZH sampling", "qa": "source article cluster within language", "reranking": "query within language", "retrieval": "unavailable: original saved outputs retain aggregate metrics only"},
+    "paired_comparisons": [["V0", "V1"], ["V1", "V2"], ["V2", "V3"], ["V0", "V3"]]
+  },
+  "encoder_cost": {
+    "checkpoint_family": "formal_67m/mlm/*/8192",
+    "lengths": [512, 4096, 8192],
+    "physical_batches": {"512": 16, "4096": 4, "8192": 2},
+    "rounds": 3,
+    "warmup_forwards_per_cell_round": 5,
+    "measured_seconds_per_cell_round": 10,
+    "precision": "BF16 autocast; original parameter dtype",
+    "timing_scopes": ["CUDA events: encoder only", "wall clock: prepared CPU tokens to GPU, mask, and encoder; excludes tokenization"],
+    "memory_scopes": ["model and checkpoint loading", "steady-state inference; max over all measured rounds"],
+    "scheduling": "no concurrent task-owned GPU workload during timing"
+  },
+  "long_evidence": {
+    "checkpoint_family": "formal_67m/downstream/V0,V1/qa; formal_67m_gatefix/downstream/V2,V3/qa",
+    "source_groups_per_language": 50,
+    "languages": ["en", "zh"],
+    "lengths": [1024, 4096, 8192],
+    "evidence_positions": ["first", "middle", "last"],
+    "conditions": ["intact", "evidence_deleted", "background_replaced", "counterfactual"],
+    "views": ["first512", "sliding512", "full"],
+    "physical_batch": 4,
+    "primary_endpoint": "intact/full/8192 F1; equal-weight language and evidence position",
+    "primary_sample_rule": "use variant-matched available source groups within each language/position cell; equal-weight the six cell means; report cell coverage and complete-case sensitivity",
+    "resampling_unit": "source article group; paired across variants",
+    "resampling_rule": "one union-of-source-groups draw per language shared across positions and variants; normalize within each available position",
+    "evidence_deleted_endpoint": "original-answer exact-match repetition rate; not refusal accuracy",
+    "scope": "controlled synthetic Wikipedia background with heldout QA evidence; not natural long-document or multi-hop QA",
+    "scheduling": "four independent evaluation processes on GPU7; finish before encoder timing"
+  },
+  "analysis": {
+    "retain_primary_task_results": true,
+    "no_weighted_overall_quality_score": true,
+    "cost_quality_comparison": "per-task and per-input-length tradeoffs; report effect sizes and uncertainty",
+    "training_cost": "existing matching-batch calibration and actual resource accounting; do not compare contended worker wall times as architecture speed"
+  }
+}

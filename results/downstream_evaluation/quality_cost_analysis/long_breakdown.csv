@@ -1,0 +1,865 @@
+condition,evidence_position,exact_match,f1,language,length,metric_note,old_answer_reproduction_rate,predictions,scored_predictions,source_groups,variant,view
+background_replaced,first,0.4791666666666667,0.686758309092868,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+background_replaced,first,0.5,0.7004201680672268,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+background_replaced,first,0.4791666666666667,0.6927106900452489,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+counterfactual,first,0.3541666666666667,0.48260732323232325,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,first,0.3541666666666667,0.4723642676767677,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,first,0.3541666666666667,0.4605835137085137,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,first,0.5,0.7205725775538755,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,first,0.5416666666666666,0.7558555313150901,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,first,0.5,0.7268225775538755,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,last,0.0,0.0024691358024691358,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V0,first512
+background_replaced,last,0.4444444444444444,0.6710301898537193,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V0,full
+background_replaced,last,0.4444444444444444,0.6074285714285714,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V0,sliding512
+counterfactual,last,0.0,0.002173913043478261,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,first512
+counterfactual,last,0.41304347826086957,0.506319958813565,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,full
+counterfactual,last,0.32608695652173914,0.3817622701254415,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,sliding512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V0,first512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V0,full
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V0,sliding512
+intact,last,0.0,0.014699792960662525,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,first512
+intact,last,0.5,0.7211811898672512,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,full
+intact,last,0.43478260869565216,0.6229335881509794,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V0,sliding512
+background_replaced,middle,0.2127659574468085,0.3858538624496071,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V0,first512
+background_replaced,middle,0.48936170212765956,0.7007158777809591,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V0,full
+background_replaced,middle,0.425531914893617,0.6352938884227995,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V0,sliding512
+counterfactual,middle,0.14583333333333334,0.23639069264069265,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,middle,0.3541666666666667,0.4262502848029164,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,middle,0.375,0.46139069264069266,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,middle,0.1875,0.36831089232405023,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,middle,0.3958333333333333,0.6213960093555682,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,middle,0.4375,0.6237801414272003,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,first,0.4791666666666667,0.7312967384997183,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+background_replaced,first,0.4375,0.6750814260344059,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+background_replaced,first,0.4583333333333333,0.6946647940552739,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+counterfactual,first,0.4166666666666667,0.497016223155929,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,first,0.3958333333333333,0.4730835137085137,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,first,0.3958333333333333,0.47201622315592906,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,first,0.4791666666666667,0.7250864664427644,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,first,0.4583333333333333,0.6938207550299942,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,first,0.4791666666666667,0.7250864664427644,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,last,0.0,0.005797101449275362,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V0,first512
+background_replaced,last,0.32608695652173914,0.4932037525448483,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V0,full
+background_replaced,last,0.41304347826086957,0.5740166696049049,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V0,sliding512
+counterfactual,last,0.0,0.0018939393939393938,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,first512
+counterfactual,last,0.3181818181818182,0.42529573812996274,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,full
+counterfactual,last,0.36363636363636365,0.4325068870523416,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,sliding512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,first512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,full
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,sliding512
+intact,last,0.0,0.013194233302928954,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,first512
+intact,last,0.3181818181818182,0.5385194356391111,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,full
+intact,last,0.36363636363636365,0.6162092809151632,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V0,sliding512
+background_replaced,middle,0.0,0.007638888888888889,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+background_replaced,middle,0.3541666666666667,0.5861223285610541,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+background_replaced,middle,0.375,0.5527057297277885,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+counterfactual,middle,0.0,0.005787037037037037,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,middle,0.3125,0.44501165365135953,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,middle,0.3541666666666667,0.43358187972158563,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,middle,0.0,0.005398110661268556,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,middle,0.2916666666666667,0.5442337618808207,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,middle,0.3958333333333333,0.5717853327228327,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,first,0.4791666666666667,0.6744829822954823,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+background_replaced,first,0.5,0.6842828149232948,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+background_replaced,first,0.4583333333333333,0.644285961966883,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+counterfactual,first,0.375,0.46219426406926406,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,first,0.3541666666666667,0.45819444444444446,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,first,0.3125,0.39219426406926405,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,first,0.5,0.714165521978022,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,first,0.4791666666666667,0.6658717303937892,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,first,0.4583333333333333,0.6670133277670043,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,last,0.0,0.006379585326953748,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V0,first512
+background_replaced,last,0.15555555555555556,0.2921815811670884,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V0,full
+background_replaced,last,0.35555555555555557,0.5648661686896981,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V0,sliding512
+counterfactual,last,0.0,0.0,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,first512
+counterfactual,last,0.22727272727272727,0.26943132624950805,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,full
+counterfactual,last,0.38636363636363635,0.4516971664698937,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,sliding512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,first512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,full
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V0,sliding512
+intact,last,0.0,0.008547008547008546,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,first512
+intact,last,0.20454545454545456,0.32249579124579125,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,full
+intact,last,0.4318181818181818,0.5931818181818181,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V0,sliding512
+background_replaced,middle,0.0,0.004092261904761905,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+background_replaced,middle,0.2916666666666667,0.47218515076970957,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+background_replaced,middle,0.4583333333333333,0.6188492063492064,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+counterfactual,middle,0.0,0.007341269841269841,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,middle,0.25,0.34074675324675324,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,middle,0.3125,0.37090097402597405,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,first512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,full
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V0,sliding512
+intact,middle,0.0,0.004672299027137737,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+intact,middle,0.2916666666666667,0.4883818721483195,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+intact,middle,0.3958333333333333,0.5601775342390668,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+background_replaced,first,0.54,0.862059319861448,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,first,0.52,0.8591454545924218,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,first,0.56,0.866059319861448,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,first,0.2857142857142857,0.6178223245689726,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+counterfactual,first,0.24489795918367346,0.5828667057076322,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+counterfactual,first,0.2857142857142857,0.6178223245689726,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,first512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,full
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,sliding512
+intact,first,0.54,0.8594659132680414,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+intact,first,0.56,0.8657242091711764,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+intact,first,0.54,0.8594659132680414,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+background_replaced,last,0.02857142857142857,0.07302390345685925,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V0,first512
+background_replaced,last,0.42857142857142855,0.7857237310345736,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V0,full
+background_replaced,last,0.5428571428571428,0.8272947526055952,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V0,sliding512
+counterfactual,last,0.0,0.01939358965381412,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V0,first512
+counterfactual,last,0.2631578947368421,0.6014778157684336,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V0,full
+counterfactual,last,0.3157894736842105,0.647492210730197,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V0,sliding512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V0,first512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V0,full
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V0,sliding512
+intact,last,0.02564102564102564,0.06348635880408456,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V0,first512
+intact,last,0.5128205128205128,0.8368452349579716,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V0,full
+intact,last,0.5641025641025641,0.8814924140879093,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V0,sliding512
+background_replaced,middle,0.28,0.4669798968073137,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,middle,0.52,0.8377747544113768,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,middle,0.5,0.806530584229264,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,middle,0.14285714285714285,0.3786306367105813,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+counterfactual,middle,0.24489795918367346,0.5885073229967372,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+counterfactual,middle,0.20408163265306123,0.5617777248801582,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,first512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,full
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,sliding512
+intact,middle,0.32,0.4683730258915062,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+intact,middle,0.5,0.8174968795901882,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+intact,middle,0.58,0.8245436790527038,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+background_replaced,first,0.52,0.7876099900569573,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,first,0.52,0.8261624376094048,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,first,0.52,0.8032320223456563,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,first,0.2653061224489796,0.5900252123376215,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+counterfactual,first,0.20408163265306123,0.5382188365699672,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+counterfactual,first,0.2653061224489796,0.5665236232702713,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,first512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,full
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,sliding512
+intact,first,0.5,0.7807601732071404,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+intact,first,0.52,0.8260664392627671,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+intact,first,0.52,0.8185714939618574,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+background_replaced,last,0.0,0.03786637726588525,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V0,first512
+background_replaced,last,0.3333333333333333,0.6706693875524193,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V0,full
+background_replaced,last,0.5333333333333333,0.8393106171839678,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V0,sliding512
+counterfactual,last,0.0,0.0138053398240237,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V0,first512
+counterfactual,last,0.16666666666666666,0.47021249130768156,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V0,full
+counterfactual,last,0.2222222222222222,0.5518110261427819,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V0,sliding512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V0,first512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V0,full
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V0,sliding512
+intact,last,0.0,0.00947239673676002,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V0,first512
+intact,last,0.34210526315789475,0.6409438446274011,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V0,full
+intact,last,0.5,0.7930981041829546,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V0,sliding512
+background_replaced,middle,0.0,0.03309579121569109,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,middle,0.42,0.7352673164105237,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,middle,0.5,0.8099853101183178,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,middle,0.0,0.01833883910911922,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+counterfactual,middle,0.20408163265306123,0.5135120802405011,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+counterfactual,middle,0.2857142857142857,0.6172478417366973,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,first512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,full
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,sliding512
+intact,middle,0.0,0.024827668455575432,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+intact,middle,0.38,0.6968349255431162,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+intact,middle,0.56,0.8651754302554489,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+background_replaced,first,0.52,0.7884524808994481,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,first,0.52,0.8302220441187546,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,first,0.5,0.7942100566570238,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,first,0.2653061224489796,0.5831482086625883,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+counterfactual,first,0.24489795918367346,0.562423710480476,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+counterfactual,first,0.2653061224489796,0.5767668010011338,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,first512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,full
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V0,sliding512
+intact,first,0.54,0.7898194276781596,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+intact,first,0.48,0.7693713405811161,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+intact,first,0.54,0.8037588216175535,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+background_replaced,last,0.0,0.021517870047281812,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,first512
+background_replaced,last,0.10810810810810811,0.46649555166596907,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,full
+background_replaced,last,0.5135135135135135,0.8210777775293905,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,sliding512
+counterfactual,last,0.0,0.019918018063838302,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,first512
+counterfactual,last,0.0,0.2793764342550752,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,full
+counterfactual,last,0.2972972972972973,0.5547941941478957,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V0,sliding512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V0,first512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V0,full
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V0,sliding512
+intact,last,0.0,0.040854183108509294,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V0,first512
+intact,last,0.09090909090909091,0.47574960468667576,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V0,full
+intact,last,0.5454545454545454,0.8319199183568685,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V0,sliding512
+background_replaced,middle,0.0,0.044116241247948114,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,first512
+background_replaced,middle,0.28,0.6061718412187163,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,full
+background_replaced,middle,0.5,0.7926970862514704,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V0,sliding512
+counterfactual,middle,0.0,0.014678675899321692,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,first512
+counterfactual,middle,0.10416666666666667,0.4425470697782928,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,full
+counterfactual,middle,0.2916666666666667,0.6080386482744679,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V0,sliding512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V0,first512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V0,full
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V0,sliding512
+intact,middle,0.0,0.018260338308848302,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,first512
+intact,middle,0.2653061224489796,0.5991872269760193,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,full
+intact,middle,0.46938775510204084,0.7800999568218298,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V0,sliding512
+background_replaced,first,0.5,0.6937702846670238,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+background_replaced,first,0.5625,0.7586806393211192,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+background_replaced,first,0.5,0.6610779769747162,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+counterfactual,first,0.3958333333333333,0.4731917388167388,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,first,0.375,0.46485840548340546,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,first,0.3958333333333333,0.4677804834054834,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,first,0.5416666666666666,0.7168995859213251,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,first,0.5208333333333334,0.7055638016075996,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,first,0.5416666666666666,0.6995384748102139,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,last,0.0,0.004740740740740741,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V1,first512
+background_replaced,last,0.4222222222222222,0.6422764604912943,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V1,full
+background_replaced,last,0.4222222222222222,0.6129265098830317,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V1,sliding512
+counterfactual,last,0.0,0.0,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,first512
+counterfactual,last,0.41304347826086957,0.50566534914361,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,full
+counterfactual,last,0.2826086956521739,0.36161773009599096,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,sliding512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V1,first512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V1,full
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V1,sliding512
+intact,last,0.0,0.011645962732919254,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,first512
+intact,last,0.43478260869565216,0.6553269839492457,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,full
+intact,last,0.41304347826086957,0.6257688672386215,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V1,sliding512
+background_replaced,middle,0.2127659574468085,0.39512289540041623,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V1,first512
+background_replaced,middle,0.46808510638297873,0.6466556041045892,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V1,full
+background_replaced,middle,0.44680851063829785,0.6266086436946752,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V1,sliding512
+counterfactual,middle,0.10416666666666667,0.17751163310373835,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,middle,0.3333333333333333,0.42280923733129616,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,middle,0.375,0.43705628531143403,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,middle,0.20833333333333334,0.3547205476393456,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,middle,0.4791666666666667,0.6787755647130647,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,middle,0.4583333333333333,0.6468244853682833,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,first,0.5416666666666666,0.7118271221532091,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+background_replaced,first,0.5,0.6589029431216932,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+background_replaced,first,0.4791666666666667,0.6326604554865425,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+counterfactual,first,0.3333333333333333,0.45234938672438674,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,first,0.3333333333333333,0.4429327536158931,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,first,0.3125,0.3907422438672439,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,first,0.5208333333333334,0.7172114233095691,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,first,0.4375,0.6371720467575114,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,first,0.4583333333333333,0.6068302780978612,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,last,0.0,0.0,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V1,first512
+background_replaced,last,0.32608695652173914,0.5389079592094072,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V1,full
+background_replaced,last,0.391304347826087,0.5334011923803984,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V1,sliding512
+counterfactual,last,0.0,0.004132231404958678,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,first512
+counterfactual,last,0.3181818181818182,0.389189787485242,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,full
+counterfactual,last,0.3181818181818182,0.39145021645021644,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,sliding512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,first512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,full
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,sliding512
+intact,last,0.0,0.011707988980716254,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,first512
+intact,last,0.3409090909090909,0.5445349535590177,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,full
+intact,last,0.4090909090909091,0.6072779344838168,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V1,sliding512
+background_replaced,middle,0.0,0.006765734265734266,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+background_replaced,middle,0.3125,0.5286341956654457,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+background_replaced,middle,0.3958333333333333,0.5490618042088631,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+counterfactual,middle,0.0,0.0,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,middle,0.22916666666666666,0.344072183299157,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,middle,0.2708333333333333,0.38076475155279504,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,middle,0.0,0.004166666666666667,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,middle,0.4166666666666667,0.5595311880955857,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,middle,0.4375,0.6194374279812259,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,first,0.5,0.7231315484032875,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+background_replaced,first,0.4166666666666667,0.5868983426704015,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+background_replaced,first,0.4791666666666667,0.6189648817366209,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+counterfactual,first,0.3333333333333333,0.43567069504569506,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,first,0.2916666666666667,0.40699224386724386,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,first,0.2916666666666667,0.3598259379509379,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,first,0.4791666666666667,0.6477002164502165,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,first,0.4375,0.59557208994709,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,first,0.4583333333333333,0.5764700577200578,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,last,0.0,0.011244536461927766,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V1,first512
+background_replaced,last,0.08888888888888889,0.18125661375661375,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V1,full
+background_replaced,last,0.3111111111111111,0.5060078048313342,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V1,sliding512
+counterfactual,last,0.0,0.0,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,first512
+counterfactual,last,0.1590909090909091,0.1896349862258953,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,full
+counterfactual,last,0.3409090909090909,0.4042945690672963,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,sliding512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,first512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,full
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V1,sliding512
+intact,last,0.0,0.008041958041958043,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,first512
+intact,last,0.11363636363636363,0.21996240415358062,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,full
+intact,last,0.38636363636363635,0.49531604758877484,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V1,sliding512
+background_replaced,middle,0.0,0.001488095238095238,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+background_replaced,middle,0.3333333333333333,0.5040064274868197,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+background_replaced,middle,0.4166666666666667,0.5466493922743922,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+counterfactual,middle,0.0,0.008263187429854097,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,middle,0.25,0.33086444805194803,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,middle,0.3333333333333333,0.4028003246753247,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,first512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,full
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V1,sliding512
+intact,middle,0.0,0.008291620318872822,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+intact,middle,0.3958333333333333,0.5183219537815126,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+intact,middle,0.5,0.5951093274009941,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+background_replaced,first,0.46,0.8268316531149374,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,first,0.46,0.8286693154525998,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,first,0.46,0.8234983197816041,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,first,0.32653061224489793,0.6157653988901299,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+counterfactual,first,0.30612244897959184,0.6057374897205778,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+counterfactual,first,0.32653061224489793,0.5966297726116465,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,first512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,full
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,sliding512
+intact,first,0.48,0.8408035145867989,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+intact,first,0.46,0.8121272381262986,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+intact,first,0.5,0.8280416098248942,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+background_replaced,last,0.02857142857142857,0.06723694297925475,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V1,first512
+background_replaced,last,0.4857142857142857,0.8103917943092596,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V1,full
+background_replaced,last,0.42857142857142855,0.7985426910315848,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V1,sliding512
+counterfactual,last,0.0,0.025821327795012006,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V1,first512
+counterfactual,last,0.2894736842105263,0.5822401820571157,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V1,full
+counterfactual,last,0.3684210526315789,0.6751274545364617,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V1,sliding512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V1,first512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V1,full
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V1,sliding512
+intact,last,0.02564102564102564,0.058246951898262615,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V1,first512
+intact,last,0.5128205128205128,0.8564644048773327,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V1,full
+intact,last,0.5384615384615384,0.8397427458562168,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V1,sliding512
+background_replaced,middle,0.24,0.4477653556821544,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,middle,0.46,0.7701268809374178,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,middle,0.5,0.7624070497472601,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,middle,0.14285714285714285,0.35932585169048054,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+counterfactual,middle,0.2653061224489796,0.6070321738724048,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+counterfactual,middle,0.2653061224489796,0.5510934430324289,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,first512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,full
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,sliding512
+intact,middle,0.26,0.45463874773391455,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+intact,middle,0.46,0.7545618699250384,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+intact,middle,0.52,0.7794138457188019,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+background_replaced,first,0.42,0.7562721359131888,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,first,0.42,0.778089771302679,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,first,0.44,0.773522465293953,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,first,0.2857142857142857,0.5890521127458381,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+counterfactual,first,0.2857142857142857,0.548405815852216,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+counterfactual,first,0.32653061224489793,0.6230443106874852,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,first512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,full
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,sliding512
+intact,first,0.44,0.7743896669815338,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+intact,first,0.48,0.8131985917956458,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+intact,first,0.48,0.8236585148808164,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+background_replaced,last,0.0,0.022780237471312987,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V1,first512
+background_replaced,last,0.26666666666666666,0.6795852285311388,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V1,full
+background_replaced,last,0.4444444444444444,0.803872273703453,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V1,sliding512
+counterfactual,last,0.0,0.009858475688712624,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V1,first512
+counterfactual,last,0.19444444444444445,0.5699475264252722,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V1,full
+counterfactual,last,0.2777777777777778,0.55608986089829,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V1,sliding512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V1,first512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V1,full
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V1,sliding512
+intact,last,0.0,0.010931189145674827,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V1,first512
+intact,last,0.23684210526315788,0.6532847492966234,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V1,full
+intact,last,0.42105263157894735,0.7902768618117909,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V1,sliding512
+background_replaced,middle,0.0,0.03046082291103898,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,middle,0.28,0.710987952028258,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,middle,0.46,0.7939049131881976,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,middle,0.0,0.023712260704537927,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+counterfactual,middle,0.2653061224489796,0.596239933274553,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+counterfactual,middle,0.2857142857142857,0.6382041460846956,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,first512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,full
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,sliding512
+intact,middle,0.0,0.03530738955828368,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+intact,middle,0.4,0.7693042765265168,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+intact,middle,0.48,0.820487279847026,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+background_replaced,first,0.44,0.7610058367031801,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,first,0.36,0.7569080051099837,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,first,0.48,0.7947746846024628,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,first,0.2653061224489796,0.5737525598609963,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+counterfactual,first,0.2653061224489796,0.5523868535667618,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+counterfactual,first,0.2857142857142857,0.5924984394951006,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,first512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,full
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V1,sliding512
+intact,first,0.4,0.7506506514568878,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+intact,first,0.42,0.7505217894713573,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+intact,first,0.42,0.7455959699444058,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+background_replaced,last,0.0,0.026639628296574215,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,first512
+background_replaced,last,0.1891891891891892,0.4089184629376009,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,full
+background_replaced,last,0.4864864864864865,0.8121836499255854,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,sliding512
+counterfactual,last,0.0,0.026703170760538623,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,first512
+counterfactual,last,0.05405405405405406,0.27151776299427344,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,full
+counterfactual,last,0.21621621621621623,0.5063493776357755,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V1,sliding512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V1,first512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V1,full
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V1,sliding512
+intact,last,0.0,0.04133621391194824,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V1,first512
+intact,last,0.06060606060606061,0.35018390481444905,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V1,full
+intact,last,0.42424242424242425,0.8303896266156439,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V1,sliding512
+background_replaced,middle,0.0,0.04122551786713585,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,first512
+background_replaced,middle,0.26,0.5999509463921062,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,full
+background_replaced,middle,0.42,0.7469627118009848,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V1,sliding512
+counterfactual,middle,0.0,0.009364127905302147,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,first512
+counterfactual,middle,0.22916666666666666,0.5354113323813434,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,full
+counterfactual,middle,0.3125,0.5815211744368812,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V1,sliding512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V1,first512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V1,full
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V1,sliding512
+intact,middle,0.0,0.014057154449107998,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,first512
+intact,middle,0.2857142857142857,0.6367085557151266,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,full
+intact,middle,0.4489795918367347,0.7460995371963729,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V1,sliding512
+background_replaced,first,0.4791666666666667,0.7171619864054074,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+background_replaced,first,0.5416666666666666,0.7714693457127668,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+background_replaced,first,0.4791666666666667,0.7032730975165186,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+counterfactual,first,0.3958333333333333,0.4847978329809725,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,first,0.3333333333333333,0.43549227742541696,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,first,0.3958333333333333,0.4828598484848485,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,first,0.5,0.70095166894509,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,first,0.5416666666666666,0.723844246031746,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,first,0.5,0.67595166894509,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,last,0.0,0.009904761904761904,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V2,first512
+background_replaced,last,0.4444444444444444,0.6385365902633455,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V2,full
+background_replaced,last,0.4,0.6203174603174603,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V2,sliding512
+counterfactual,last,0.0,0.0,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,first512
+counterfactual,last,0.41304347826086957,0.4974598930481283,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,full
+counterfactual,last,0.2826086956521739,0.38350743459439113,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,sliding512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V2,first512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V2,full
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V2,sliding512
+intact,last,0.0,0.009555661729574772,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,first512
+intact,last,0.45652173913043476,0.6823613140908538,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,full
+intact,last,0.45652173913043476,0.6258210991906644,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V2,sliding512
+background_replaced,middle,0.2127659574468085,0.34870707717608734,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V2,first512
+background_replaced,middle,0.44680851063829785,0.6472027165665953,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V2,full
+background_replaced,middle,0.425531914893617,0.6090242777060538,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V2,sliding512
+counterfactual,middle,0.14583333333333334,0.2035894660894661,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,middle,0.3333333333333333,0.46861339232662763,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,middle,0.4166666666666667,0.500884787726893,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,middle,0.20833333333333334,0.3459164024381416,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,middle,0.3958333333333333,0.6143395819866408,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,middle,0.4791666666666667,0.6731991890959282,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,first,0.4791666666666667,0.6589134748102139,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+background_replaced,first,0.4791666666666667,0.6552132936507936,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+background_replaced,first,0.4375,0.5901634748102139,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+counterfactual,first,0.3958333333333333,0.5147536410617806,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,first,0.2708333333333333,0.4035478329809725,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,first,0.3958333333333333,0.45783730158730157,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,first,0.5208333333333334,0.699075511847251,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,first,0.4375,0.6255057367149759,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,first,0.5,0.6443301414768806,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,last,0.0,0.002288329519450801,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V2,first512
+background_replaced,last,0.30434782608695654,0.4881015179288837,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V2,full
+background_replaced,last,0.41304347826086957,0.5469979296066253,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V2,sliding512
+counterfactual,last,0.0,0.0018939393939393938,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,first512
+counterfactual,last,0.29545454545454547,0.3791472922053696,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,full
+counterfactual,last,0.2727272727272727,0.3281582054309327,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,sliding512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,first512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,full
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,sliding512
+intact,last,0.0,0.02881436745073109,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,first512
+intact,last,0.29545454545454547,0.46729923695832787,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,full
+intact,last,0.45454545454545453,0.6111726508785332,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V2,sliding512
+background_replaced,middle,0.0,0.007991224461812697,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+background_replaced,middle,0.3333333333333333,0.5302721216691805,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+background_replaced,middle,0.3333333333333333,0.5236855158730159,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+counterfactual,middle,0.0,0.0,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,middle,0.3125,0.39671266233766234,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,middle,0.2916666666666667,0.41481056684861034,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,middle,0.0,0.004166666666666667,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,middle,0.4166666666666667,0.5578253883462216,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,middle,0.4166666666666667,0.6011160714285714,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,first,0.4375,0.680664466873706,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+background_replaced,first,0.3958333333333333,0.5678688141923436,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+background_replaced,first,0.375,0.5568301414768806,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+counterfactual,first,0.3333333333333333,0.431524023457163,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,first,0.3125,0.4176882145632146,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,first,0.2916666666666667,0.3573457792207792,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,first,0.4375,0.6517248301215692,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,first,0.4166666666666667,0.5646261724386724,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,first,0.4166666666666667,0.5975047446514837,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,last,0.0,0.01062075478551451,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V2,first512
+background_replaced,last,0.06666666666666667,0.1647197409478111,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V2,full
+background_replaced,last,0.35555555555555557,0.5171428571428571,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V2,sliding512
+counterfactual,last,0.0,0.009090909090909092,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,first512
+counterfactual,last,0.1590909090909091,0.18130165289256198,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,full
+counterfactual,last,0.36363636363636365,0.42783353010625735,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,sliding512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,first512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,full
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V2,sliding512
+intact,last,0.0,0.016601580237943874,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,first512
+intact,last,0.1590909090909091,0.2250149005583788,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,full
+intact,last,0.38636363636363635,0.5210497835497836,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V2,sliding512
+background_replaced,middle,0.0,0.005291005291005291,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+background_replaced,middle,0.2708333333333333,0.45822391456582634,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+background_replaced,middle,0.4166666666666667,0.5405106970324361,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+counterfactual,middle,0.0,0.008804601195905544,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,middle,0.25,0.3625745234297866,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,middle,0.3125,0.39096320346320346,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,first512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,full
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V2,sliding512
+intact,middle,0.0,0.010476190476190476,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+intact,middle,0.3333333333333333,0.5046191961633139,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+intact,middle,0.4166666666666667,0.5999313186813187,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+background_replaced,first,0.46,0.8281894024265151,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,first,0.48,0.8252399835785161,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,first,0.46,0.8172889695260822,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,first,0.2857142857142857,0.6313305593532496,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+counterfactual,first,0.2653061224489796,0.6208047137319012,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+counterfactual,first,0.2653061224489796,0.6246828803598443,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,first512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,full
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,sliding512
+intact,first,0.46,0.8231735653224427,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+intact,first,0.44,0.7733735649461712,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+intact,first,0.46,0.8199907945657637,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+background_replaced,last,0.02857142857142857,0.06057027631258808,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V2,first512
+background_replaced,last,0.45714285714285713,0.7835984285882338,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V2,full
+background_replaced,last,0.5142857142857142,0.8135873534511082,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V2,sliding512
+counterfactual,last,0.0,0.026248551746872018,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V2,first512
+counterfactual,last,0.23684210526315788,0.5674097561638002,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V2,full
+counterfactual,last,0.3157894736842105,0.6583929815504673,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V2,sliding512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V2,first512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V2,full
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V2,sliding512
+intact,last,0.02564102564102564,0.06118595538721448,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V2,first512
+intact,last,0.48717948717948717,0.8088396027083076,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V2,full
+intact,last,0.5384615384615384,0.848667142433561,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V2,sliding512
+background_replaced,middle,0.26,0.4517369726050652,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,middle,0.54,0.780842374573828,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,middle,0.52,0.8132153789023385,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,middle,0.10204081632653061,0.32715326546742224,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+counterfactual,middle,0.22448979591836735,0.5549837352949198,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+counterfactual,middle,0.2653061224489796,0.5888126693129867,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,first512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,full
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,sliding512
+intact,middle,0.24,0.43964044832532795,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+intact,middle,0.48,0.7922147258854583,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+intact,middle,0.48,0.7962813325565274,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+background_replaced,first,0.46,0.7706328890029079,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,first,0.4,0.7568121286680493,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,first,0.52,0.8022866949670587,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,first,0.22448979591836735,0.5703440679172724,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+counterfactual,first,0.24489795918367346,0.5716554977709084,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+counterfactual,first,0.2857142857142857,0.6181762605895684,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,first512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,full
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,sliding512
+intact,first,0.48,0.7744365625286911,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+intact,first,0.48,0.8116063027461943,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+intact,first,0.5,0.7896487785597645,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+background_replaced,last,0.0,0.020545397008328532,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V2,first512
+background_replaced,last,0.28888888888888886,0.6711503952017576,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V2,full
+background_replaced,last,0.4222222222222222,0.7794921583813088,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V2,sliding512
+counterfactual,last,0.0,0.018493517240497918,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V2,first512
+counterfactual,last,0.2222222222222222,0.5507443719895827,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V2,full
+counterfactual,last,0.2777777777777778,0.5995101751519376,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V2,sliding512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V2,first512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V2,full
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V2,sliding512
+intact,last,0.0,0.009514781789476536,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V2,first512
+intact,last,0.34210526315789475,0.7130482530963521,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V2,full
+intact,last,0.42105263157894735,0.7875146487467364,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V2,sliding512
+background_replaced,middle,0.0,0.027945847719549104,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,middle,0.34,0.7130982423502752,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,middle,0.46,0.8067808477888583,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,middle,0.0,0.02217981349111842,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+counterfactual,middle,0.16326530612244897,0.5200144982961952,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+counterfactual,middle,0.30612244897959184,0.6359006628149868,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,first512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,full
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,sliding512
+intact,middle,0.0,0.02974280437359381,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+intact,middle,0.34,0.700614240768803,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+intact,middle,0.5,0.8384942826481464,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+background_replaced,first,0.46,0.7570210978191086,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,first,0.36,0.7391489232575102,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,first,0.48,0.7839727034274308,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,first,0.24489795918367346,0.5540901884013472,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+counterfactual,first,0.1836734693877551,0.5292187291128413,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+counterfactual,first,0.2857142857142857,0.5787741474212078,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,first512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,full
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V2,sliding512
+intact,first,0.44,0.7600642615519276,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+intact,first,0.4,0.7578787783976455,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+intact,first,0.46,0.7666538762100233,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+background_replaced,last,0.0,0.0266989766989767,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,first512
+background_replaced,last,0.13513513513513514,0.4665132206836414,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,full
+background_replaced,last,0.4864864864864865,0.8064504809601701,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,sliding512
+counterfactual,last,0.0,0.0213810154383833,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,first512
+counterfactual,last,0.05405405405405406,0.35793148233307054,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,full
+counterfactual,last,0.16216216216216217,0.5132064735297106,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V2,sliding512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V2,first512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V2,full
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V2,sliding512
+intact,last,0.0,0.04490259020559727,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V2,first512
+intact,last,0.06060606060606061,0.4479693302981989,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V2,full
+intact,last,0.42424242424242425,0.7908519115670821,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V2,sliding512
+background_replaced,middle,0.0,0.04416238895852111,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,first512
+background_replaced,middle,0.26,0.5970777551873345,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,full
+background_replaced,middle,0.4,0.7603485222463235,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V2,sliding512
+counterfactual,middle,0.0,0.007589133509914073,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,first512
+counterfactual,middle,0.14583333333333334,0.47019848174864415,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,full
+counterfactual,middle,0.2708333333333333,0.6041279808752094,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V2,sliding512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V2,first512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V2,full
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V2,sliding512
+intact,middle,0.0,0.0161503290815524,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,first512
+intact,middle,0.2653061224489796,0.6078361717467319,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,full
+intact,middle,0.3877551020408163,0.7594944375817202,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V2,sliding512
+background_replaced,first,0.5,0.7309570802005012,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+background_replaced,first,0.5,0.7172989654394453,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+background_replaced,first,0.4791666666666667,0.6751039055973267,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+counterfactual,first,0.375,0.46024877093191047,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,first,0.375,0.43896103896103894,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,first,0.375,0.4469471500721501,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,first,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,first,0.4583333333333333,0.6857671292201091,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,first,0.4583333333333333,0.6754052871148459,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,first,0.4583333333333333,0.6545171292201091,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,last,0.0,0.01099436763952893,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V3,first512
+background_replaced,last,0.4888888888888889,0.6581613158083747,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V3,full
+background_replaced,last,0.4,0.6207146927146927,en,1024,official answer EM/F1 on constructed QA case,,45,45,45,V3,sliding512
+counterfactual,last,0.0,0.0,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,first512
+counterfactual,last,0.391304347826087,0.47283605141661406,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,full
+counterfactual,last,0.30434782608695654,0.3856154714850367,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,sliding512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V3,first512
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V3,full
+evidence_deleted,last,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,46,,46,V3,sliding512
+intact,last,0.0,0.009834368530020704,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,first512
+intact,last,0.4782608695652174,0.6492997198879552,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,full
+intact,last,0.41304347826086957,0.6106728778467909,en,1024,official answer EM/F1 on constructed QA case,,46,46,46,V3,sliding512
+background_replaced,middle,0.19148936170212766,0.3496680998830425,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V3,first512
+background_replaced,middle,0.425531914893617,0.614531442691643,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V3,full
+background_replaced,middle,0.40425531914893614,0.5999510084638234,en,1024,official answer EM/F1 on constructed QA case,,47,47,47,V3,sliding512
+counterfactual,middle,0.14583333333333334,0.18977367661578187,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,middle,0.3125,0.4511634199134199,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,middle,0.4375,0.491244264851076,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,middle,,,en,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,middle,0.20833333333333334,0.35454735481909394,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,middle,0.3958333333333333,0.6057830343675932,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,middle,0.4583333333333333,0.6706846529784509,en,1024,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,first,0.5,0.67906223893066,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+background_replaced,first,0.5,0.6430090805090806,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+background_replaced,first,0.5,0.6568400167084377,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+counterfactual,first,0.375,0.48905919661733616,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,first,0.3125,0.4530269996476392,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,first,0.3541666666666667,0.42343073593073594,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,first,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,first,0.4375,0.706889125308243,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,first,0.4375,0.622468779178338,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,first,0.4375,0.59036453470277,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,last,0.0,0.002173913043478261,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V3,first512
+background_replaced,last,0.2391304347826087,0.44203526534089194,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V3,full
+background_replaced,last,0.43478260869565216,0.5749482401656315,en,4096,official answer EM/F1 on constructed QA case,,46,46,46,V3,sliding512
+counterfactual,last,0.0,0.0,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,first512
+counterfactual,last,0.2727272727272727,0.33961752745175205,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,full
+counterfactual,last,0.29545454545454547,0.33952184179456907,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,sliding512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,first512
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,full
+evidence_deleted,last,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,sliding512
+intact,last,0.0,0.007575757575757575,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,first512
+intact,last,0.3181818181818182,0.5158024383024383,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,full
+intact,last,0.4090909090909091,0.5884453781512605,en,4096,official answer EM/F1 on constructed QA case,,44,44,44,V3,sliding512
+background_replaced,middle,0.0,0.006097285067873303,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+background_replaced,middle,0.3333333333333333,0.5360308557183557,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+background_replaced,middle,0.375,0.5150268440709617,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+counterfactual,middle,0.0,0.005787037037037037,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,middle,0.3333333333333333,0.41713617265087855,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,middle,0.2708333333333333,0.3480835137085137,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,middle,,,en,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,middle,0.0,0.009137426900584795,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,middle,0.2916666666666667,0.49661507088590423,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,middle,0.4791666666666667,0.6103682562956757,en,4096,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,first,0.4791666666666667,0.6883498942101631,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+background_replaced,first,0.3958333333333333,0.540034816536042,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+background_replaced,first,0.4375,0.5544461243688933,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+counterfactual,first,0.375,0.46761353701378183,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,first,0.375,0.46946248196248197,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,first,0.3333333333333333,0.39028679653679654,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,first,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,first,0.4583333333333333,0.678543391994479,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,first,0.4166666666666667,0.5538713023088023,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,first,0.4166666666666667,0.5529361879160266,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,last,0.0,0.010059351276742581,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V3,first512
+background_replaced,last,0.06666666666666667,0.2304270318159207,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V3,full
+background_replaced,last,0.35555555555555557,0.5202645502645502,en,8192,official answer EM/F1 on constructed QA case,,45,45,45,V3,sliding512
+counterfactual,last,0.0,0.007575757575757575,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,first512
+counterfactual,last,0.13636363636363635,0.18146399055489965,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,full
+counterfactual,last,0.3409090909090909,0.38692443919716646,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,sliding512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,first512
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,full
+evidence_deleted,last,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,44,,44,V3,sliding512
+intact,last,0.0,0.008041958041958043,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,first512
+intact,last,0.13636363636363635,0.21352813852813854,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,full
+intact,last,0.4318181818181818,0.5546694214876033,en,8192,official answer EM/F1 on constructed QA case,,44,44,44,V3,sliding512
+background_replaced,middle,0.0,0.003382034632034632,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+background_replaced,middle,0.2916666666666667,0.4665493564850183,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+background_replaced,middle,0.4166666666666667,0.5340873015873016,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+counterfactual,middle,0.0,0.008804601195905544,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,middle,0.2916666666666667,0.37538780663780663,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,middle,0.2708333333333333,0.3359848484848485,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,first512
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,full
+evidence_deleted,middle,,,en,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,48,,48,V3,sliding512
+intact,middle,0.0,0.010476190476190476,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+intact,middle,0.25,0.417214642995893,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+intact,middle,0.3541666666666667,0.521203898225957,en,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+background_replaced,first,0.44,0.8299758862172933,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,first,0.48,0.8392636355050426,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,first,0.46,0.8335112397526468,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,first,0.24489795918367346,0.6298788318473563,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+counterfactual,first,0.24489795918367346,0.6105911842487646,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+counterfactual,first,0.24489795918367346,0.6167921521321615,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,first512
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,full
+evidence_deleted,first,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,sliding512
+intact,first,0.42,0.8054148948433405,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+intact,first,0.44,0.8066095716295463,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+intact,first,0.44,0.815880844664129,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+background_replaced,last,0.02857142857142857,0.05844869963795795,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V3,first512
+background_replaced,last,0.5142857142857142,0.8242257906441672,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V3,full
+background_replaced,last,0.5428571428571428,0.8147197660120922,zh,1024,official answer EM/F1 on constructed QA case,,35,35,35,V3,sliding512
+counterfactual,last,0.0,0.02716314387367019,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V3,first512
+counterfactual,last,0.2894736842105263,0.5646868369700265,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V3,full
+counterfactual,last,0.2894736842105263,0.6155505025067931,zh,1024,official answer EM/F1 on constructed QA case,,38,38,38,V3,sliding512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V3,first512
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V3,full
+evidence_deleted,last,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,39,,39,V3,sliding512
+intact,last,0.0,0.05643039751735404,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V3,first512
+intact,last,0.5384615384615384,0.8410532710846638,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V3,full
+intact,last,0.48717948717948717,0.8252398942183666,zh,1024,official answer EM/F1 on constructed QA case,,39,39,39,V3,sliding512
+background_replaced,middle,0.26,0.45175886512813784,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,middle,0.46,0.7434490084150386,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,middle,0.48,0.7811599432954515,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,middle,0.12244897959183673,0.35090179443084596,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+counterfactual,middle,0.20408163265306123,0.5495742289610438,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+counterfactual,middle,0.1836734693877551,0.5331178670577815,zh,1024,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,first512
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,full
+evidence_deleted,middle,,,zh,1024,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,sliding512
+intact,middle,0.28,0.4446793657113541,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+intact,middle,0.44,0.7555009564669867,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+intact,middle,0.48,0.7609913072719767,zh,1024,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+background_replaced,first,0.42,0.7830877478695315,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,first,0.44,0.8015196691751354,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,first,0.42,0.7791553469371306,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,first,0.22448979591836735,0.5943314787423919,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+counterfactual,first,0.22448979591836735,0.5387716133557876,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+counterfactual,first,0.2653061224489796,0.6337213201151937,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,first512
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,full
+evidence_deleted,first,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,sliding512
+intact,first,0.42,0.7635058004052312,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+intact,first,0.42,0.8048318086613553,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+intact,first,0.46,0.7982391736238779,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+background_replaced,last,0.0,0.018382187855872065,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V3,first512
+background_replaced,last,0.3333333333333333,0.6375217175686604,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V3,full
+background_replaced,last,0.4222222222222222,0.7689943503559893,zh,4096,official answer EM/F1 on constructed QA case,,45,45,45,V3,sliding512
+counterfactual,last,0.0,0.01449355389316423,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V3,first512
+counterfactual,last,0.19444444444444445,0.5602425358535461,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V3,full
+counterfactual,last,0.25,0.5996001634017394,zh,4096,official answer EM/F1 on constructed QA case,,36,36,36,V3,sliding512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V3,first512
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V3,full
+evidence_deleted,last,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,38,,38,V3,sliding512
+intact,last,0.0,0.01075415235376392,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V3,first512
+intact,last,0.3157894736842105,0.6683863784684334,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V3,full
+intact,last,0.42105263157894735,0.815640664284622,zh,4096,official answer EM/F1 on constructed QA case,,38,38,38,V3,sliding512
+background_replaced,middle,0.0,0.030273788236195146,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,middle,0.34,0.7134177169678826,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,middle,0.46,0.8081697596003996,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,middle,0.0,0.018366845554551633,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+counterfactual,middle,0.1836734693877551,0.5094701012016284,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+counterfactual,middle,0.2857142857142857,0.6045338527271114,zh,4096,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,first512
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,full
+evidence_deleted,middle,,,zh,4096,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,sliding512
+intact,middle,0.0,0.027018183199659183,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+intact,middle,0.4,0.747455435125062,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+intact,middle,0.46,0.8299691777958831,zh,4096,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+background_replaced,first,0.44,0.78554844403611,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,first,0.34,0.7208119125967866,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,first,0.48,0.8147842673009482,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,first,0.2653061224489796,0.5937599975809186,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+counterfactual,first,0.20408163265306123,0.519212580759247,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+counterfactual,first,0.30612244897959184,0.6304123803339089,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,first512
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,full
+evidence_deleted,first,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,50,,50,V3,sliding512
+intact,first,0.4,0.7758444813321473,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+intact,first,0.44,0.7633928091265509,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+intact,first,0.44,0.7907328197626853,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+background_replaced,last,0.0,0.02643910143910144,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,first512
+background_replaced,last,0.10810810810810811,0.42162921103256457,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,full
+background_replaced,last,0.4864864864864865,0.7989466893232515,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,sliding512
+counterfactual,last,0.0,0.02369693720674562,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,first512
+counterfactual,last,0.02702702702702703,0.3120023039714597,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,full
+counterfactual,last,0.21621621621621623,0.5465091363474789,zh,8192,official answer EM/F1 on constructed QA case,,37,37,37,V3,sliding512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V3,first512
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V3,full
+evidence_deleted,last,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,33,,33,V3,sliding512
+intact,last,0.0,0.04664915367807308,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V3,first512
+intact,last,0.030303030303030304,0.3926779638229526,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V3,full
+intact,last,0.48484848484848486,0.8055391767016117,zh,8192,official answer EM/F1 on constructed QA case,,33,33,33,V3,sliding512
+background_replaced,middle,0.0,0.04256450536063751,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,first512
+background_replaced,middle,0.28,0.6004431346942879,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,full
+background_replaced,middle,0.48,0.8416000011498818,zh,8192,official answer EM/F1 on constructed QA case,,50,50,50,V3,sliding512
+counterfactual,middle,0.0,0.011711722034914879,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,first512
+counterfactual,middle,0.14583333333333334,0.47478944539395884,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,full
+counterfactual,middle,0.3125,0.6069716339536533,zh,8192,official answer EM/F1 on constructed QA case,,48,48,48,V3,sliding512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V3,first512
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V3,full
+evidence_deleted,middle,,,zh,8192,exact match to the original answer after deleting evidence; not refusal accuracy,0.0,49,,49,V3,sliding512
+intact,middle,0.0,0.021488732364827883,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,first512
+intact,middle,0.30612244897959184,0.6067000172435366,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,full
+intact,middle,0.42857142857142855,0.7582752107354004,zh,8192,official answer EM/F1 on constructed QA case,,49,49,49,V3,sliding512

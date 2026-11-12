@@ -1,6 +1,6 @@
 # NextBERT 双尺度编码器：设计与复现
 
-本仓库实现从 mmBERT-base warm-start 的四种注意力配置、MLM 适配、分类、抽取式 QA、双编码检索和交叉编码重排，以及评测与长上下文诊断。当前方案是每个完整适配分支 67,108,864 输入 token 的候选配方。GPU 7 的真实批次短预跑已完成，用于核对速度与显存；模型质量由正式训练后的固定任务评测判断。正式训练矩阵尚未启动，等待用户预算决定。
+本仓库实现从 mmBERT-base warm-start 的四种注意力配置、MLM 适配、分类、抽取式 QA、双编码检索和交叉编码重排，以及评测与长上下文诊断。每个完整适配分支使用 67,108,864 输入 token。正式训练、门控状态修复后的六项下游补训及主要下游测评已完成；质量与成本补充测评采用 `configs/quality_cost_evaluation.json` 的固定协议。
 
 代码及复现材料：[https://github.com/stq1234/LLMandAppliedPractices-NextBERT](https://github.com/stq1234/LLMandAppliedPractices-NextBERT)。
 
@@ -145,6 +145,7 @@ python src/evaluate_nextbert.py --task retrieval --variant V0 `
 ```powershell
 python src/diagnostics_nextbert.py --mode long --profile full_67m `
   --model-dir artifacts/mmbert-base --variant V0 `
+  --checkpoint results/formal_67m/downstream/V0/qa/17/V0_qa_checkpoint.pt `
   --qa-data data/prepared/full_67m/qa_test.jsonl `
   --wiki-background-dir artifacts/raw/full_67m/wikipedia `
   --max-source-groups 50 --eval-batch-size 4 `
@@ -167,6 +168,39 @@ python src/diagnostics_nextbert.py --mode probe --profile full_67m `
 ```
 
 指标和输出字段以 `src/evaluate_nextbert.py`、`src/qa_metrics.py`、`src/diagnostics_nextbert.py` 及 JSON 结果中的实际 schema 为准。正式模型质量仅在正式模型与冻结数据完成后评估；短校准结果不能替代质量结果。
+
+## 质量与成本补充测量
+
+协议由 `configs/quality_cost_evaluation.json` 固定。主要下游任务继续采用正式测试集结果；受控长文本实验采用最终 QA checkpoint，其中 V2/V3 使用 `formal_67m_gatefix` 下的修复版权重。长文本主指标为 intact/full/8K 的 F1，按语言和证据位置等权，其他干预分开汇总。evidence_deleted 只报告旧答案复述率，不将“预测不同于旧答案”解释为正确拒答。
+
+独立编码器测量必须在本次其他 GPU 任务全部退出后运行：
+
+```powershell
+python tools/benchmark_encoder_cost.py --gpu 7 `
+  --model-dir artifacts/mmbert-base `
+  --prepared-dir data/prepared/full_67m `
+  --checkpoint-root results/formal_67m `
+  --output results/quality_cost_20261112/encoder_cost.json
+```
+
+该入口在同一 GPU 上逐模型测量，512/4096/8192 长度分别采用 batch 16/4/2；每格三轮，每轮预热五次后计时十秒。GPU event 记录 encoder 前向，wall clock 记录预处理 token 的 CPU→GPU 传入、mask 构造和 encoder；均不含分词与 MLM 词表头。吞吐主值使用总非 padding token 数除以总 wall time。输出保存原始计时样本、轮次、输入和 checkpoint 来源、后端，以及加载和推理阶段各自的显存峰值；拒绝覆盖已有结果。
+
+CPU 分析入口保留原主要下游结果，并补充配对重采样区间、长文本分项和质量—成本图。XNLI 按共同英文 premise 簇同步重采样中英文；普通 QA 按文章簇重采样并保持逐题均值；长文本在每个语言、位置内使用四模型共同有效的文章组，再等权汇总，使用同一来源组抽样保持位置间相关性。检索旧输出未保存逐 query 分数，因此仅保留其点估计，不生成检索置信区间。
+
+`results/quality_cost_evaluation/remote-results.tar.gz` 保存新增测评的原始结果、逐例预测、运行日志及执行源码。解包后可在 CPU 上重建分析：
+
+```powershell
+python -m tarfile -e results/quality_cost_evaluation/remote-results.tar.gz .
+python tools/analyze_quality_cost.py `
+  --cost-json results/quality_cost_20261112/encoder_cost.json `
+  --long-json V0=results/quality_cost_20261112/long/V0.json `
+  --long-json V1=results/quality_cost_20261112/long/V1.json `
+  --long-json V2=results/quality_cost_20261112/long/V2.json `
+  --long-json V3=results/quality_cost_20261112/long/V3.json `
+  --outdir results/downstream_evaluation/quality_cost_analysis
+```
+
+分析输出为 JSON、CSV 和图，不包含新的训练阶段。未压缩的本地原始结果副本由 `.gitignore` 排除，以归档中的完整原始结果为准。
 
 ## 检查与参考资料
 
