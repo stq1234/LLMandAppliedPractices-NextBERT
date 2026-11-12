@@ -1,0 +1,25 @@
+{
+  "method": "original_BM25_candidate_order",
+  "source": "D:\\北京大学\\硕士\\大语言模型与应用\\作业3.2_NextBERT设计验证\\data\\prepared\\full_67m\\reranking_test.jsonl",
+  "source_sha256": "473ded8b30a60430395cda56d3c3c3cc5d21a59290f17fe7a4a08babb5148d19",
+  "by_language": {
+    "en": {
+      "queries": 200,
+      "nDCG@10": 0.8007068463107685,
+      "MRR@10": 0.77125,
+      "candidate_Recall@20": 0.91
+    },
+    "zh": {
+      "queries": 200,
+      "nDCG@10": 0.7390146545305452,
+      "MRR@10": 0.7113333333333334,
+      "candidate_Recall@20": 0.86
+    }
+  },
+  "balanced_language_macro": {
+    "nDCG@10": 0.7698607504206568,
+    "MRR@10": 0.7412916666666667,
+    "candidate_Recall@20": 0.885
+  },
+  "scope": "same 20 candidates used by the learned rerankers; no model inference"
+}

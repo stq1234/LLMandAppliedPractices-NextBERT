@@ -1,0 +1,945 @@
+{
+  "status": "complete",
+  "evaluation_dir": "/home/shaotianqi/LLM/nextbert/results/formal_67m/evaluation",
+  "units": {
+    "classification": "percent",
+    "qa": "percent; 0..1 scorer outputs multiplied by 100",
+    "retrieval": "0..1 ratio",
+    "reranking": "0..1 ratio"
+  },
+  "results": {
+    "classification": {
+      "V0": {
+        "dev": {
+          "balanced_language_macro": {
+            "accuracy_pct": 78.1928,
+            "macro_f1_pct": 78.1632
+          },
+          "by_language": {
+            "en": {
+              "examples": 2490,
+              "accuracy_pct": 81.8876,
+              "macro_f1_pct": 81.9203
+            },
+            "zh": {
+              "examples": 2490,
+              "accuracy_pct": 74.498,
+              "macro_f1_pct": 74.406
+            }
+          },
+          "sources": [
+            {
+              "key": "classification_dev",
+              "path": "data/prepared/full_67m/classification_dev.jsonl",
+              "sha256": "da0d14b7d7029e6db6f9ead457830942e352f4055a281b7d3ee45fa5a03cfa82",
+              "rows": 4980
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/classification/17/V0_classification_checkpoint.pt",
+            "sha256": "7ed668878335bad76859593df025c3966c1a1711a41abc8a944ce72dcd6c249c",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "balanced_language_macro": {
+            "accuracy_pct": 78.503,
+            "macro_f1_pct": 78.4427
+          },
+          "by_language": {
+            "en": {
+              "examples": 5010,
+              "accuracy_pct": 81.9162,
+              "macro_f1_pct": 81.9248
+            },
+            "zh": {
+              "examples": 5010,
+              "accuracy_pct": 75.0898,
+              "macro_f1_pct": 74.9605
+            }
+          },
+          "sources": [
+            {
+              "key": "classification_test",
+              "path": "data/prepared/full_67m/classification_test.jsonl",
+              "sha256": "2e5dd7854129ff29a9f9d2f3810047cc83d84f79ed8ef9beb07131a0cd0e3823",
+              "rows": 10020
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/classification/17/V0_classification_checkpoint.pt",
+            "sha256": "7ed668878335bad76859593df025c3966c1a1711a41abc8a944ce72dcd6c249c",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V3": {
+        "dev": {
+          "balanced_language_macro": {
+            "accuracy_pct": 78.3936,
+            "macro_f1_pct": 78.3911
+          },
+          "by_language": {
+            "en": {
+              "examples": 2490,
+              "accuracy_pct": 81.9277,
+              "macro_f1_pct": 81.9382
+            },
+            "zh": {
+              "examples": 2490,
+              "accuracy_pct": 74.8594,
+              "macro_f1_pct": 74.8441
+            }
+          },
+          "sources": [
+            {
+              "key": "classification_dev",
+              "path": "data/prepared/full_67m/classification_dev.jsonl",
+              "sha256": "da0d14b7d7029e6db6f9ead457830942e352f4055a281b7d3ee45fa5a03cfa82",
+              "rows": 4980
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/classification/17/V3_classification_checkpoint.pt",
+            "sha256": "49eb2bbc70b994eca1b6fe5e5d04180fa7a6a0d2d067e953eea51895b69b2702",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "balanced_language_macro": {
+            "accuracy_pct": 77.6746,
+            "macro_f1_pct": 77.6379
+          },
+          "by_language": {
+            "en": {
+              "examples": 5010,
+              "accuracy_pct": 80.519,
+              "macro_f1_pct": 80.5594
+            },
+            "zh": {
+              "examples": 5010,
+              "accuracy_pct": 74.8303,
+              "macro_f1_pct": 74.7163
+            }
+          },
+          "sources": [
+            {
+              "key": "classification_test",
+              "path": "data/prepared/full_67m/classification_test.jsonl",
+              "sha256": "2e5dd7854129ff29a9f9d2f3810047cc83d84f79ed8ef9beb07131a0cd0e3823",
+              "rows": 10020
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/classification/17/V3_classification_checkpoint.pt",
+            "sha256": "49eb2bbc70b994eca1b6fe5e5d04180fa7a6a0d2d067e953eea51895b69b2702",
+            "family": "gatefix_downstream"
+          }
+        }
+      }
+    },
+    "qa": {
+      "V0": {
+        "dev": {
+          "questions": 400,
+          "overflow_windows": 440,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 57.25,
+            "F1_pct": 80.1956
+          },
+          "by_language": {
+            "en": {
+              "questions": 200,
+              "EM_pct": 68,
+              "F1_pct": 81.2823
+            },
+            "zh": {
+              "questions": 200,
+              "EM_pct": 46.5,
+              "F1_pct": 79.1089
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_dev",
+              "path": "data/prepared/full_67m/qa_dev.jsonl",
+              "sha256": "e5678947f63a233c0c66d16bf16b43dac485a783d26957738d9f8d8789c31c34",
+              "rows": 440
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/qa/17/V0_qa_checkpoint.pt",
+            "sha256": "17ff850c69bb3bab4fb1b7770d383a53365d829273e04a5daf98a8602631bd7e",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "questions": 13789,
+          "overflow_windows": 14547,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 70.2405,
+            "F1_pct": 86.6844
+          },
+          "by_language": {
+            "en": {
+              "questions": 10570,
+              "EM_pct": 76.6414,
+              "F1_pct": 86.5056
+            },
+            "zh": {
+              "questions": 3219,
+              "EM_pct": 63.8397,
+              "F1_pct": 86.8632
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_test",
+              "path": "data/prepared/full_67m/qa_test.jsonl",
+              "sha256": "2b3b0ba52818738842bacffeced124bf4c94b5ea89153183e07c089390e531aa",
+              "rows": 14547
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/qa/17/V0_qa_checkpoint.pt",
+            "sha256": "17ff850c69bb3bab4fb1b7770d383a53365d829273e04a5daf98a8602631bd7e",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V1": {
+        "dev": {
+          "questions": 400,
+          "overflow_windows": 440,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 56.5,
+            "F1_pct": 79.7124
+          },
+          "by_language": {
+            "en": {
+              "questions": 200,
+              "EM_pct": 64.5,
+              "F1_pct": 79.1344
+            },
+            "zh": {
+              "questions": 200,
+              "EM_pct": 48.5,
+              "F1_pct": 80.2903
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_dev",
+              "path": "data/prepared/full_67m/qa_dev.jsonl",
+              "sha256": "e5678947f63a233c0c66d16bf16b43dac485a783d26957738d9f8d8789c31c34",
+              "rows": 440
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V1/qa/17/V1_qa_checkpoint.pt",
+            "sha256": "8461401e7453033f2f9bd3f0a84bfbb48e064322163ae7f5be798e590fd16b48",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "questions": 13789,
+          "overflow_windows": 14547,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 67.4751,
+            "F1_pct": 84.3763
+          },
+          "by_language": {
+            "en": {
+              "questions": 10570,
+              "EM_pct": 74.4655,
+              "F1_pct": 84.1072
+            },
+            "zh": {
+              "questions": 3219,
+              "EM_pct": 60.4846,
+              "F1_pct": 84.6454
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_test",
+              "path": "data/prepared/full_67m/qa_test.jsonl",
+              "sha256": "2b3b0ba52818738842bacffeced124bf4c94b5ea89153183e07c089390e531aa",
+              "rows": 14547
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V1/qa/17/V1_qa_checkpoint.pt",
+            "sha256": "8461401e7453033f2f9bd3f0a84bfbb48e064322163ae7f5be798e590fd16b48",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V2": {
+        "dev": {
+          "questions": 400,
+          "overflow_windows": 440,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 56,
+            "F1_pct": 80.1628
+          },
+          "by_language": {
+            "en": {
+              "questions": 200,
+              "EM_pct": 66.5,
+              "F1_pct": 81.2124
+            },
+            "zh": {
+              "questions": 200,
+              "EM_pct": 45.5,
+              "F1_pct": 79.1133
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_dev",
+              "path": "data/prepared/full_67m/qa_dev.jsonl",
+              "sha256": "e5678947f63a233c0c66d16bf16b43dac485a783d26957738d9f8d8789c31c34",
+              "rows": 440
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V2/qa/17/V2_qa_checkpoint.pt",
+            "sha256": "cbb3f3129e1789c2ef557ad112c9b6df2af765ae7bce3f8f8b1a5be7b5dca511",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "questions": 13789,
+          "overflow_windows": 14547,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 67.204,
+            "F1_pct": 84.3051
+          },
+          "by_language": {
+            "en": {
+              "questions": 10570,
+              "EM_pct": 73.737,
+              "F1_pct": 83.7088
+            },
+            "zh": {
+              "questions": 3219,
+              "EM_pct": 60.671,
+              "F1_pct": 84.9014
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_test",
+              "path": "data/prepared/full_67m/qa_test.jsonl",
+              "sha256": "2b3b0ba52818738842bacffeced124bf4c94b5ea89153183e07c089390e531aa",
+              "rows": 14547
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V2/qa/17/V2_qa_checkpoint.pt",
+            "sha256": "cbb3f3129e1789c2ef557ad112c9b6df2af765ae7bce3f8f8b1a5be7b5dca511",
+            "family": "gatefix_downstream"
+          }
+        }
+      },
+      "V3": {
+        "dev": {
+          "questions": 400,
+          "overflow_windows": 440,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 57.25,
+            "F1_pct": 80.5677
+          },
+          "by_language": {
+            "en": {
+              "questions": 200,
+              "EM_pct": 69,
+              "F1_pct": 82.0462
+            },
+            "zh": {
+              "questions": 200,
+              "EM_pct": 45.5,
+              "F1_pct": 79.0893
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_dev",
+              "path": "data/prepared/full_67m/qa_dev.jsonl",
+              "sha256": "e5678947f63a233c0c66d16bf16b43dac485a783d26957738d9f8d8789c31c34",
+              "rows": 440
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/qa/17/V3_qa_checkpoint.pt",
+            "sha256": "4e40585e6cac23405e20ea92d92375561f47fc99ad24df98808c994b874ea9af",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "questions": 13789,
+          "overflow_windows": 14547,
+          "scoring_status": "official SQuAD/CMRC scorer via qa_metrics.answer_em/answer_f1",
+          "balanced_language_macro": {
+            "EM_pct": 67.3329,
+            "F1_pct": 84.403
+          },
+          "by_language": {
+            "en": {
+              "questions": 10570,
+              "EM_pct": 73.5289,
+              "F1_pct": 83.7732
+            },
+            "zh": {
+              "questions": 3219,
+              "EM_pct": 61.137,
+              "F1_pct": 85.0327
+            }
+          },
+          "sources": [
+            {
+              "key": "qa_test",
+              "path": "data/prepared/full_67m/qa_test.jsonl",
+              "sha256": "2b3b0ba52818738842bacffeced124bf4c94b5ea89153183e07c089390e531aa",
+              "rows": 14547
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/qa/17/V3_qa_checkpoint.pt",
+            "sha256": "4e40585e6cac23405e20ea92d92375561f47fc99ad24df98808c994b874ea9af",
+            "family": "gatefix_downstream"
+          }
+        }
+      }
+    },
+    "retrieval": {
+      "V0": {
+        "dev": {
+          "queries": 200,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.386937,
+            "Recall@10": 0.5,
+            "Recall@100": 0.68
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.498077,
+              "Recall@10": 0.59,
+              "Recall@100": 0.74
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.275798,
+              "Recall@10": 0.41,
+              "Recall@100": 0.62
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_dev",
+              "path": "data/prepared/full_67m/retrieval_queries_dev.jsonl",
+              "sha256": "789fc401f64769978daf57be7623b666c282c6e9a92993e249a6c6fd0ac9e668",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/retrieval/17/V0_retrieval_checkpoint.pt",
+            "sha256": "fe711796f2cb7e6073c6439ce6985a5307f54a2662a5fd13b550b1bee2c53750",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.319232,
+            "Recall@10": 0.43,
+            "Recall@100": 0.715
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.347557,
+              "Recall@10": 0.46,
+              "Recall@100": 0.715
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.290906,
+              "Recall@10": 0.4,
+              "Recall@100": 0.715
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_test",
+              "path": "data/prepared/full_67m/retrieval_queries_test.jsonl",
+              "sha256": "9c32592502f6a99c65d982dac2e5c438459755a9acd42b33e2ed773b6b8aca9f",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/retrieval/17/V0_retrieval_checkpoint.pt",
+            "sha256": "fe711796f2cb7e6073c6439ce6985a5307f54a2662a5fd13b550b1bee2c53750",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V1": {
+        "dev": {
+          "queries": 200,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.39257,
+            "Recall@10": 0.505,
+            "Recall@100": 0.695
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.502929,
+              "Recall@10": 0.61,
+              "Recall@100": 0.76
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.282211,
+              "Recall@10": 0.4,
+              "Recall@100": 0.63
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_dev",
+              "path": "data/prepared/full_67m/retrieval_queries_dev.jsonl",
+              "sha256": "789fc401f64769978daf57be7623b666c282c6e9a92993e249a6c6fd0ac9e668",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V1/retrieval/17/V1_retrieval_checkpoint.pt",
+            "sha256": "76bc7596d9d94ce3e782bbb597791760857bd495ad97ba36c09c11373e88cfa9",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.321755,
+            "Recall@10": 0.43,
+            "Recall@100": 0.7
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.360723,
+              "Recall@10": 0.475,
+              "Recall@100": 0.725
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.282788,
+              "Recall@10": 0.385,
+              "Recall@100": 0.675
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_test",
+              "path": "data/prepared/full_67m/retrieval_queries_test.jsonl",
+              "sha256": "9c32592502f6a99c65d982dac2e5c438459755a9acd42b33e2ed773b6b8aca9f",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V1/retrieval/17/V1_retrieval_checkpoint.pt",
+            "sha256": "76bc7596d9d94ce3e782bbb597791760857bd495ad97ba36c09c11373e88cfa9",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V2": {
+        "dev": {
+          "queries": 200,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.393949,
+            "Recall@10": 0.515,
+            "Recall@100": 0.705
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.500198,
+              "Recall@10": 0.63,
+              "Recall@100": 0.79
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.2877,
+              "Recall@10": 0.4,
+              "Recall@100": 0.62
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_dev",
+              "path": "data/prepared/full_67m/retrieval_queries_dev.jsonl",
+              "sha256": "789fc401f64769978daf57be7623b666c282c6e9a92993e249a6c6fd0ac9e668",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V2/retrieval/17/V2_retrieval_checkpoint.pt",
+            "sha256": "b86e7ba0c1527f769a29e4296f574d0675eca2d9acd888151ee1328c22042506",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.326128,
+            "Recall@10": 0.4425,
+            "Recall@100": 0.685
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.364359,
+              "Recall@10": 0.495,
+              "Recall@100": 0.71
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.287898,
+              "Recall@10": 0.39,
+              "Recall@100": 0.66
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_test",
+              "path": "data/prepared/full_67m/retrieval_queries_test.jsonl",
+              "sha256": "9c32592502f6a99c65d982dac2e5c438459755a9acd42b33e2ed773b6b8aca9f",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V2/retrieval/17/V2_retrieval_checkpoint.pt",
+            "sha256": "b86e7ba0c1527f769a29e4296f574d0675eca2d9acd888151ee1328c22042506",
+            "family": "gatefix_downstream"
+          }
+        }
+      },
+      "V3": {
+        "dev": {
+          "queries": 200,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.393488,
+            "Recall@10": 0.51,
+            "Recall@100": 0.695
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.489434,
+              "Recall@10": 0.61,
+              "Recall@100": 0.76
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.297542,
+              "Recall@10": 0.41,
+              "Recall@100": 0.63
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_dev",
+              "path": "data/prepared/full_67m/retrieval_queries_dev.jsonl",
+              "sha256": "789fc401f64769978daf57be7623b666c282c6e9a92993e249a6c6fd0ac9e668",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/retrieval/17/V3_retrieval_checkpoint.pt",
+            "sha256": "e8b7cb7786e8763805a43c12de47577502142ef343c0dbed7a027957b8524c03",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "corpus_documents_per_language": 5000,
+          "balanced_language_macro": {
+            "nDCG@10": 0.327123,
+            "Recall@10": 0.45,
+            "Recall@100": 0.6925
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.363496,
+              "Recall@10": 0.485,
+              "Recall@100": 0.73
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.29075,
+              "Recall@10": 0.415,
+              "Recall@100": 0.655
+            }
+          },
+          "sources": [
+            {
+              "key": "retrieval_queries_test",
+              "path": "data/prepared/full_67m/retrieval_queries_test.jsonl",
+              "sha256": "9c32592502f6a99c65d982dac2e5c438459755a9acd42b33e2ed773b6b8aca9f",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/retrieval/17/V3_retrieval_checkpoint.pt",
+            "sha256": "e8b7cb7786e8763805a43c12de47577502142ef343c0dbed7a027957b8524c03",
+            "family": "gatefix_downstream"
+          }
+        }
+      }
+    },
+    "reranking": {
+      "V0": {
+        "dev": {
+          "queries": 200,
+          "candidate_count": 20,
+          "balanced_language_macro": {
+            "nDCG@10": 0.517387,
+            "MRR@10": 0.463656,
+            "candidate_Recall@20": 0.89
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.571731,
+              "MRR@10": 0.525496,
+              "candidate_Recall@20": 0.92
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.463043,
+              "MRR@10": 0.401817,
+              "candidate_Recall@20": 0.86
+            }
+          },
+          "sources": [
+            {
+              "key": "reranking_dev",
+              "path": "data/prepared/full_67m/reranking_dev.jsonl",
+              "sha256": "c1e838b098a1ea95dfd3da6af837eceffad13a6c42adb42947178e5707e7aba4",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/reranking/17/V0_reranking_checkpoint.pt",
+            "sha256": "e5470b05e0f7fc84f380bfdc9c0678bf8e4b81e93d95adcb0ed36b8c3db61ffc",
+            "family": "original_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "candidate_count": 20,
+          "balanced_language_macro": {
+            "nDCG@10": 0.501376,
+            "MRR@10": 0.442317,
+            "candidate_Recall@20": 0.885
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.55442,
+              "MRR@10": 0.495599,
+              "candidate_Recall@20": 0.91
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.448332,
+              "MRR@10": 0.389034,
+              "candidate_Recall@20": 0.86
+            }
+          },
+          "sources": [
+            {
+              "key": "reranking_test",
+              "path": "data/prepared/full_67m/reranking_test.jsonl",
+              "sha256": "473ded8b30a60430395cda56d3c3c3cc5d21a59290f17fe7a4a08babb5148d19",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m/downstream/V0/reranking/17/V0_reranking_checkpoint.pt",
+            "sha256": "e5470b05e0f7fc84f380bfdc9c0678bf8e4b81e93d95adcb0ed36b8c3db61ffc",
+            "family": "original_downstream"
+          }
+        }
+      },
+      "V3": {
+        "dev": {
+          "queries": 200,
+          "candidate_count": 20,
+          "balanced_language_macro": {
+            "nDCG@10": 0.513532,
+            "MRR@10": 0.455399,
+            "candidate_Recall@20": 0.89
+          },
+          "by_language": {
+            "en": {
+              "queries": 100,
+              "nDCG@10": 0.585092,
+              "MRR@10": 0.536512,
+              "candidate_Recall@20": 0.92
+            },
+            "zh": {
+              "queries": 100,
+              "nDCG@10": 0.441972,
+              "MRR@10": 0.374286,
+              "candidate_Recall@20": 0.86
+            }
+          },
+          "sources": [
+            {
+              "key": "reranking_dev",
+              "path": "data/prepared/full_67m/reranking_dev.jsonl",
+              "sha256": "c1e838b098a1ea95dfd3da6af837eceffad13a6c42adb42947178e5707e7aba4",
+              "rows": 200
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/reranking/17/V3_reranking_checkpoint.pt",
+            "sha256": "e036c2bd2003094425f704de47f216961f80467dbb364e36fe42f51a8aecf693",
+            "family": "gatefix_downstream"
+          }
+        },
+        "test": {
+          "queries": 400,
+          "candidate_count": 20,
+          "balanced_language_macro": {
+            "nDCG@10": 0.489774,
+            "MRR@10": 0.428271,
+            "candidate_Recall@20": 0.885
+          },
+          "by_language": {
+            "en": {
+              "queries": 200,
+              "nDCG@10": 0.546939,
+              "MRR@10": 0.486897,
+              "candidate_Recall@20": 0.91
+            },
+            "zh": {
+              "queries": 200,
+              "nDCG@10": 0.432609,
+              "MRR@10": 0.369645,
+              "candidate_Recall@20": 0.86
+            }
+          },
+          "sources": [
+            {
+              "key": "reranking_test",
+              "path": "data/prepared/full_67m/reranking_test.jsonl",
+              "sha256": "473ded8b30a60430395cda56d3c3c3cc5d21a59290f17fe7a4a08babb5148d19",
+              "rows": 400
+            },
+            {
+              "key": "retrieval_corpus",
+              "path": "data/prepared/full_67m/retrieval_corpus.jsonl",
+              "sha256": "a5711f82906acd6b7c6e3b6ba5b813ec2fa2d2e8ea1b52d1ed18351e0bf19bf0",
+              "rows": 10000
+            }
+          ],
+          "checkpoint": {
+            "path": "/home/shaotianqi/LLM/nextbert/results/formal_67m_gatefix/downstream/V3/reranking/17/V3_reranking_checkpoint.pt",
+            "sha256": "e036c2bd2003094425f704de47f216961f80467dbb364e36fe42f51a8aecf693",
+            "family": "gatefix_downstream"
+          }
+        }
+      }
+    }
+  },
+  "scope_note": "Retrieval uses the fixed reduced 5,000-document-per-language pool; not the full MLDR corpus."
+}

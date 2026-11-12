@@ -55,7 +55,7 @@ def _metric_by_language(predictions: Sequence[Mapping[str, Any]], metric: str) -
         groups[_language(row)].append(row)
     result: dict[str, Any] = {}
     for language, rows in sorted(groups.items()):
-        result[language] = {metric: sum(bool(row[metric]) for row in rows) / len(rows),
+        result[language] = {metric: statistics.mean(float(row[metric]) for row in rows),
                             "count": len(rows)}
     return result
 

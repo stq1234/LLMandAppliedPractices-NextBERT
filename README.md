@@ -170,6 +170,12 @@ python src/diagnostics_nextbert.py --mode probe --profile full_67m `
 
 ## 检查与参考资料
 
+下游测评的机器可读汇总位于 `results/downstream_evaluation/summary.json`，语言分项与双语宏平均数据位于同目录 `metrics.csv`。`bm25_baseline.json` 使用已冻结的 BM25 top-20 候选原顺序计算，无模型推理；可通过 `python tools/evaluate_saved_bm25_order.py` 重算。
+
+`nextbert-formal-results.tar.gz` 归档正式训练、六项补训与下游测评的日志、状态、逐题预测和文档向量，不包含模型 checkpoint。归档保留测评时的源码快照与 QA 汇总更正前的原始 JSON。QA 的逐题 EM/F1 未改变；`tools/correct_qa_language_metrics.py` 仅在 CPU 上按语言重新求数值平均，修正将非零 F1 当作布尔值的问题。当前 `evaluate_nextbert.py` 已直接采用数值均值。
+
+下游测评入口为 `python tools/run_all_evaluation.py --phase tasks --gpu 7 --execute`，V0/V1 使用原任务 checkpoint，V2/V3 使用门控修复后的任务 checkpoint。已有结果目录会拒绝覆盖；复现实验应指定新的 `--output-dir`。`tools/summarize_downstream_evaluation.py` 核对任务完整性、数据来源、样本数及 checkpoint 家族，并从保存的逐题 QA 分数核验汇总值。
+
 本地测试：
 
 ```powershell
