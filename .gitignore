@@ -2,12 +2,3 @@ __pycache__/
 *.py[cod]
 .venv/
 Piazza发布截图.png
-artifacts/
-data/raw/
-runs/
-.pytest_cache/
-data/prepared/
-results/formal*/
-results/quality_cost_20261112/
-results/quality_cost_evaluation/long/
-results/quality_cost_evaluation/encoder_cost.json

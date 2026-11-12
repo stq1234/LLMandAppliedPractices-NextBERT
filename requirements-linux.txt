@@ -1,9 +1,0 @@
-# Install after activating conda llm. All wheels are acquired locally.
-torch==2.6.0
-transformers==4.51.3
-numpy==2.2.6
-sentencepiece==0.2.0
-safetensors==0.5.3
-tokenizers==0.21.1
-pytest==8.3.5
-nltk==3.9.1
